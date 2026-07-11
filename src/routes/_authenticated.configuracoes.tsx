@@ -118,3 +118,46 @@ function SettingsPage() {
     </AppShell>
   );
 }
+
+function IntegrationsTab({ channels }: { channels: { id: string; alias: string; phone?: string; status: string }[] }) {
+  // Import dinâmico evita ciclo com AppShell / router
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { providerStatus } = require("@/providers") as typeof import("@/providers");
+  const status = providerStatus();
+  return (
+    <div>
+      <h3 className="text-[14px] font-semibold mb-1">Integrações & Providers</h3>
+      <p className="text-[12px] text-muted-foreground mb-3">Todos os tokens ficam no backend seguro. O front nunca acessa credenciais.</p>
+
+      <div className="text-[11px] uppercase text-muted-foreground font-medium mb-2">Providers plugáveis</div>
+      <ul className="space-y-2 mb-4">
+        {status.map((p) => (
+          <li key={p.key} className="p-3 rounded-lg border border-border flex items-center justify-between">
+            <div>
+              <div className="text-[13px] font-medium">{p.label}</div>
+              <div className="text-[11px] text-muted-foreground">Provider ativo: <span className="font-mono">{p.provider}</span></div>
+            </div>
+            <span className={`text-[11px] px-2 py-0.5 rounded-full ${p.ready ? "bg-emerald-500/10 text-emerald-700" : "bg-muted text-muted-foreground"}`}>
+              {p.ready ? "pronto" : "aguardando backend"}
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <div className="text-[11px] uppercase text-muted-foreground font-medium mb-2">Canais WhatsApp (Z-API)</div>
+      <ul className="space-y-2">
+        {channels.map((c) => (
+          <li key={c.id} className="p-3 rounded-lg border border-border flex items-center justify-between">
+            <div>
+              <div className="text-[13px] font-medium">Z-API · {c.alias}</div>
+              <div className="text-[11px] text-muted-foreground">{c.phone ?? "sem número"}</div>
+            </div>
+            <span className={`text-[11px] px-2 py-0.5 rounded-full ${c.status === "conectado" ? "bg-emerald-500/10 text-emerald-700" : "bg-muted text-muted-foreground"}`}>
+              {c.status.replace("_", " ")}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
