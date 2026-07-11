@@ -8,7 +8,7 @@ import {
   createOrcamento,
   updateOrcamento,
   aprovarOrcamento,
-  type OrcamentoStatus,
+  type StatusOrcamento,
   type LinhaOrcamento,
 } from "@/domain/canonical";
 import { FileText, Plus, CheckCircle2, XCircle, Download, Clock } from "lucide-react";
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/_authenticated/orcamentos")({
   component: OrcamentosPage,
 });
 
-const STATUS_COR: Record<OrcamentoStatus, string> = {
+const STATUS_COR: Record<StatusOrcamento, string> = {
   Rascunho: "bg-slate-100 text-slate-700",
   "Aguardando aprovação": "bg-amber-100 text-amber-700",
   Aprovado: "bg-emerald-100 text-emerald-700",
