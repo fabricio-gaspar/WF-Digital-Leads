@@ -31,6 +31,8 @@ const NAV: NavItem[] = [
   { to: "/central", label: "Central", icon: MessagesSquare, badgeKey: "conversas" },
   { to: "/simulador", label: "Simulador SDR", icon: Bot },
   { to: "/handoffs", label: "Handoffs", icon: ArrowRightLeft, badgeKey: "handoffs" },
+  { to: "/oportunidades", label: "Oportunidades", icon: Briefcase },
+  { to: "/orcamentos", label: "Orçamentos (CPQ)", icon: FileText },
   { to: "/empresa-servicos", label: "Empresa & Serviços", icon: Building2 },
   { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
   { to: "/relatorios-sdr", label: "Relatórios SDR", icon: LineChart },
