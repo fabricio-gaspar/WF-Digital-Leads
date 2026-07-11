@@ -223,7 +223,7 @@ function CreateOrcamentoCard({
                   <td className="px-2 py-1">
                     <input type="number" value={linhas[i].desconto} onChange={(e) => setLinhas((l) => l.map((x, idx) => idx === i ? { ...x, desconto: parseFloat(e.target.value) || 0 } : x))} className="w-full h-7 px-1 text-right rounded border border-input bg-background" />
                   </td>
-                  <td className="px-2 py-1 text-right font-medium">R$ {lc.subtotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td>
+                  <td className="px-2 py-1 text-right font-medium">R$ {lineSub(lc).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td>
                   <td className="px-2 py-1"><button onClick={() => remLinha(i)} className="text-red-600 text-xs">×</button></td>
                 </tr>
               ))}
