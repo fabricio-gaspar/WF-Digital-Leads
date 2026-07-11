@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/app/AppShell";
+import { PageHero } from "@/app/PageHero";
 import { useSearchProfiles, useServicesList } from "@/domain/sdrVirtual";
-import { Target, MapPin, Users } from "lucide-react";
+import { Target, MapPin, Users, Crosshair } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/perfis-busca")({
   head: () => ({ meta: [{ title: "Perfis de Busca — WF Digital Leads" }] }),
