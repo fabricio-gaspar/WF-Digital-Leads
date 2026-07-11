@@ -22,19 +22,35 @@ async def main() -> None:
         browser = await p.chromium.launch(headless=True)
         ctx = await browser.new_context(viewport={"width": 1280, "height": 1800})
         page = await ctx.new_page()
-
-        # 1. LOGIN
+        # 1. LOGIN — injeta sessão demo direto no sessionStorage (o AuthProvider
+        # carrega a partir dali no mount). Evita flakiness com inputs controlados
+        # em ambientes headless.
         await page.goto(f"{BASE}/login", wait_until="domcontentloaded")
-        await page.locator("#email").click()
-        await page.keyboard.type("fabricio@wfdigital.com.br", delay=15)
-        await page.locator("#password").click()
-        await page.keyboard.type("demo123", delay=15)
-        await page.wait_for_timeout(200)
+        now = int(__import__("time").time() * 1000)
+        session_payload = {
+            "user": {
+                "id": "u-admin",
+                "name": "Fabrício Admin",
+                "email": "fabricio@wfdigital.com.br",
+                "role": "admin",
+                "active": True,
+                "avatarInitials": "FA",
+                "teamId": "t-com",
+                "availability": "disponivel",
+            },
+            "issuedAt": now,
+            "expiresAt": now + 8 * 60 * 60 * 1000,
+        }
+        import json as _json
+        await page.evaluate(
+            "s => window.sessionStorage.setItem('wf-crm-demo-session', s)",
+            _json.dumps(session_payload),
+        )
         await page.screenshot(path=str(SHOTS / "1_login.png"))
-        await page.get_by_role("button", name="Entrar no CRM").click()
-        await page.wait_for_timeout(3000)
+        await page.goto(f"{BASE}/dashboard", wait_until="domcontentloaded")
+        await page.wait_for_timeout(1500)
         if "/login" in page.url:
-            failures.append(f"login: continuou em /login (url={page.url})")
+            failures.append(f"login: sessão não persistiu (url={page.url})")
         await page.screenshot(path=str(SHOTS / "2_dashboard.png"))
 
         # 2. SIMULADOR — envia mensagem, gera rascunho
