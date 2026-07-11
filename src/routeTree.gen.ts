@@ -18,12 +18,17 @@ import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authentic
 import { Route as AuthenticatedProspeccaoRouteImport } from './routes/_authenticated.prospeccao'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated.portal'
 import { Route as AuthenticatedPlaybooksRouteImport } from './routes/_authenticated.playbooks'
+import { Route as AuthenticatedPerfisBuscaRouteImport } from './routes/_authenticated.perfis-busca'
+import { Route as AuthenticatedListasRouteImport } from './routes/_authenticated.listas'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated.leads'
+import { Route as AuthenticatedHandoffsRouteImport } from './routes/_authenticated.handoffs'
 import { Route as AuthenticatedEstrategiaRouteImport } from './routes/_authenticated.estrategia'
 import { Route as AuthenticatedEmpresaServicosRouteImport } from './routes/_authenticated.empresa-servicos'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated.configuracoes'
+import { Route as AuthenticatedCentralRouteImport } from './routes/_authenticated.central'
 import { Route as AuthenticatedCampanhasRouteImport } from './routes/_authenticated.campanhas'
+import { Route as AuthenticatedCadenciasRouteImport } from './routes/_authenticated.cadencias'
 import { Route as AuthenticatedAtendimentosRouteImport } from './routes/_authenticated.atendimentos'
 import { Route as AuthenticatedLeadsLeadIdRouteImport } from './routes/_authenticated.leads.$leadId'
 
@@ -71,9 +76,25 @@ const AuthenticatedPlaybooksRoute = AuthenticatedPlaybooksRouteImport.update({
   path: '/playbooks',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedPerfisBuscaRoute =
+  AuthenticatedPerfisBuscaRouteImport.update({
+    id: '/perfis-busca',
+    path: '/perfis-busca',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedListasRoute = AuthenticatedListasRouteImport.update({
+  id: '/listas',
+  path: '/listas',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedLeadsRoute = AuthenticatedLeadsRouteImport.update({
   id: '/leads',
   path: '/leads',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedHandoffsRoute = AuthenticatedHandoffsRouteImport.update({
+  id: '/handoffs',
+  path: '/handoffs',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedEstrategiaRoute = AuthenticatedEstrategiaRouteImport.update({
@@ -98,9 +119,19 @@ const AuthenticatedConfiguracoesRoute =
     path: '/configuracoes',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedCentralRoute = AuthenticatedCentralRouteImport.update({
+  id: '/central',
+  path: '/central',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedCampanhasRoute = AuthenticatedCampanhasRouteImport.update({
   id: '/campanhas',
   path: '/campanhas',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCadenciasRoute = AuthenticatedCadenciasRouteImport.update({
+  id: '/cadencias',
+  path: '/cadencias',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedAtendimentosRoute =
@@ -121,12 +152,17 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/atendimentos': typeof AuthenticatedAtendimentosRoute
+  '/cadencias': typeof AuthenticatedCadenciasRoute
   '/campanhas': typeof AuthenticatedCampanhasRoute
+  '/central': typeof AuthenticatedCentralRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/empresa-servicos': typeof AuthenticatedEmpresaServicosRoute
   '/estrategia': typeof AuthenticatedEstrategiaRoute
+  '/handoffs': typeof AuthenticatedHandoffsRoute
   '/leads': typeof AuthenticatedLeadsRouteWithChildren
+  '/listas': typeof AuthenticatedListasRoute
+  '/perfis-busca': typeof AuthenticatedPerfisBuscaRoute
   '/playbooks': typeof AuthenticatedPlaybooksRoute
   '/portal': typeof AuthenticatedPortalRoute
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
@@ -139,12 +175,17 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/atendimentos': typeof AuthenticatedAtendimentosRoute
+  '/cadencias': typeof AuthenticatedCadenciasRoute
   '/campanhas': typeof AuthenticatedCampanhasRoute
+  '/central': typeof AuthenticatedCentralRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/empresa-servicos': typeof AuthenticatedEmpresaServicosRoute
   '/estrategia': typeof AuthenticatedEstrategiaRoute
+  '/handoffs': typeof AuthenticatedHandoffsRoute
   '/leads': typeof AuthenticatedLeadsRouteWithChildren
+  '/listas': typeof AuthenticatedListasRoute
+  '/perfis-busca': typeof AuthenticatedPerfisBuscaRoute
   '/playbooks': typeof AuthenticatedPlaybooksRoute
   '/portal': typeof AuthenticatedPortalRoute
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
@@ -159,12 +200,17 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/_authenticated/atendimentos': typeof AuthenticatedAtendimentosRoute
+  '/_authenticated/cadencias': typeof AuthenticatedCadenciasRoute
   '/_authenticated/campanhas': typeof AuthenticatedCampanhasRoute
+  '/_authenticated/central': typeof AuthenticatedCentralRoute
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/empresa-servicos': typeof AuthenticatedEmpresaServicosRoute
   '/_authenticated/estrategia': typeof AuthenticatedEstrategiaRoute
+  '/_authenticated/handoffs': typeof AuthenticatedHandoffsRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRouteWithChildren
+  '/_authenticated/listas': typeof AuthenticatedListasRoute
+  '/_authenticated/perfis-busca': typeof AuthenticatedPerfisBuscaRoute
   '/_authenticated/playbooks': typeof AuthenticatedPlaybooksRoute
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
   '/_authenticated/prospeccao': typeof AuthenticatedProspeccaoRoute
@@ -179,12 +225,17 @@ export interface FileRouteTypes {
     | '/login'
     | '/recuperar-senha'
     | '/atendimentos'
+    | '/cadencias'
     | '/campanhas'
+    | '/central'
     | '/configuracoes'
     | '/dashboard'
     | '/empresa-servicos'
     | '/estrategia'
+    | '/handoffs'
     | '/leads'
+    | '/listas'
+    | '/perfis-busca'
     | '/playbooks'
     | '/portal'
     | '/prospeccao'
@@ -197,12 +248,17 @@ export interface FileRouteTypes {
     | '/login'
     | '/recuperar-senha'
     | '/atendimentos'
+    | '/cadencias'
     | '/campanhas'
+    | '/central'
     | '/configuracoes'
     | '/dashboard'
     | '/empresa-servicos'
     | '/estrategia'
+    | '/handoffs'
     | '/leads'
+    | '/listas'
+    | '/perfis-busca'
     | '/playbooks'
     | '/portal'
     | '/prospeccao'
@@ -216,12 +272,17 @@ export interface FileRouteTypes {
     | '/login'
     | '/recuperar-senha'
     | '/_authenticated/atendimentos'
+    | '/_authenticated/cadencias'
     | '/_authenticated/campanhas'
+    | '/_authenticated/central'
     | '/_authenticated/configuracoes'
     | '/_authenticated/dashboard'
     | '/_authenticated/empresa-servicos'
     | '/_authenticated/estrategia'
+    | '/_authenticated/handoffs'
     | '/_authenticated/leads'
+    | '/_authenticated/listas'
+    | '/_authenticated/perfis-busca'
     | '/_authenticated/playbooks'
     | '/_authenticated/portal'
     | '/_authenticated/prospeccao'
@@ -302,11 +363,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPlaybooksRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/perfis-busca': {
+      id: '/_authenticated/perfis-busca'
+      path: '/perfis-busca'
+      fullPath: '/perfis-busca'
+      preLoaderRoute: typeof AuthenticatedPerfisBuscaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/listas': {
+      id: '/_authenticated/listas'
+      path: '/listas'
+      fullPath: '/listas'
+      preLoaderRoute: typeof AuthenticatedListasRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/leads': {
       id: '/_authenticated/leads'
       path: '/leads'
       fullPath: '/leads'
       preLoaderRoute: typeof AuthenticatedLeadsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/handoffs': {
+      id: '/_authenticated/handoffs'
+      path: '/handoffs'
+      fullPath: '/handoffs'
+      preLoaderRoute: typeof AuthenticatedHandoffsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/estrategia': {
@@ -337,11 +419,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConfiguracoesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/central': {
+      id: '/_authenticated/central'
+      path: '/central'
+      fullPath: '/central'
+      preLoaderRoute: typeof AuthenticatedCentralRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/campanhas': {
       id: '/_authenticated/campanhas'
       path: '/campanhas'
       fullPath: '/campanhas'
       preLoaderRoute: typeof AuthenticatedCampanhasRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/cadencias': {
+      id: '/_authenticated/cadencias'
+      path: '/cadencias'
+      fullPath: '/cadencias'
+      preLoaderRoute: typeof AuthenticatedCadenciasRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/atendimentos': {
@@ -374,12 +470,17 @@ const AuthenticatedLeadsRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAtendimentosRoute: typeof AuthenticatedAtendimentosRoute
+  AuthenticatedCadenciasRoute: typeof AuthenticatedCadenciasRoute
   AuthenticatedCampanhasRoute: typeof AuthenticatedCampanhasRoute
+  AuthenticatedCentralRoute: typeof AuthenticatedCentralRoute
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEmpresaServicosRoute: typeof AuthenticatedEmpresaServicosRoute
   AuthenticatedEstrategiaRoute: typeof AuthenticatedEstrategiaRoute
+  AuthenticatedHandoffsRoute: typeof AuthenticatedHandoffsRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRouteWithChildren
+  AuthenticatedListasRoute: typeof AuthenticatedListasRoute
+  AuthenticatedPerfisBuscaRoute: typeof AuthenticatedPerfisBuscaRoute
   AuthenticatedPlaybooksRoute: typeof AuthenticatedPlaybooksRoute
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
   AuthenticatedProspeccaoRoute: typeof AuthenticatedProspeccaoRoute
@@ -389,12 +490,17 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAtendimentosRoute: AuthenticatedAtendimentosRoute,
+  AuthenticatedCadenciasRoute: AuthenticatedCadenciasRoute,
   AuthenticatedCampanhasRoute: AuthenticatedCampanhasRoute,
+  AuthenticatedCentralRoute: AuthenticatedCentralRoute,
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEmpresaServicosRoute: AuthenticatedEmpresaServicosRoute,
   AuthenticatedEstrategiaRoute: AuthenticatedEstrategiaRoute,
+  AuthenticatedHandoffsRoute: AuthenticatedHandoffsRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRouteWithChildren,
+  AuthenticatedListasRoute: AuthenticatedListasRoute,
+  AuthenticatedPerfisBuscaRoute: AuthenticatedPerfisBuscaRoute,
   AuthenticatedPlaybooksRoute: AuthenticatedPlaybooksRoute,
   AuthenticatedPortalRoute: AuthenticatedPortalRoute,
   AuthenticatedProspeccaoRoute: AuthenticatedProspeccaoRoute,
