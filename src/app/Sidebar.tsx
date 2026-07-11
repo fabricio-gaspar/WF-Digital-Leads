@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Search, Users, MessagesSquare,
-  BarChart3, Settings, LogOut, UserCircle2, Menu, X,
+  BarChart3, Settings, LogOut, UserCircle2, Menu, X, Compass,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/auth/AuthProvider";
