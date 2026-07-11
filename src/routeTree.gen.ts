@@ -22,6 +22,7 @@ import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedPlaybooksRouteImport } from './routes/_authenticated.playbooks'
 import { Route as AuthenticatedPerfisBuscaRouteImport } from './routes/_authenticated.perfis-busca'
 import { Route as AuthenticatedObservabilidadeRouteImport } from './routes/_authenticated.observabilidade'
+import { Route as AuthenticatedMissionControlRouteImport } from './routes/_authenticated.mission-control'
 import { Route as AuthenticatedListasRouteImport } from './routes/_authenticated.listas'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated.leads'
 import { Route as AuthenticatedHandoffsRouteImport } from './routes/_authenticated.handoffs'
@@ -100,6 +101,12 @@ const AuthenticatedObservabilidadeRoute =
   AuthenticatedObservabilidadeRouteImport.update({
     id: '/observabilidade',
     path: '/observabilidade',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedMissionControlRoute =
+  AuthenticatedMissionControlRouteImport.update({
+    id: '/mission-control',
+    path: '/mission-control',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedListasRoute = AuthenticatedListasRouteImport.update({
@@ -182,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/handoffs': typeof AuthenticatedHandoffsRoute
   '/leads': typeof AuthenticatedLeadsRouteWithChildren
   '/listas': typeof AuthenticatedListasRoute
+  '/mission-control': typeof AuthenticatedMissionControlRoute
   '/observabilidade': typeof AuthenticatedObservabilidadeRoute
   '/perfis-busca': typeof AuthenticatedPerfisBuscaRoute
   '/playbooks': typeof AuthenticatedPlaybooksRoute
@@ -208,6 +216,7 @@ export interface FileRoutesByTo {
   '/handoffs': typeof AuthenticatedHandoffsRoute
   '/leads': typeof AuthenticatedLeadsRouteWithChildren
   '/listas': typeof AuthenticatedListasRoute
+  '/mission-control': typeof AuthenticatedMissionControlRoute
   '/observabilidade': typeof AuthenticatedObservabilidadeRoute
   '/perfis-busca': typeof AuthenticatedPerfisBuscaRoute
   '/playbooks': typeof AuthenticatedPlaybooksRoute
@@ -236,6 +245,7 @@ export interface FileRoutesById {
   '/_authenticated/handoffs': typeof AuthenticatedHandoffsRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRouteWithChildren
   '/_authenticated/listas': typeof AuthenticatedListasRoute
+  '/_authenticated/mission-control': typeof AuthenticatedMissionControlRoute
   '/_authenticated/observabilidade': typeof AuthenticatedObservabilidadeRoute
   '/_authenticated/perfis-busca': typeof AuthenticatedPerfisBuscaRoute
   '/_authenticated/playbooks': typeof AuthenticatedPlaybooksRoute
@@ -264,6 +274,7 @@ export interface FileRouteTypes {
     | '/handoffs'
     | '/leads'
     | '/listas'
+    | '/mission-control'
     | '/observabilidade'
     | '/perfis-busca'
     | '/playbooks'
@@ -290,6 +301,7 @@ export interface FileRouteTypes {
     | '/handoffs'
     | '/leads'
     | '/listas'
+    | '/mission-control'
     | '/observabilidade'
     | '/perfis-busca'
     | '/playbooks'
@@ -317,6 +329,7 @@ export interface FileRouteTypes {
     | '/_authenticated/handoffs'
     | '/_authenticated/leads'
     | '/_authenticated/listas'
+    | '/_authenticated/mission-control'
     | '/_authenticated/observabilidade'
     | '/_authenticated/perfis-busca'
     | '/_authenticated/playbooks'
@@ -429,6 +442,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedObservabilidadeRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/mission-control': {
+      id: '/_authenticated/mission-control'
+      path: '/mission-control'
+      fullPath: '/mission-control'
+      preLoaderRoute: typeof AuthenticatedMissionControlRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/listas': {
       id: '/_authenticated/listas'
       path: '/listas'
@@ -539,6 +559,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedHandoffsRoute: typeof AuthenticatedHandoffsRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRouteWithChildren
   AuthenticatedListasRoute: typeof AuthenticatedListasRoute
+  AuthenticatedMissionControlRoute: typeof AuthenticatedMissionControlRoute
   AuthenticatedObservabilidadeRoute: typeof AuthenticatedObservabilidadeRoute
   AuthenticatedPerfisBuscaRoute: typeof AuthenticatedPerfisBuscaRoute
   AuthenticatedPlaybooksRoute: typeof AuthenticatedPlaybooksRoute
@@ -562,6 +583,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedHandoffsRoute: AuthenticatedHandoffsRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRouteWithChildren,
   AuthenticatedListasRoute: AuthenticatedListasRoute,
+  AuthenticatedMissionControlRoute: AuthenticatedMissionControlRoute,
   AuthenticatedObservabilidadeRoute: AuthenticatedObservabilidadeRoute,
   AuthenticatedPerfisBuscaRoute: AuthenticatedPerfisBuscaRoute,
   AuthenticatedPlaybooksRoute: AuthenticatedPlaybooksRoute,
