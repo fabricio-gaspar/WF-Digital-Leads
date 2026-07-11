@@ -1,286 +1,327 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { AppShell } from "@/app/AppShell";
-import { useProspectingResults } from "@/repositories/hooks";
-import { stores, generateId, nowIso } from "@/repositories/demo";
-import { useAuth } from "@/auth/AuthProvider";
 import { useState } from "react";
-import { Search, Sparkles, Import, Loader2, Target, Zap, MapPin, CheckCircle2 } from "lucide-react";
-import { toast } from "sonner";
-import { useQueryClient } from "@tanstack/react-query";
-import { useSearchProfiles, useServicesList } from "@/domain/sdrVirtual";
-import { recordSearchRun, recordEnrichment, useEnrichmentEvents } from "@/domain/DemoDataProvider";
-import { checkEligibility, upsertEmpresa } from "@/domain/canonical";
+import { AppShell } from "@/app/AppShell";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/prospeccao")({
   head: () => ({ meta: [{ title: "Prospecção — WF Digital CRM" }] }),
-  component: ProspectingPage,
+  component: ProspeccaoPage,
 });
 
-function ProspectingPage() {
-  const { session } = useAuth();
-  const qc = useQueryClient();
-  const { data: results = [] } = useProspectingResults();
-  const perfis = useSearchProfiles();
-  const services = useServicesList();
-  const enrichmentEvents = useEnrichmentEvents();
+type Chance = "alta" | "media" | "baixa" | "duplicado";
 
-  const [tab, setTab] = useState<"apify" | "vibe" | "gmaps">("gmaps");
-  const [perfilId, setPerfilId] = useState<string>("");
-  const [running, setRunning] = useState(false);
-  const [enriquecendo, setEnriquecendo] = useState<string | null>(null);
-  const [importedIds, setImportedIds] = useState<Set<string>>(new Set());
+type Empresa = {
+  id: string;
+  nome: string;
+  razao: string;
+  cnpj: string;
+  segmento: string;
+  cnae: string;
+  porte: string;
+  cidade: string;
+  uf: string;
+  km: number;
+  whatsapp: string;
+  chance: Chance;
+  score: number;
+  sinais: { texto: string; pts: number }[];
+  duplicadoInfo?: string;
+};
 
-  const perfil = perfis.find((p) => p.id === perfilId);
-  const servico = perfil ? services.find((s) => s.id === perfil.servicoId) : undefined;
+const EMPRESAS: Empresa[] = [
+  {
+    id: "1",
+    nome: "Metalfino Usinagem",
+    razao: "Metalfino Ind. e Com. Ltda",
+    cnpj: "61.234.567/0001-10",
+    segmento: "Indústria Metalúrgica",
+    cnae: "2599-3/99",
+    porte: "EPP",
+    cidade: "Sorocaba",
+    uf: "SP",
+    km: 28,
+    whatsapp: "(15) 99100-2200",
+    chance: "alta",
+    score: 88,
+    sinais: [
+      { texto: 'Segmento bate com "Indústria Metalúrgica" (segmento-alvo)', pts: 30 },
+      { texto: "WhatsApp comercial válido e ativo", pts: 20 },
+      { texto: "Site no ar, com página de produtos", pts: 15 },
+      { texto: "Porte EPP — dentro da faixa-alvo", pts: 15 },
+      { texto: "4,6 estrelas no Google (38 avaliações)", pts: 10 },
+      { texto: "A 28 km da sua base — dentro da região", pts: 10 },
+    ],
+  },
+  {
+    id: "2",
+    nome: "Construtora Vale Verde",
+    razao: "Vale Verde Engenharia Ltda",
+    cnpj: "62.345.678/0001-21",
+    segmento: "Construção Civil",
+    cnae: "4120-4/00",
+    porte: "Média",
+    cidade: "Itu",
+    uf: "SP",
+    km: 22,
+    whatsapp: "(11) 99117-2219",
+    chance: "alta",
+    score: 79,
+    sinais: [],
+  },
+  {
+    id: "3",
+    nome: "Transportes Rota Sul",
+    razao: "Rota Sul Log. Ltda",
+    cnpj: "63.456.789/0001-32",
+    segmento: "Logística e Transporte",
+    cnae: "4930-2/02",
+    porte: "EPP",
+    cidade: "Campinas",
+    uf: "SP",
+    km: 48,
+    whatsapp: "(19) 99134-2238",
+    chance: "media",
+    score: 61,
+    sinais: [],
+  },
+  {
+    id: "4",
+    nome: "Pedra Nobre Marmoraria",
+    razao: "",
+    cnpj: "64.567.890/0001-43",
+    segmento: "Construção Civil",
+    cnae: "2391-5/03",
+    porte: "EPP",
+    cidade: "Guarulhos",
+    uf: "SP",
+    km: 62,
+    whatsapp: "(11) 99121-2244",
+    chance: "duplicado",
+    score: 0,
+    sinais: [],
+    duplicadoInfo: "abordada em 12/05 por Carlos",
+  },
+  {
+    id: "5",
+    nome: "Auto Escola Direção Segura",
+    razao: "",
+    cnpj: "65.678.901/0001-54",
+    segmento: "Educação",
+    cnae: "8599-6/01",
+    porte: "ME",
+    cidade: "Santo André",
+    uf: "SP",
+    km: 78,
+    whatsapp: "—",
+    chance: "baixa",
+    score: 32,
+    sinais: [],
+  },
+];
 
-  function runSearch() {
-    if (!perfil) return toast.error("Selecione um Perfil de Busca");
-    setRunning(true);
-    setTimeout(() => {
-      const searchId = generateId("ps");
-      const cidades = perfil.cidades.length ? perfil.cidades : ["São Paulo", "Curitiba", "Belo Horizonte"];
-      const nFound = 6 + Math.floor(Math.random() * 6);
-      let qualified = 0;
-      for (let i = 0; i < nFound; i++) {
-        const c = cidades[i % cidades.length];
-        const confidence = 0.35 + Math.random() * 0.6;
-        if (confidence > 0.6) qualified++;
-        stores.prospectingResults.upsert({
-          id: generateId("pr"),
-          searchId,
-          empresa: `${perfil.segmento.split(" ")[0]} ${["Indústria", "Comércio", "Serviços", "Tech"][i % 4]} ${i + 1}`,
-          cnpj: `${10 + i}.${100 + i}.${200 + i}/0001-${10 + i}`,
-          segmento: perfil.segmento,
-          cidade: c,
-          uf: perfil.ufs[0] ?? "SP",
-          telefone: `+55 ${11 + (i % 20)} 9${1000 + i}-${1000 + i}`,
-          source: tab,
-          collectedAt: nowIso(),
-          confidence,
-          status: "novo",
-        });
-      }
-      recordSearchRun({
-        perfilId: perfil.id,
-        query: `${perfil.nome} · fonte=${tab}`,
-        location: cidades.slice(0, 2).join(", "),
-        totalFound: nFound,
-        qualified,
-      });
-      qc.invalidateQueries({ queryKey: ["prospectingResults"] });
-      setRunning(false);
-      toast.success(`${nFound} leads encontrados (${qualified} pré-qualificados) via ${tab.toUpperCase()}`);
-    }, 900);
-  }
-
-  async function runEnrichmentCascade(resultId: string, empresaNome: string) {
-    setEnriquecendo(resultId);
-    // gmaps → linkedin → web (cascata visível)
-    const chain: Array<"gmaps" | "linkedin" | "web"> = ["gmaps", "linkedin", "web"];
-    for (const source of chain) {
-      await new Promise((r) => setTimeout(r, 500));
-      const hit = Math.random() > 0.3;
-      recordEnrichment({
-        leadRef: resultId,
-        source,
-        hit,
-        fields: hit
-          ? source === "gmaps"
-            ? ["endereço", "telefone", "site"]
-            : source === "linkedin"
-            ? ["cargo", "porte", "decisor"]
-            : ["email genérico", "descrição"]
-          : [],
-      });
-      if (hit) {
-        toast.success(`${source.toUpperCase()} enriqueceu ${empresaNome}`);
-        break;
-      }
-      toast.message(`${source.toUpperCase()} sem match para ${empresaNome} — tentando próxima fonte`);
-    }
-    setEnriquecendo(null);
-  }
-
-  function importLead(id: string) {
-    const r = stores.prospectingResults.get(id);
-    if (!r) return;
-    // Elegibilidade
-    const eleg = checkEligibility({
-      segmento: r.segmento,
-      emailValido: false,
-      telefoneValido: !!r.telefone,
-      perfilSegmento: perfil?.segmento,
-    });
-    if (!eleg.elegivel) {
-      return toast.error(`Bloqueado pela elegibilidade: ${eleg.motivos.join(", ")}`);
-    }
-    if (eleg.avisos.length) toast.warning(`Avisos: ${eleg.avisos.join("; ")}`);
-
-    // Dedupe canônico via upsertEmpresa
-    const empresa = upsertEmpresa({
-      razaoSocial: r.empresa,
-      nomeFantasia: r.empresa,
-      cnpj: r.cnpj,
-      segmento: r.segmento,
-      cidade: r.cidade,
-      uf: r.uf,
-      telefone: r.telefone,
-      proveniencia: [{ source: r.source, at: r.collectedAt }],
-    });
-
-    const companyId = generateId("co");
-    stores.companies.upsert({
-      id: companyId,
-      razaoSocial: empresa.razaoSocial,
-      nomeFantasia: empresa.nomeFantasia ?? empresa.razaoSocial,
-      cnpj: empresa.cnpj,
-      segmento: empresa.segmento,
-      cidade: empresa.cidade,
-      uf: empresa.uf,
-      createdAt: nowIso(),
-    });
-    stores.leads.upsert({
-      id: generateId("ld"),
-      companyId,
-      ownerId: session!.user.id,
-      stage: "prospeccao",
-      temperature: "frio",
-      score: Math.round(r.confidence * 100),
-      estimatedValue: 5000 + Math.round(r.confidence * 10000),
-      source: "busca_ativa",
-      createdAt: nowIso(),
-      updatedAt: nowIso(),
-    });
-    setImportedIds((s) => new Set(s).add(id));
-    qc.invalidateQueries();
-    toast.success("Lead importado (empresa canônica + pipeline)");
-  }
-
-  const filtered = results.filter((r) => r.source === tab);
-  const enrichmentByRef = enrichmentEvents.reduce<Record<string, typeof enrichmentEvents>>((acc, e) => {
-    (acc[e.leadRef] ??= []).push(e);
-    return acc;
-  }, {});
+function ProspeccaoPage() {
+  const [expanded, setExpanded] = useState<string | null>("1");
+  const [selected, setSelected] = useState<Record<string, boolean>>({ "1": true, "2": true, "3": true });
+  const selCount = Object.values(selected).filter(Boolean).length;
 
   return (
-    <AppShell title="Prospecção" subtitle="Perfil de Busca + coleta multifonte + enriquecimento em cascata (sandbox)">
-      <div className="bg-card border border-border rounded-xl p-4 mb-4 space-y-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 flex-1 min-w-[280px]">
-            <Target className="h-4 w-4 text-primary" />
-            <select
-              value={perfilId}
-              onChange={(e) => setPerfilId(e.target.value)}
-              className="flex-1 h-10 px-3 rounded-lg border border-input bg-background text-sm"
-            >
-              <option value="">Selecione um Perfil de Busca…</option>
-              {perfis.map((p) => (
-                <option key={p.id} value={p.id}>{p.nome} — {p.status}</option>
-              ))}
-            </select>
+    <AppShell title="Prospecção" subtitle="Busque empresas, veja a chance de negócio e converta em leads">
+      <Section title="Busca de empresas" hint="defina a região e o perfil — o score compara cada empresa com o seu cliente ideal">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
+          <Select label="País" options={["Brasil"]} />
+          <Select label="Estado" options={["São Paulo", "Paraná", "Santa Catarina"]} />
+          <Field label="Cidade" defaultValue="São Roque" />
+          <Select label="Raio de busca" options={["25 km", "50 km", "100 km"]} defaultValue="50 km" />
+          <Select label="Segmento" options={["Todos os segmentos", "Indústria Metalúrgica", "Construção Civil"]} defaultValue="Todos os segmentos" />
+          <Select label="Porte" options={["Todos", "MEI", "ME", "EPP", "Média", "Grande"]} defaultValue="Todos" />
+          <Select label="Origem da busca" options={["Busca ativa", "Google Maps", "Indicação"]} defaultValue="Busca ativa" />
+          <div className="md:col-span-3">
+            <Field label="Palavra-chave" placeholder="Nome da empresa, fantasia ou segmento..." />
           </div>
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">SANDBOX</span>
         </div>
-
-        {perfil && (
-          <div className="rounded-lg bg-muted/40 p-3 text-xs text-muted-foreground grid grid-cols-2 md:grid-cols-4 gap-2">
-            <span><b className="text-foreground">Serviço:</b> {servico?.nome ?? "—"}</span>
-            <span><b className="text-foreground">Segmento:</b> {perfil.segmento}</span>
-            <span><MapPin className="inline h-3 w-3 mr-1" />{perfil.cidades.slice(0, 2).join(", ") || perfil.ufs.join(", ")}</span>
-            <span><b className="text-foreground">Porte:</b> {perfil.porteMin}-{perfil.porteMax} func</span>
-          </div>
-        )}
-
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex rounded-lg border border-border p-0.5 bg-background">
-            {(["gmaps", "apify", "vibe"] as const).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-[13px] ${tab === t ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
-              >
-                <Search className="h-3.5 w-3.5" /> {t === "gmaps" ? "Google Maps" : t === "apify" ? "Apify" : "Vibe"}
-              </button>
-            ))}
-          </div>
-          <button
-            disabled={running || !perfilId}
-            onClick={runSearch}
-            className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary-strong disabled:opacity-60 inline-flex items-center gap-1.5"
-          >
-            {running ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />} Executar busca
+        <div className="mt-4 flex items-center gap-2">
+          <button className="h-10 px-4 rounded-md bg-primary text-primary-foreground text-[13px] font-semibold hover:bg-primary/90 inline-flex items-center gap-2">
+            <span>◊</span> Buscar empresas
+          </button>
+          <button className="h-10 px-4 rounded-md border border-border bg-card text-[13px] font-medium hover:bg-muted">
+            Salvar esta busca
           </button>
         </div>
-      </div>
+      </Section>
 
-      <div className="bg-card border border-border rounded-xl overflow-hidden">
-        <div className="px-4 py-2.5 border-b border-border text-[13px] font-semibold">
-          Resultados ({filtered.length}) — {tab.toUpperCase()}
-        </div>
-        {filtered.length === 0 ? (
-          <div className="p-10 text-center text-muted-foreground text-[13px]">
-            {perfilId ? "Nenhum resultado ainda. Execute uma busca acima." : "Selecione um Perfil de Busca para começar."}
+      <section className="mt-5 rounded-xl border border-border bg-card">
+        <div className="flex flex-wrap items-center gap-3 px-5 py-3 border-b border-border">
+          <div className="text-[13px] font-semibold text-foreground">
+            {EMPRESAS.length} RESULTADOS
+            <span className="text-muted-foreground font-normal ml-2">{selCount} selecionados</span>
           </div>
-        ) : (
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50 text-[11px] uppercase text-muted-foreground">
-              <tr>
-                <th className="text-left px-3 py-2">Empresa</th>
-                <th className="text-left px-3 py-2">Local</th>
-                <th className="text-left px-3 py-2">Enriquecimento</th>
-                <th className="text-right px-3 py-2">Confiança</th>
-                <th className="text-right px-3 py-2">Ação</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((r) => {
-                const imported = importedIds.has(r.id);
-                const events = enrichmentByRef[r.id] ?? [];
-                return (
-                  <tr key={r.id} className="border-t border-border hover:bg-muted/40">
-                    <td className="px-3 py-2">
-                      <div className="font-medium">{r.empresa}</div>
-                      <div className="text-[11px] text-muted-foreground">{r.cnpj} · {r.segmento}</div>
-                    </td>
-                    <td className="px-3 py-2 text-muted-foreground">{r.cidade}/{r.uf}</td>
-                    <td className="px-3 py-2">
-                      {events.length === 0 ? (
-                        <button
-                          onClick={() => runEnrichmentCascade(r.id, r.empresa)}
-                          disabled={enriquecendo === r.id}
-                          className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-                        >
-                          {enriquecendo === r.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <Zap className="h-3 w-3" />}
-                          Enriquecer
-                        </button>
-                      ) : (
-                        <div className="flex flex-wrap gap-1">
-                          {events.map((e) => (
-                            <span key={e.id} className={`text-[10px] px-1.5 py-0.5 rounded-full ${e.hit ? "bg-emerald-100 text-emerald-700" : "bg-muted text-muted-foreground line-through"}`}>
-                              {e.source}{e.hit && ` ✓${e.fields.length}`}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-3 py-2 text-right font-medium">{Math.round(r.confidence * 100)}%</td>
-                    <td className="px-3 py-2 text-right">
+          <div className="ml-auto flex items-center gap-2 flex-wrap">
+            <MiniSelect label="Score: todos" />
+            <MiniSelect label="Status: todos" />
+            <button className="h-9 px-3 rounded-md border border-primary/40 bg-primary/5 text-primary text-[12px] font-semibold hover:bg-primary/10">
+              ◆ Enviar para vendedor virtual
+            </button>
+            <button className="h-9 px-3 rounded-md bg-primary text-primary-foreground text-[12px] font-semibold hover:bg-primary/90">
+              › Enviar para vendedor humano
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <div className="grid grid-cols-[36px_2fr_1.4fr_1fr_1.2fr_1.3fr_1fr] gap-3 px-5 py-2 text-[11px] uppercase tracking-wide text-muted-foreground border-b border-border">
+            <div />
+            <div>Empresa</div>
+            <div>Segmento / CNAE</div>
+            <div>Cidade/UF</div>
+            <div>WhatsApp</div>
+            <div>Chance de negócio</div>
+            <div>Enviar para</div>
+          </div>
+          {EMPRESAS.map((e) => {
+            const open = expanded === e.id;
+            return (
+              <div key={e.id} className="border-b border-border last:border-0">
+                <div className="grid grid-cols-[36px_2fr_1.4fr_1fr_1.2fr_1.3fr_1fr] gap-3 px-5 py-3.5 items-center">
+                  <input
+                    type="checkbox"
+                    checked={!!selected[e.id]}
+                    onChange={() => setSelected((s) => ({ ...s, [e.id]: !s[e.id] }))}
+                    className="h-4 w-4 accent-primary"
+                  />
+                  <div className={cn("min-w-0", e.chance === "duplicado" && "opacity-60")}>
+                    <div className="font-semibold text-foreground text-[13px]">{e.nome}</div>
+                    <div className="text-[11px] text-muted-foreground truncate">
+                      {e.razao ? `${e.razao} · ` : ""}
+                      {e.cnpj}
+                    </div>
+                  </div>
+                  <div className="min-w-0">
+                    <div className="text-[13px] text-foreground">{e.segmento}</div>
+                    <div className="text-[11px] text-muted-foreground">
+                      {e.cnae} · {e.porte}
+                    </div>
+                  </div>
+                  <div className="text-[13px]">
+                    <div className="text-foreground">{e.cidade}/{e.uf}</div>
+                    <div className="text-[11px] text-muted-foreground">{e.km} km</div>
+                  </div>
+                  <div className="text-[13px] text-foreground">{e.whatsapp}</div>
+                  <div>
+                    <ChanceTag chance={e.chance} score={e.score} />
+                    {e.chance !== "duplicado" ? (
                       <button
-                        onClick={() => importLead(r.id)}
-                        disabled={imported}
-                        className="inline-flex items-center gap-1 h-8 px-2.5 rounded-md text-[12px] bg-primary-soft text-primary-strong hover:bg-primary hover:text-primary-foreground disabled:opacity-50"
+                        onClick={() => setExpanded(open ? null : e.id)}
+                        className="block mt-1 text-[11px] text-primary hover:underline"
                       >
-                        {imported ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Import className="h-3.5 w-3.5" />}
-                        {imported ? "Importado" : "Importar"}
+                        ver por quê ▾
                       </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
+                    ) : (
+                      <div className="text-[11px] text-muted-foreground mt-1">{e.duplicadoInfo}</div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {e.chance === "duplicado" ? (
+                      <span className="h-8 px-3 rounded-md border border-border bg-muted text-[12px] text-muted-foreground inline-flex items-center">
+                        Duplicado
+                      </span>
+                    ) : (
+                      <>
+                        <button className="h-8 px-2.5 rounded-md border border-primary/40 bg-primary/5 text-primary text-[12px] font-medium hover:bg-primary/10">
+                          ◆ IA
+                        </button>
+                        <button className="h-8 px-2.5 rounded-md border border-border bg-card text-[12px] font-medium hover:bg-muted">
+                          › Humano
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {open && e.sinais.length > 0 && (
+                  <div className="bg-muted/40 px-5 py-3 border-t border-border">
+                    <div className="space-y-1.5">
+                      {e.sinais.map((s) => (
+                        <div key={s.texto} className="flex items-center justify-between text-[12.5px]">
+                          <span className="text-foreground">{s.texto}</span>
+                          <span className="text-primary font-semibold">+{s.pts}</span>
+                        </div>
+                      ))}
+                      <div className="pt-2 mt-1 border-t border-border flex items-center justify-between text-[13px] font-semibold">
+                        <span className="text-primary">Total</span>
+                        <span className="text-primary">{e.score} / 100</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <p className="text-[11px] text-muted-foreground mt-4 leading-relaxed max-w-3xl">
+        Três acréscimos em relação ao layout original: o score agora é <strong className="text-foreground">explicável</strong> (o vendedor vê o cálculo antes de enviar), leads já abordados aparecem <strong className="text-foreground">marcados como duplicados</strong> em vez de serem prospectados de novo, e o envio já decide <strong className="text-foreground">quem atende</strong> — IA ou humano.
+      </p>
     </AppShell>
+  );
+}
+
+/* Primitives */
+function Section({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <section className="rounded-xl border border-border bg-card">
+      <div className="px-5 py-3 border-b border-border">
+        <div className="text-[11px] uppercase tracking-[0.12em] text-muted-foreground font-semibold">+ {title}</div>
+        {hint && <div className="text-[11px] text-muted-foreground/80 mt-0.5">{hint}</div>}
+      </div>
+      <div className="p-5">{children}</div>
+    </section>
+  );
+}
+function Field({ label, defaultValue, placeholder }: { label: string; defaultValue?: string; placeholder?: string }) {
+  return (
+    <label className="block">
+      <div className="text-[11px] text-muted-foreground mb-1.5">{label}</div>
+      <input
+        defaultValue={defaultValue}
+        placeholder={placeholder}
+        className="w-full h-10 px-3 rounded-md border border-input bg-background text-[13px] text-foreground"
+      />
+    </label>
+  );
+}
+function Select({ label, options, defaultValue }: { label: string; options: string[]; defaultValue?: string }) {
+  return (
+    <label className="block">
+      <div className="text-[11px] text-muted-foreground mb-1.5">{label}</div>
+      <select
+        defaultValue={defaultValue}
+        className="w-full h-10 px-3 rounded-md border border-input bg-background text-[13px] text-foreground"
+      >
+        {options.map((o) => <option key={o}>{o}</option>)}
+      </select>
+    </label>
+  );
+}
+function MiniSelect({ label }: { label: string }) {
+  return (
+    <select className="h-9 px-2.5 rounded-md border border-input bg-background text-[12px] text-foreground">
+      <option>{label}</option>
+    </select>
+  );
+}
+function ChanceTag({ chance, score }: { chance: Chance; score: number }) {
+  if (chance === "duplicado")
+    return <span className="text-[12px] px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-medium">@ Já na base</span>;
+  const cfg = {
+    alta: { icon: "🔥", label: "Alta chance", cls: "bg-orange-100 text-orange-700" },
+    media: { icon: "◆", label: "Média chance", cls: "bg-primary/10 text-primary" },
+    baixa: { icon: "❄", label: "Baixa chance", cls: "bg-sky-100 text-sky-700" },
+  }[chance];
+  return (
+    <span className={cn("inline-flex items-center gap-1 text-[12px] px-2 py-0.5 rounded-full font-semibold", cfg.cls)}>
+      <span>{cfg.icon}</span>
+      {cfg.label} · {score}
+    </span>
   );
 }
