@@ -64,9 +64,14 @@ async def main() -> None:
         await page.wait_for_timeout(900)
         await page.screenshot(path=str(SHOTS / "3_simulador.png"))
 
+        # Helper: espera o AppShell montar (sidebar visível).
+        async def wait_app_ready():
+            await page.wait_for_selector('[data-testid="app-sidebar"]', timeout=10000)
+
         # 3. CENTRAL — aprovar rascunho
         await page.goto(f"{BASE}/central", wait_until="domcontentloaded")
-        await page.wait_for_timeout(500)
+        await wait_app_ready()
+        await page.wait_for_timeout(400)
         approve_buttons = page.locator('[data-testid^="approve-"]')
         approve_count = await approve_buttons.count()
         if approve_count == 0:
@@ -83,6 +88,7 @@ async def main() -> None:
 
         # 5. Export CSV disponível
         await page.goto(f"{BASE}/relatorios-sdr", wait_until="domcontentloaded")
+        await wait_app_ready()
         await page.wait_for_timeout(400)
         if await page.get_by_test_id("export-csv").count() == 0:
             failures.append("relatorios-sdr: botão Exportar CSV ausente")
@@ -90,9 +96,10 @@ async def main() -> None:
 
         # 6. Kill-switch por serviço presente
         await page.goto(f"{BASE}/empresa-servicos", wait_until="domcontentloaded")
+        await wait_app_ready()
         await page.wait_for_timeout(400)
         await page.locator("button", has_text="Serviços").first.click()
-        await page.wait_for_timeout(300)
+        await page.wait_for_timeout(400)
         toggles = page.locator('[data-testid^="sdr-toggle-"]')
         n = await toggles.count()
         if n == 0:
