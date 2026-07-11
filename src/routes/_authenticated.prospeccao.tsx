@@ -28,14 +28,7 @@ function ProspectingPage() {
     setRunning(true);
     setTimeout(() => {
       const searchId = generateId("ps");
-      stores.prospectingSearches?.upsert?.({
-        id: searchId,
-        createdBy: session!.user.id,
-        createdAt: nowIso(),
-        provider: tab,
-        params: { query },
-        resultCount: 8,
-      } as never);
+
       const segmentos = ["Metalurgia", "Alimentos", "Logística", "TI", "Construção"];
       const cidades: [string, string][] = [["São Paulo", "SP"], ["Curitiba", "PR"], ["Belo Horizonte", "MG"], ["Porto Alegre", "RS"]];
       for (let i = 0; i < 8; i++) {
