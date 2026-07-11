@@ -543,6 +543,92 @@ const leadListsStore = createStore(leadLists);
 export const useLeadLists = () =>
   useSyncExternalStore(leadListsStore.subscribe, leadListsStore.get, leadListsStore.get);
 
+export function addLeadList(list: Omit<LeadList, "id" | "criadaEm"> & { id?: string }) {
+  const novo: LeadList = {
+    ...list,
+    id: list.id ?? `ll-${Date.now()}`,
+    criadaEm: new Date().toISOString().slice(0, 10),
+  };
+  leadListsStore.set((d) => [novo, ...d]);
+  return novo;
+}
+
+// ============ SDR DRAFT QUEUE (Semiautomático — padrão da demo) ============
+// Rascunhos produzidos pelo SDR Virtual que aguardam aprovação humana antes do envio.
+// Modo padrão: Semiautomático. Nenhuma mensagem sai sem confirmação de um atendente.
+export type SdrMode = "Semiautomático" | "Manual" | "Automático (futuro)";
+export const DEFAULT_SDR_MODE: SdrMode = "Semiautomático";
+
+export interface SdrDraft {
+  id: string;
+  conversaId: string;
+  empresa: string;
+  contato: string;
+  leadMessage: string;
+  draftReply: string;
+  source: string;
+  confidence: number;
+  requiresHuman: boolean;
+  guardrails: { rule: string; detail: string; severity: "info" | "warn" | "block" }[];
+  status: "pendente" | "aprovado" | "editado" | "descartado";
+  criadoEm: string;
+}
+
+export const sdrDrafts: SdrDraft[] = [
+  {
+    id: "df-1",
+    conversaId: "cv-1",
+    empresa: "Padaria Trigo Dourado",
+    contato: "Ana Ribeiro",
+    leadMessage: "Ok, pode explicar mais?",
+    draftReply: "Claro! Nós criamos sites profissionais com pedido online integrado. Posso enviar 2 exemplos de padarias que atendemos e um resumo de investimento. Tudo bem?",
+    source: "service",
+    confidence: 82,
+    requiresHuman: false,
+    guardrails: [
+      { rule: "TomVozOk", detail: "Tom cordial dentro do padrão da empresa", severity: "info" },
+      { rule: "SemPrecoEspecifico", detail: "Rascunho evita valor exato — respeitando política", severity: "info" },
+    ],
+    status: "pendente",
+    criadoEm: new Date().toISOString(),
+  },
+  {
+    id: "df-2",
+    conversaId: "cv-5",
+    empresa: "Ápice Contabil",
+    contato: "Renata Souza",
+    leadMessage: "Não estou interessada agora",
+    draftReply: "Sem problemas, Renata! Deixo por aqui e, se fizer sentido lá na frente, é só chamar. Um ótimo dia!",
+    source: "policy",
+    confidence: 94,
+    requiresHuman: false,
+    guardrails: [
+      { rule: "RespeitoOptOut", detail: "Cliente sinalizou não-interesse; encerrar cadência", severity: "info" },
+    ],
+    status: "pendente",
+    criadoEm: new Date().toISOString(),
+  },
+];
+
+const sdrDraftsStore = createStore(sdrDrafts);
+export const useSdrDrafts = () =>
+  useSyncExternalStore(sdrDraftsStore.subscribe, sdrDraftsStore.get, sdrDraftsStore.get);
+
+export function addSdrDraft(d: Omit<SdrDraft, "id" | "criadoEm" | "status"> & { id?: string; status?: SdrDraft["status"] }) {
+  const novo: SdrDraft = {
+    ...d,
+    id: d.id ?? `df-${Date.now()}`,
+    status: d.status ?? "pendente",
+    criadoEm: new Date().toISOString(),
+  };
+  sdrDraftsStore.set((v) => [novo, ...v]);
+  return novo;
+}
+
+export function updateSdrDraft(id: string, patch: Partial<SdrDraft>) {
+  sdrDraftsStore.set((v) => v.map((d) => (d.id === id ? { ...d, ...patch } : d)));
+}
+
 const cadencesStore = createStore(cadences);
 export const useCadences = () =>
   useSyncExternalStore(cadencesStore.subscribe, cadencesStore.get, cadencesStore.get);
