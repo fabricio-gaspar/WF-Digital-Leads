@@ -78,6 +78,7 @@ function OrcamentosPage() {
               {orcamentos.map((o) => {
                 const op = oportunidades.find((x) => x.id === o.oportunidadeId);
                 const empresa = op ? empresas.find((e) => e.id === op.empresaId) : undefined;
+                const totals = computeOrcamentoTotals(o);
                 return (
                   <tr key={o.id} className="border-t border-border hover:bg-muted/40">
                     <td className="px-4 py-2 font-mono text-xs">{o.numero}</td>
@@ -85,7 +86,7 @@ function OrcamentosPage() {
                     <td className="px-4 py-2">
                       <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${STATUS_COR[o.status]}`}>{o.status}</span>
                     </td>
-                    <td className="px-4 py-2 text-right font-semibold">R$ {o.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td>
+                    <td className="px-4 py-2 text-right font-semibold">R$ {totals.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td>
                     <td className="px-4 py-2 text-center text-xs text-muted-foreground">v{o.versao}</td>
                     <td className="px-4 py-2 text-right">
                       <div className="inline-flex gap-1">
@@ -97,7 +98,7 @@ function OrcamentosPage() {
                           </>
                         )}
                         {o.status === "Aprovado" && (
-                          <button onClick={() => { updateOrcamento(o.id, { status: "Enviado", dataEnvio: new Date().toISOString() }); toast.success("Marcado como enviado"); }} className="h-7 px-2 rounded text-xs bg-blue-600 text-white">Enviar</button>
+                          <button onClick={() => { updateOrcamento(o.id, { status: "Enviado" }); toast.success("Marcado como enviado"); }} className="h-7 px-2 rounded text-xs bg-blue-600 text-white">Enviar</button>
                         )}
                       </div>
                     </td>
