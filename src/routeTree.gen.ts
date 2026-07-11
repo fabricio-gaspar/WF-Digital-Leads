@@ -21,6 +21,7 @@ import { Route as AuthenticatedProspeccaoRouteImport } from './routes/_authentic
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated.portal'
 import { Route as AuthenticatedPlaybooksRouteImport } from './routes/_authenticated.playbooks'
 import { Route as AuthenticatedPerfisBuscaRouteImport } from './routes/_authenticated.perfis-busca'
+import { Route as AuthenticatedOportunidadesRouteImport } from './routes/_authenticated.oportunidades'
 import { Route as AuthenticatedObservabilidadeRouteImport } from './routes/_authenticated.observabilidade'
 import { Route as AuthenticatedMissionControlRouteImport } from './routes/_authenticated.mission-control'
 import { Route as AuthenticatedListasRouteImport } from './routes/_authenticated.listas'
@@ -95,6 +96,12 @@ const AuthenticatedPerfisBuscaRoute =
   AuthenticatedPerfisBuscaRouteImport.update({
     id: '/perfis-busca',
     path: '/perfis-busca',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedOportunidadesRoute =
+  AuthenticatedOportunidadesRouteImport.update({
+    id: '/oportunidades',
+    path: '/oportunidades',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedObservabilidadeRoute =
@@ -191,6 +198,7 @@ export interface FileRoutesByFullPath {
   '/listas': typeof AuthenticatedListasRoute
   '/mission-control': typeof AuthenticatedMissionControlRoute
   '/observabilidade': typeof AuthenticatedObservabilidadeRoute
+  '/oportunidades': typeof AuthenticatedOportunidadesRoute
   '/perfis-busca': typeof AuthenticatedPerfisBuscaRoute
   '/playbooks': typeof AuthenticatedPlaybooksRoute
   '/portal': typeof AuthenticatedPortalRoute
@@ -218,6 +226,7 @@ export interface FileRoutesByTo {
   '/listas': typeof AuthenticatedListasRoute
   '/mission-control': typeof AuthenticatedMissionControlRoute
   '/observabilidade': typeof AuthenticatedObservabilidadeRoute
+  '/oportunidades': typeof AuthenticatedOportunidadesRoute
   '/perfis-busca': typeof AuthenticatedPerfisBuscaRoute
   '/playbooks': typeof AuthenticatedPlaybooksRoute
   '/portal': typeof AuthenticatedPortalRoute
@@ -247,6 +256,7 @@ export interface FileRoutesById {
   '/_authenticated/listas': typeof AuthenticatedListasRoute
   '/_authenticated/mission-control': typeof AuthenticatedMissionControlRoute
   '/_authenticated/observabilidade': typeof AuthenticatedObservabilidadeRoute
+  '/_authenticated/oportunidades': typeof AuthenticatedOportunidadesRoute
   '/_authenticated/perfis-busca': typeof AuthenticatedPerfisBuscaRoute
   '/_authenticated/playbooks': typeof AuthenticatedPlaybooksRoute
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
@@ -276,6 +286,7 @@ export interface FileRouteTypes {
     | '/listas'
     | '/mission-control'
     | '/observabilidade'
+    | '/oportunidades'
     | '/perfis-busca'
     | '/playbooks'
     | '/portal'
@@ -303,6 +314,7 @@ export interface FileRouteTypes {
     | '/listas'
     | '/mission-control'
     | '/observabilidade'
+    | '/oportunidades'
     | '/perfis-busca'
     | '/playbooks'
     | '/portal'
@@ -331,6 +343,7 @@ export interface FileRouteTypes {
     | '/_authenticated/listas'
     | '/_authenticated/mission-control'
     | '/_authenticated/observabilidade'
+    | '/_authenticated/oportunidades'
     | '/_authenticated/perfis-busca'
     | '/_authenticated/playbooks'
     | '/_authenticated/portal'
@@ -433,6 +446,13 @@ declare module '@tanstack/react-router' {
       path: '/perfis-busca'
       fullPath: '/perfis-busca'
       preLoaderRoute: typeof AuthenticatedPerfisBuscaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/oportunidades': {
+      id: '/_authenticated/oportunidades'
+      path: '/oportunidades'
+      fullPath: '/oportunidades'
+      preLoaderRoute: typeof AuthenticatedOportunidadesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/observabilidade': {
@@ -561,6 +581,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedListasRoute: typeof AuthenticatedListasRoute
   AuthenticatedMissionControlRoute: typeof AuthenticatedMissionControlRoute
   AuthenticatedObservabilidadeRoute: typeof AuthenticatedObservabilidadeRoute
+  AuthenticatedOportunidadesRoute: typeof AuthenticatedOportunidadesRoute
   AuthenticatedPerfisBuscaRoute: typeof AuthenticatedPerfisBuscaRoute
   AuthenticatedPlaybooksRoute: typeof AuthenticatedPlaybooksRoute
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
@@ -585,6 +606,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedListasRoute: AuthenticatedListasRoute,
   AuthenticatedMissionControlRoute: AuthenticatedMissionControlRoute,
   AuthenticatedObservabilidadeRoute: AuthenticatedObservabilidadeRoute,
+  AuthenticatedOportunidadesRoute: AuthenticatedOportunidadesRoute,
   AuthenticatedPerfisBuscaRoute: AuthenticatedPerfisBuscaRoute,
   AuthenticatedPlaybooksRoute: AuthenticatedPlaybooksRoute,
   AuthenticatedPortalRoute: AuthenticatedPortalRoute,
