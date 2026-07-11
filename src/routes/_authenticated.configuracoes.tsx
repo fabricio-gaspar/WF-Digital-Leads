@@ -19,7 +19,7 @@ const tabs = [
 ] as const;
 
 function SettingsPage() {
-  const { session, can } = useAuth();
+  const { session, hasPermission } = useAuth();
   const [tab, setTab] = useState<typeof tabs[number]["id"]>("usuarios");
   const { data: users = [] } = useUsers();
   const { data: teams = [] } = useTeams();
