@@ -6,7 +6,10 @@ import {
   sdrPolicies,
   services,
   addHandoff,
+  addSdrDraft,
+  DEFAULT_SDR_MODE,
 } from "@/domain/sdrVirtual";
+import { toast } from "sonner";
 import { runSdrTurn, type SdrReply, type SdrState } from "@/domain/sdrEngine";
 import {
   Bot, User, Send, ShieldCheck, AlertTriangle, ArrowRightLeft,
