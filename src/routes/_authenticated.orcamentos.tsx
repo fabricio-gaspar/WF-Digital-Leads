@@ -305,9 +305,9 @@ function OrcamentoDetail({ id, onClose }: { id: string; onClose: () => void }) {
               ))}
             </tbody>
             <tfoot className="text-sm">
-              <tr><td colSpan={4} className="py-1 text-right text-muted-foreground">Subtotal</td><td className="text-right">R$ {o.subtotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td></tr>
+              <tr><td colSpan={4} className="py-1 text-right text-muted-foreground">Subtotal</td><td className="text-right">R$ {totals.subtotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td></tr>
               <tr><td colSpan={4} className="py-1 text-right text-muted-foreground">Desconto geral</td><td className="text-right">{o.descontoGeral}%</td></tr>
-              <tr className="border-t border-border font-bold text-primary"><td colSpan={4} className="py-2 text-right">TOTAL</td><td className="text-right">R$ {o.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td></tr>
+              <tr className="border-t border-border font-bold text-primary"><td colSpan={4} className="py-2 text-right">TOTAL</td><td className="text-right">R$ {totals.total.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td></tr>
             </tfoot>
           </table>
           <div className="flex justify-end gap-2 pt-2">
