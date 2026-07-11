@@ -9,10 +9,10 @@ import {
   useSearchRuns,
 } from "@/domain/DemoDataProvider";
 import {
-  useAutonomyLevel,
+  useAutonomy,
   setAutonomyLevel,
-  useKillSwitch,
-  setKillSwitch,
+  setGlobalKillSwitch,
+  AUTONOMY_DESCRIPTIONS,
   type AutonomyLevel,
 } from "@/domain/canonical";
 import { Activity, MessageSquare, Upload, Search, Power, ShieldAlert, Eye, Users as UsersIcon, Gauge, Zap } from "lucide-react";
