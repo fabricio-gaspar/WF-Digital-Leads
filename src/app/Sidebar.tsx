@@ -32,6 +32,7 @@ const NAV: NavItem[] = [
   { to: "/empresa-servicos", label: "Empresa & Serviços", icon: Building2 },
   { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
   { to: "/relatorios-sdr", label: "Relatórios SDR", icon: LineChart },
+  { to: "/observabilidade", label: "Observabilidade", icon: Activity },
   { to: "/portal", label: "Meu Portal", icon: UserCircle2 },
   { to: "/configuracoes", label: "Configurações", icon: Settings, adminOnly: true },
 ];
