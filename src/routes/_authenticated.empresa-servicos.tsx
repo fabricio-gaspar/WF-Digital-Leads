@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/app/AppShell";
+import { PageHero } from "@/app/PageHero";
 import { useCompanyProfile, useServicesList, useKnowledgeBase, sdrPolicies, toggleServiceSdr } from "@/domain/sdrVirtual";
 import { useProdutos, useOfertas, upsertProduto, removeProduto, upsertOferta, removeOferta } from "@/domain/canonical";
 import { Building2, Package, BookOpen, Shield, CheckCircle2, AlertTriangle, Power, PowerOff, ShoppingBag, Tag, Trash2, Plus } from "lucide-react";
