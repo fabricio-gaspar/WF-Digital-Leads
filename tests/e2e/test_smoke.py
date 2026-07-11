@@ -25,11 +25,14 @@ async def main() -> None:
 
         # 1. LOGIN
         await page.goto(f"{BASE}/login", wait_until="domcontentloaded")
-        await page.locator("#email").press_sequentially("fabricio@wfdigital.com.br", delay=10)
-        await page.locator("#password").press_sequentially("demo123", delay=10)
+        await page.locator("#email").click()
+        await page.keyboard.type("fabricio@wfdigital.com.br", delay=15)
+        await page.locator("#password").click()
+        await page.keyboard.type("demo123", delay=15)
+        await page.wait_for_timeout(200)
         await page.screenshot(path=str(SHOTS / "1_login.png"))
         await page.get_by_role("button", name="Entrar no CRM").click()
-        await page.wait_for_timeout(2500)
+        await page.wait_for_timeout(3000)
         if "/login" in page.url:
             failures.append(f"login: continuou em /login (url={page.url})")
         await page.screenshot(path=str(SHOTS / "2_dashboard.png"))
