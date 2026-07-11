@@ -25,15 +25,12 @@ async def main() -> None:
 
         # 1. LOGIN
         await page.goto(f"{BASE}/login", wait_until="domcontentloaded")
-        await page.fill("#email", "fabricio@wfdigital.com.br")
-        await page.fill("#password", "demo123")
+        await page.get_by_text("fabricio@wfdigital.com.br").first.click()
         await page.screenshot(path=str(SHOTS / "1_login.png"))
         await page.get_by_role("button", name="Entrar no CRM").click()
-        try:
-            await page.wait_for_url(lambda u: "/login" not in u, timeout=15000)
-        except Exception:
-            failures.append(f"login: URL final foi {page.url}")
-        await page.wait_for_timeout(500)
+        await page.wait_for_timeout(2500)
+        if "/login" in page.url:
+            failures.append(f"login: continuou em /login (url={page.url})")
         await page.screenshot(path=str(SHOTS / "2_dashboard.png"))
 
         # 2. SIMULADOR — envia mensagem, gera rascunho
