@@ -4,6 +4,7 @@ import {
   BarChart3, Settings, LogOut, UserCircle2, Menu, X,
   Building2, Target, List, Megaphone, Zap, ArrowRightLeft, BookOpen,
   Bot, LineChart, ChevronDown, ChevronRight, Sparkles, Compass, Gauge, Activity,
+  Rocket, Briefcase, FileText,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/auth/AuthProvider";
@@ -21,6 +22,7 @@ type NavItem = {
 
 const NAV: NavItem[] = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/mission-control", label: "Mission Control", icon: Rocket },
   { to: "/prospeccao", label: "Buscar Leads", icon: Search },
   { to: "/perfis-busca", label: "Perfis de Busca", icon: Target },
   { to: "/listas", label: "Listas", icon: List },
@@ -29,6 +31,8 @@ const NAV: NavItem[] = [
   { to: "/central", label: "Central", icon: MessagesSquare, badgeKey: "conversas" },
   { to: "/simulador", label: "Simulador SDR", icon: Bot },
   { to: "/handoffs", label: "Handoffs", icon: ArrowRightLeft, badgeKey: "handoffs" },
+  { to: "/oportunidades", label: "Oportunidades", icon: Briefcase },
+  { to: "/orcamentos", label: "Orçamentos (CPQ)", icon: FileText },
   { to: "/empresa-servicos", label: "Empresa & Serviços", icon: Building2 },
   { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
   { to: "/relatorios-sdr", label: "Relatórios SDR", icon: LineChart },

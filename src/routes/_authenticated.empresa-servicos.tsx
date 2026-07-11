@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/app/AppShell";
 import { useCompanyProfile, useServicesList, useKnowledgeBase, sdrPolicies, toggleServiceSdr } from "@/domain/sdrVirtual";
-import { Building2, Package, BookOpen, Shield, CheckCircle2, AlertTriangle, Power, PowerOff } from "lucide-react";
+import { useProdutos, useOfertas, upsertProduto, removeProduto, upsertOferta, removeOferta } from "@/domain/canonical";
+import { Building2, Package, BookOpen, Shield, CheckCircle2, AlertTriangle, Power, PowerOff, ShoppingBag, Tag, Trash2, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/empresa-servicos")({
@@ -10,17 +11,21 @@ export const Route = createFileRoute("/_authenticated/empresa-servicos")({
   component: EmpresaServicosPage,
 });
 
-type Tab = "empresa" | "servicos" | "conhecimento" | "limites" | "revisao";
+type Tab = "empresa" | "servicos" | "produtos" | "ofertas" | "conhecimento" | "limites" | "revisao";
 
 function EmpresaServicosPage() {
   const [tab, setTab] = useState<Tab>("empresa");
   const company = useCompanyProfile();
   const services = useServicesList();
   const knowledge = useKnowledgeBase();
+  const produtos = useProdutos();
+  const ofertas = useOfertas();
 
   const tabs: { id: Tab; label: string; icon: typeof Building2 }[] = [
     { id: "empresa", label: "Empresa", icon: Building2 },
     { id: "servicos", label: "Serviços", icon: Package },
+    { id: "produtos", label: "Produtos", icon: ShoppingBag },
+    { id: "ofertas", label: "Ofertas", icon: Tag },
     { id: "conhecimento", label: "Conhecimento SDR", icon: BookOpen },
     { id: "limites", label: "Limites SDR", icon: Shield },
     { id: "revisao", label: "Revisão", icon: CheckCircle2 },
@@ -191,6 +196,9 @@ function EmpresaServicosPage() {
           </div>
         )}
 
+        {tab === "produtos" && <ProdutosTab produtos={produtos} />}
+        {tab === "ofertas" && <OfertasTab ofertas={ofertas} produtos={produtos} services={services} />}
+
         {tab === "limites" && (
           <div className="space-y-4">
             <div className="rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-950/20 p-4 flex gap-3">
@@ -267,6 +275,104 @@ function Toggle({ label, on }: { label: string; on: boolean }) {
       <span className="text-sm text-foreground">{label}</span>
       <div className={`h-5 w-9 rounded-full ${on ? "bg-primary" : "bg-muted"} relative transition-colors`}>
         <div className={`absolute top-0.5 ${on ? "right-0.5" : "left-0.5"} h-4 w-4 rounded-full bg-white shadow-sm transition-all`} />
+      </div>
+    </div>
+  );
+}
+
+function ProdutosTab({ produtos }: { produtos: ReturnType<typeof useProdutos> }) {
+  const [form, setForm] = useState({ nome: "", descricao: "", precoBase: 0, unidade: "projeto", categoria: "" });
+  const submit = () => {
+    if (!form.nome.trim()) return toast.error("Nome é obrigatório");
+    upsertProduto({ ...form, ativo: true });
+    toast.success("Produto salvo");
+    setForm({ nome: "", descricao: "", precoBase: 0, unidade: "projeto", categoria: "" });
+  };
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl border border-border bg-card p-4 space-y-2">
+        <h3 className="text-sm font-semibold text-foreground flex items-center gap-2"><Plus className="h-4 w-4" /> Novo produto</h3>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
+          <input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Nome" className="h-9 px-2 rounded-md border border-input bg-background text-sm md:col-span-2" />
+          <input value={form.categoria} onChange={(e) => setForm({ ...form, categoria: e.target.value })} placeholder="Categoria" className="h-9 px-2 rounded-md border border-input bg-background text-sm" />
+          <input type="number" value={form.precoBase} onChange={(e) => setForm({ ...form, precoBase: parseFloat(e.target.value) || 0 })} placeholder="Preço" className="h-9 px-2 rounded-md border border-input bg-background text-sm" />
+          <input value={form.unidade} onChange={(e) => setForm({ ...form, unidade: e.target.value })} placeholder="Unidade" className="h-9 px-2 rounded-md border border-input bg-background text-sm" />
+        </div>
+        <textarea value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} placeholder="Descrição" rows={2} className="w-full px-2 py-1.5 rounded-md border border-input bg-background text-sm" />
+        <button onClick={submit} className="h-9 px-3 rounded-lg bg-primary text-primary-foreground text-sm font-medium">Adicionar</button>
+      </div>
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
+            <tr><th className="text-left px-4 py-2">Nome</th><th className="text-left px-4 py-2">Categoria</th><th className="text-right px-4 py-2">Preço</th><th className="text-left px-4 py-2">Unidade</th><th className="text-right px-4 py-2">Ação</th></tr>
+          </thead>
+          <tbody>
+            {produtos.map((p) => (
+              <tr key={p.id} className="border-t border-border">
+                <td className="px-4 py-2"><div className="font-medium">{p.nome}</div><div className="text-xs text-muted-foreground">{p.descricao}</div></td>
+                <td className="px-4 py-2 text-muted-foreground">{p.categoria}</td>
+                <td className="px-4 py-2 text-right font-medium">R$ {p.precoBase.toLocaleString("pt-BR")}</td>
+                <td className="px-4 py-2 text-muted-foreground">{p.unidade}</td>
+                <td className="px-4 py-2 text-right"><button onClick={() => removeProduto(p.id)} className="text-red-600 hover:opacity-70"><Trash2 className="h-4 w-4" /></button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function OfertasTab({ ofertas, produtos, services }: { ofertas: ReturnType<typeof useOfertas>; produtos: ReturnType<typeof useProdutos>; services: ReturnType<typeof useServicesList> }) {
+  const [form, setForm] = useState({ nome: "", servicoId: "", produtoIds: [] as string[], desconto: 0, observacao: "" });
+  const toggleProduto = (id: string) => setForm((f) => ({ ...f, produtoIds: f.produtoIds.includes(id) ? f.produtoIds.filter((x) => x !== id) : [...f.produtoIds, id] }));
+  const submit = () => {
+    if (!form.nome.trim()) return toast.error("Nome da oferta é obrigatório");
+    upsertOferta({ ...form, ativa: true });
+    toast.success("Oferta salva");
+    setForm({ nome: "", servicoId: "", produtoIds: [], desconto: 0, observacao: "" });
+  };
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl border border-border bg-card p-4 space-y-2">
+        <h3 className="text-sm font-semibold text-foreground flex items-center gap-2"><Plus className="h-4 w-4" /> Nova oferta</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+          <input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Nome" className="h-9 px-2 rounded-md border border-input bg-background text-sm" />
+          <select value={form.servicoId} onChange={(e) => setForm({ ...form, servicoId: e.target.value })} className="h-9 px-2 rounded-md border border-input bg-background text-sm">
+            <option value="">Serviço (opcional)</option>
+            {services.map((s) => <option key={s.id} value={s.id}>{s.nome}</option>)}
+          </select>
+          <input type="number" value={form.desconto} onChange={(e) => setForm({ ...form, desconto: parseFloat(e.target.value) || 0 })} placeholder="Desconto %" className="h-9 px-2 rounded-md border border-input bg-background text-sm" />
+        </div>
+        <div>
+          <div className="text-xs text-muted-foreground mb-1">Produtos inclusos:</div>
+          <div className="flex gap-1.5 flex-wrap">
+            {produtos.map((p) => (
+              <button key={p.id} onClick={() => toggleProduto(p.id)} className={`text-xs px-2 py-1 rounded-full border ${form.produtoIds.includes(p.id) ? "bg-primary text-primary-foreground border-primary" : "border-border text-muted-foreground"}`}>
+                {p.nome}
+              </button>
+            ))}
+          </div>
+        </div>
+        <input value={form.observacao} onChange={(e) => setForm({ ...form, observacao: e.target.value })} placeholder="Observação" className="w-full h-9 px-2 rounded-md border border-input bg-background text-sm" />
+        <button onClick={submit} className="h-9 px-3 rounded-lg bg-primary text-primary-foreground text-sm font-medium">Adicionar</button>
+      </div>
+      <div className="space-y-2">
+        {ofertas.map((o) => (
+          <div key={o.id} className="rounded-xl border border-border bg-card p-4">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="font-semibold text-foreground">{o.nome}</div>
+                <div className="text-xs text-muted-foreground">{o.observacao}</div>
+                <div className="text-xs text-muted-foreground mt-1">Produtos: {o.produtoIds.map((id) => produtos.find((p) => p.id === id)?.nome).filter(Boolean).join(", ") || "—"}</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">-{o.desconto}%</span>
+                <button onClick={() => removeOferta(o.id)} className="text-red-600 hover:opacity-70"><Trash2 className="h-4 w-4" /></button>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

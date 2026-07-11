@@ -21,7 +21,10 @@ import { Route as AuthenticatedProspeccaoRouteImport } from './routes/_authentic
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated.portal'
 import { Route as AuthenticatedPlaybooksRouteImport } from './routes/_authenticated.playbooks'
 import { Route as AuthenticatedPerfisBuscaRouteImport } from './routes/_authenticated.perfis-busca'
+import { Route as AuthenticatedOrcamentosRouteImport } from './routes/_authenticated.orcamentos'
+import { Route as AuthenticatedOportunidadesRouteImport } from './routes/_authenticated.oportunidades'
 import { Route as AuthenticatedObservabilidadeRouteImport } from './routes/_authenticated.observabilidade'
+import { Route as AuthenticatedMissionControlRouteImport } from './routes/_authenticated.mission-control'
 import { Route as AuthenticatedListasRouteImport } from './routes/_authenticated.listas'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated.leads'
 import { Route as AuthenticatedHandoffsRouteImport } from './routes/_authenticated.handoffs'
@@ -96,10 +99,27 @@ const AuthenticatedPerfisBuscaRoute =
     path: '/perfis-busca',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedOrcamentosRoute = AuthenticatedOrcamentosRouteImport.update({
+  id: '/orcamentos',
+  path: '/orcamentos',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedOportunidadesRoute =
+  AuthenticatedOportunidadesRouteImport.update({
+    id: '/oportunidades',
+    path: '/oportunidades',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedObservabilidadeRoute =
   AuthenticatedObservabilidadeRouteImport.update({
     id: '/observabilidade',
     path: '/observabilidade',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedMissionControlRoute =
+  AuthenticatedMissionControlRouteImport.update({
+    id: '/mission-control',
+    path: '/mission-control',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedListasRoute = AuthenticatedListasRouteImport.update({
@@ -182,7 +202,10 @@ export interface FileRoutesByFullPath {
   '/handoffs': typeof AuthenticatedHandoffsRoute
   '/leads': typeof AuthenticatedLeadsRouteWithChildren
   '/listas': typeof AuthenticatedListasRoute
+  '/mission-control': typeof AuthenticatedMissionControlRoute
   '/observabilidade': typeof AuthenticatedObservabilidadeRoute
+  '/oportunidades': typeof AuthenticatedOportunidadesRoute
+  '/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/perfis-busca': typeof AuthenticatedPerfisBuscaRoute
   '/playbooks': typeof AuthenticatedPlaybooksRoute
   '/portal': typeof AuthenticatedPortalRoute
@@ -208,7 +231,10 @@ export interface FileRoutesByTo {
   '/handoffs': typeof AuthenticatedHandoffsRoute
   '/leads': typeof AuthenticatedLeadsRouteWithChildren
   '/listas': typeof AuthenticatedListasRoute
+  '/mission-control': typeof AuthenticatedMissionControlRoute
   '/observabilidade': typeof AuthenticatedObservabilidadeRoute
+  '/oportunidades': typeof AuthenticatedOportunidadesRoute
+  '/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/perfis-busca': typeof AuthenticatedPerfisBuscaRoute
   '/playbooks': typeof AuthenticatedPlaybooksRoute
   '/portal': typeof AuthenticatedPortalRoute
@@ -236,7 +262,10 @@ export interface FileRoutesById {
   '/_authenticated/handoffs': typeof AuthenticatedHandoffsRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRouteWithChildren
   '/_authenticated/listas': typeof AuthenticatedListasRoute
+  '/_authenticated/mission-control': typeof AuthenticatedMissionControlRoute
   '/_authenticated/observabilidade': typeof AuthenticatedObservabilidadeRoute
+  '/_authenticated/oportunidades': typeof AuthenticatedOportunidadesRoute
+  '/_authenticated/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/_authenticated/perfis-busca': typeof AuthenticatedPerfisBuscaRoute
   '/_authenticated/playbooks': typeof AuthenticatedPlaybooksRoute
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
@@ -264,7 +293,10 @@ export interface FileRouteTypes {
     | '/handoffs'
     | '/leads'
     | '/listas'
+    | '/mission-control'
     | '/observabilidade'
+    | '/oportunidades'
+    | '/orcamentos'
     | '/perfis-busca'
     | '/playbooks'
     | '/portal'
@@ -290,7 +322,10 @@ export interface FileRouteTypes {
     | '/handoffs'
     | '/leads'
     | '/listas'
+    | '/mission-control'
     | '/observabilidade'
+    | '/oportunidades'
+    | '/orcamentos'
     | '/perfis-busca'
     | '/playbooks'
     | '/portal'
@@ -317,7 +352,10 @@ export interface FileRouteTypes {
     | '/_authenticated/handoffs'
     | '/_authenticated/leads'
     | '/_authenticated/listas'
+    | '/_authenticated/mission-control'
     | '/_authenticated/observabilidade'
+    | '/_authenticated/oportunidades'
+    | '/_authenticated/orcamentos'
     | '/_authenticated/perfis-busca'
     | '/_authenticated/playbooks'
     | '/_authenticated/portal'
@@ -422,11 +460,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPerfisBuscaRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/orcamentos': {
+      id: '/_authenticated/orcamentos'
+      path: '/orcamentos'
+      fullPath: '/orcamentos'
+      preLoaderRoute: typeof AuthenticatedOrcamentosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/oportunidades': {
+      id: '/_authenticated/oportunidades'
+      path: '/oportunidades'
+      fullPath: '/oportunidades'
+      preLoaderRoute: typeof AuthenticatedOportunidadesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/observabilidade': {
       id: '/_authenticated/observabilidade'
       path: '/observabilidade'
       fullPath: '/observabilidade'
       preLoaderRoute: typeof AuthenticatedObservabilidadeRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/mission-control': {
+      id: '/_authenticated/mission-control'
+      path: '/mission-control'
+      fullPath: '/mission-control'
+      preLoaderRoute: typeof AuthenticatedMissionControlRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/listas': {
@@ -539,7 +598,10 @@ interface AuthenticatedRouteChildren {
   AuthenticatedHandoffsRoute: typeof AuthenticatedHandoffsRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRouteWithChildren
   AuthenticatedListasRoute: typeof AuthenticatedListasRoute
+  AuthenticatedMissionControlRoute: typeof AuthenticatedMissionControlRoute
   AuthenticatedObservabilidadeRoute: typeof AuthenticatedObservabilidadeRoute
+  AuthenticatedOportunidadesRoute: typeof AuthenticatedOportunidadesRoute
+  AuthenticatedOrcamentosRoute: typeof AuthenticatedOrcamentosRoute
   AuthenticatedPerfisBuscaRoute: typeof AuthenticatedPerfisBuscaRoute
   AuthenticatedPlaybooksRoute: typeof AuthenticatedPlaybooksRoute
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
@@ -562,7 +624,10 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedHandoffsRoute: AuthenticatedHandoffsRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRouteWithChildren,
   AuthenticatedListasRoute: AuthenticatedListasRoute,
+  AuthenticatedMissionControlRoute: AuthenticatedMissionControlRoute,
   AuthenticatedObservabilidadeRoute: AuthenticatedObservabilidadeRoute,
+  AuthenticatedOportunidadesRoute: AuthenticatedOportunidadesRoute,
+  AuthenticatedOrcamentosRoute: AuthenticatedOrcamentosRoute,
   AuthenticatedPerfisBuscaRoute: AuthenticatedPerfisBuscaRoute,
   AuthenticatedPlaybooksRoute: AuthenticatedPlaybooksRoute,
   AuthenticatedPortalRoute: AuthenticatedPortalRoute,

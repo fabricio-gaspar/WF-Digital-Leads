@@ -234,7 +234,7 @@ export interface ProspectingResult {
   whatsapp?: string;
   email?: string;
   site?: string;
-  source: "vibe" | "apify" | "csv" | "demo";
+  source: "vibe" | "apify" | "csv" | "demo" | "gmaps";
   collectedAt: string;
   confidence: number; // 0..1
   status: "novo" | "convertido" | "ignorado" | "duplicado" | "invalido" | "revisao";

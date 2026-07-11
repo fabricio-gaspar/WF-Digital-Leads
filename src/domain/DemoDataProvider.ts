@@ -108,7 +108,9 @@ export type AuditAction =
   | "message.sent"
   | "message.blocked"
   | "service.sdr_toggled"
-  | "handoff.updated";
+  | "handoff.updated"
+  | "handoff.accepted"
+  | "handoff.rejected";
 
 export interface AuditEntry {
   id: string;
