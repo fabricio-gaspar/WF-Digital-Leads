@@ -27,13 +27,8 @@ function EmpresaServicosPage() {
 
   return (
     <AppShell title="Empresa e Serviços" subtitle="Perfil da empresa, catálogo e base do SDR">
-      <div className="p-6 max-w-6xl mx-auto space-y-6">
-        <header>
-          <h1 className="text-2xl font-semibold text-foreground">Empresa e Serviços</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Configure sua empresa, catálogo de serviços e a base do SDR Virtual.
-          </p>
-        </header>
+      <div className="max-w-6xl mx-auto space-y-6">
+
 
         <div className="flex gap-1 border-b border-border">
           {tabs.map((t) => {
