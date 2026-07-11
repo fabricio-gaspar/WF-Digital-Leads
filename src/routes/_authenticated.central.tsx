@@ -151,10 +151,16 @@ function SdrDraftsPanel() {
     );
   }
 
-  const approve = (id: string, novoTexto?: string) => {
-    updateSdrDraft(id, { status: novoTexto ? "editado" : "aprovado", ...(novoTexto && { draftReply: novoTexto }) });
-    toast.success("Rascunho aprovado (sandbox — sem envio real).");
-    setEditing(null);
+  const approve = async (id: string, novoTexto?: string) => {
+    const draft = pendentes.find((d) => d.id === id);
+    if (!draft) return;
+    const res = await sendApprovedDraft({ draft, editedBody: novoTexto });
+    if (res.ok) {
+      toast.success("Rascunho aprovado e mensagem registrada (sandbox).");
+      setEditing(null);
+    } else {
+      toast.error(res.reason ?? "Falha ao enviar rascunho.");
+    }
   };
   const discard = (id: string) => {
     updateSdrDraft(id, { status: "descartado" });
