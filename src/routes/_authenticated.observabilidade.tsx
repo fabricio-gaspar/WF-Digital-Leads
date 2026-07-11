@@ -27,23 +27,68 @@ export const Route = createFileRoute("/_authenticated/observabilidade")({
   component: ObservabilidadePage,
 });
 
+const AUTONOMY_ICONS: Record<AutonomyLevel, typeof Eye> = {
+  Sombra: Eye,
+  Copiloto: UsersIcon,
+  Semiautomático: Gauge,
+  PilotoAutomatico: Zap,
+};
+
 function ObservabilidadePage() {
   const audit = useAuditLog();
   const messages = useSentMessages();
   const imports = useImportBatches();
   const searches = useSearchRuns();
+  const autonomy = useAutonomy();
 
   return (
     <div className="p-6 space-y-6">
       <header>
-        <h1 className="text-2xl font-bold text-foreground">Observabilidade</h1>
+        <h1 className="text-2xl font-bold text-foreground">Control Tower</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Auditoria completa da demo — todos os eventos ficam no navegador (localStorage).
+          Auditoria, telemetria, nível de autonomia do SDR e kill-switch global — tudo em uma tela.
           <span className="ml-2 text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">
             SANDBOX
           </span>
         </p>
       </header>
+
+      <div className="rounded-xl border border-border bg-card p-4 space-y-3">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div>
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <ShieldAlert className="h-4 w-4 text-primary" /> Nível de autonomia global
+            </h3>
+            <p className="text-xs text-muted-foreground">Atualizado {new Date(autonomy.updatedAt).toLocaleString("pt-BR")}</p>
+          </div>
+          <button
+            onClick={() => setGlobalKillSwitch(!autonomy.killSwitch)}
+            className={`h-9 px-3 rounded-lg text-sm font-medium inline-flex items-center gap-1.5 ${autonomy.killSwitch ? "bg-red-600 text-white" : "border border-border bg-background text-foreground hover:bg-muted"}`}
+          >
+            <Power className="h-4 w-4" />
+            {autonomy.killSwitch ? "SDR PAUSADO — Reativar" : "Pausar SDR (kill-switch)"}
+          </button>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+          {(["Sombra", "Copiloto", "Semiautomático", "PilotoAutomatico"] as const).map((level) => {
+            const active = autonomy.level === level;
+            const Icon = AUTONOMY_ICONS[level];
+            return (
+              <button
+                key={level}
+                onClick={() => setAutonomyLevel(level)}
+                className={`p-3 rounded-lg border text-left transition-all ${active ? "border-primary bg-primary/10 ring-2 ring-primary/30" : "border-border bg-background hover:border-primary/40"}`}
+              >
+                <div className="flex items-center gap-1.5">
+                  <Icon className={`h-4 w-4 ${active ? "text-primary" : "text-muted-foreground"}`} />
+                  <span className={`text-sm font-semibold ${active ? "text-primary" : "text-foreground"}`}>{level}</span>
+                </div>
+                <p className="text-[11px] text-muted-foreground mt-1 leading-tight">{AUTONOMY_DESCRIPTIONS[level]}</p>
+              </button>
+            );
+          })}
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
         <KpiCard icon={Activity} label="Eventos de auditoria" value={audit.length} />
@@ -51,6 +96,7 @@ function ObservabilidadePage() {
         <KpiCard icon={Upload} label="Lotes importados" value={imports.length} />
         <KpiCard icon={Search} label="Execuções de busca" value={searches.length} />
       </div>
+
 
       <Section title="Audit log (últimos 50)">
         <table className="w-full text-sm">
