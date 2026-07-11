@@ -252,6 +252,7 @@ function OrcamentoDetail({ id, onClose }: { id: string; onClose: () => void }) {
   const o = orcamentos.find((x) => x.id === id);
   if (!o) return null;
 
+  const totals = computeOrcamentoTotals(o);
   const exportPDF = () => {
     const conteudo = [
       `ORÇAMENTO ${o.numero} (v${o.versao})`,
@@ -259,11 +260,11 @@ function OrcamentoDetail({ id, onClose }: { id: string; onClose: () => void }) {
       `Data: ${new Date(o.criadoEm).toLocaleDateString("pt-BR")}`,
       "",
       "LINHAS:",
-      ...o.linhas.map((l) => `- ${l.descricao} × ${l.quantidade} @ R$ ${l.precoUnitario.toFixed(2)} = R$ ${l.subtotal.toFixed(2)}`),
+      ...o.linhas.map((l) => `- ${l.descricao} × ${l.quantidade} @ R$ ${l.precoUnitario.toFixed(2)} = R$ ${lineSub(l).toFixed(2)}`),
       "",
-      `Subtotal: R$ ${o.subtotal.toFixed(2)}`,
+      `Subtotal: R$ ${totals.subtotal.toFixed(2)}`,
       `Desconto geral: ${o.descontoGeral}%`,
-      `TOTAL: R$ ${o.total.toFixed(2)}`,
+      `TOTAL: R$ ${totals.total.toFixed(2)}`,
       `Validade: ${o.validadeDias} dias`,
     ].join("\n");
     const blob = new Blob([conteudo], { type: "text/plain;charset=utf-8" });
