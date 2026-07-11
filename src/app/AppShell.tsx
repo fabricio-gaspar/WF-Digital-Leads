@@ -22,7 +22,6 @@ export function AppShell({ title, subtitle, actions, children }: Props) {
           <div className="mx-auto max-w-[1500px] px-4 md:px-[26px] py-[22px] pb-16">
             {children}
           </div>
-          </div>
         </main>
       </div>
     </div>
