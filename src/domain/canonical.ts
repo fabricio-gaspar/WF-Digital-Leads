@@ -506,6 +506,7 @@ export function aprovarOrcamento(id: string, aprovado: boolean, aprovadoPor?: st
     entityId: id,
     metadata: {},
   });
+}
 export function nextVersaoOrcamento(id: string) {
   const orig = orcamentosStore.get().find((o) => o.id === id);
   if (!orig) return null;
