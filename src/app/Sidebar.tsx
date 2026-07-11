@@ -4,6 +4,7 @@ import {
   BarChart3, Settings, LogOut, UserCircle2, Menu, X,
   Building2, Target, List, Megaphone, Zap, ArrowRightLeft, BookOpen,
   Bot, LineChart, ChevronDown, ChevronRight, Sparkles, Compass, Gauge, Activity,
+  Rocket, Briefcase, FileText,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/auth/AuthProvider";
