@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
 import { AppShell } from "@/app/AppShell";
+import { PageHero } from "@/app/PageHero";
 import { z } from "zod";
 import {
   useDiagnostics, useICPs, usePersonas, useTerritories, useSellingProfiles, useStrategySync,
