@@ -38,10 +38,10 @@ async def main() -> None:
         # 2. SIMULADOR — envia mensagem, gera rascunho
         await page.goto(f"{BASE}/simulador", wait_until="domcontentloaded")
         await page.wait_for_timeout(500)
-        textarea = page.locator("textarea").first
-        await textarea.fill("Olá, gostaria de saber mais sobre os serviços de vocês")
-        await page.get_by_role("button", name="Enviar").first.click()
-        await page.wait_for_timeout(800)
+        chat_input = page.get_by_placeholder("Digite como se fosse o lead...")
+        await chat_input.fill("Olá, gostaria de saber mais sobre os serviços de vocês")
+        await chat_input.press("Enter")
+        await page.wait_for_timeout(900)
         await page.screenshot(path=str(SHOTS / "3_simulador.png"))
 
         # 3. CENTRAL — aprovar rascunho
