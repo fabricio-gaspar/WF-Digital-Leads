@@ -26,7 +26,7 @@ function EmpresaServicosPage() {
   ];
 
   return (
-    <AppShell>
+    <AppShell title="Empresa e Serviços" subtitle="Perfil da empresa, catálogo e base do SDR">
       <div className="p-6 max-w-6xl mx-auto space-y-6">
         <header>
           <h1 className="text-2xl font-semibold text-foreground">Empresa e Serviços</h1>
