@@ -105,8 +105,8 @@ function LoginPage() {
             {loading && <Loader2 className="h-4 w-4 animate-spin" />} Entrar no CRM
           </button>
 
-          <details className="text-[12px] text-muted-foreground border-t border-border pt-3 mt-3">
-            <summary className="cursor-pointer hover:text-foreground">Usuários de demonstração</summary>
+          <details open className="text-[12px] text-muted-foreground border-t border-border pt-3 mt-3">
+            <summary className="cursor-pointer hover:text-foreground font-medium">Usuários de demonstração (clique para preencher)</summary>
             <div className="mt-2 space-y-1">
               <p>Senha para todos: <code className="bg-muted px-1.5 py-0.5 rounded">demo123</code></p>
               {demoUsers.map((u) => (
@@ -114,10 +114,13 @@ function LoginPage() {
                   key={u.id}
                   type="button"
                   onClick={() => { setEmail(u.email); setPassword("demo123"); }}
-                  className="w-full text-left hover:bg-muted rounded px-1.5 py-1 flex justify-between"
+                  className="w-full text-left hover:bg-muted rounded px-1.5 py-1.5 flex flex-col gap-0.5 border border-transparent hover:border-border"
                 >
-                  <span>{u.name}</span>
-                  <span className="capitalize text-primary">{u.role}</span>
+                  <span className="flex justify-between items-center">
+                    <span className="font-medium text-foreground">{u.name}</span>
+                    <span className="capitalize text-primary text-[11px]">{u.role}</span>
+                  </span>
+                  <span className="text-[11px] text-muted-foreground">{u.email}</span>
                 </button>
               ))}
             </div>
