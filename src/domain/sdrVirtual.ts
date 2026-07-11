@@ -555,6 +555,16 @@ export function updateHandoffStatus(id: string, status: HandoffStatus, motivo?: 
   handoffsStore.set((d) => d.map((h) => h.id === id ? { ...h, status, ...(motivo && { motivoDevolucao: motivo }), ...(status === "Aceito" && { aceitoEm: new Date().toISOString() }) } : h));
 }
 
+export function addHandoff(h: Omit<Handoff, "id" | "criadoEm"> & { id?: string }) {
+  const novo: Handoff = {
+    ...h,
+    id: h.id ?? `hd-${Date.now()}`,
+    criadoEm: new Date().toISOString().replace("T", " ").slice(0, 16),
+  };
+  handoffsStore.set((d) => [novo, ...d]);
+  return novo;
+}
+
 // ============ INTEGRATION STATUS ============
 export type IntegrationStatus = "Real" | "Sandbox" | "Não configurado" | "Desconectado" | "Erro";
 export interface IntegrationInfo {
