@@ -1,7 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { AppShell } from "@/app/AppShell";
-import { integrations, sdrPolicies, type IntegrationStatus } from "@/domain/sdrVirtual";
-import { Plug, Bot, MessageCircle, Radio, Sparkles, ShieldCheck } from "lucide-react";
+import { integrations, useSdrDrafts, updateSdrDraft, DEFAULT_SDR_MODE, type IntegrationStatus } from "@/domain/sdrVirtual";
+import { Plug, Bot, MessageCircle, Radio, Sparkles, ShieldCheck, Send, Pencil, Trash2, AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
+
 
 export const Route = createFileRoute("/_authenticated/central")({
   head: () => ({ meta: [{ title: "Central de Conversas — WF Digital Leads" }] }),
@@ -40,12 +43,16 @@ function CentralPage() {
           <div className="pt-3 mt-3 border-t border-border">
             <div className="text-[10px] text-muted-foreground uppercase tracking-wide px-2 mb-1.5">Modo SDR</div>
             <div className="px-2 py-1.5 rounded-md bg-primary/10 text-primary text-xs font-medium flex items-center gap-1.5">
-              <Bot className="h-3.5 w-3.5" /> {sdrPolicies.modo}
+              <Bot className="h-3.5 w-3.5" /> {DEFAULT_SDR_MODE}
             </div>
+            <div className="text-[10px] text-muted-foreground px-2 mt-1">Rascunhos exigem aprovação humana antes do envio.</div>
           </div>
         </aside>
 
+
         <div className="space-y-3">
+          <SdrDraftsPanel />
+
           <div className="rounded-xl border border-border bg-card overflow-hidden">
             {conversas.map((c) => (
               <div key={c.id} className="flex items-start gap-3 p-4 border-b border-border last:border-0 hover:bg-muted/30 cursor-pointer">
@@ -117,3 +124,98 @@ function FilterItem({ label, count, active }: { label: string; count: number; ac
     </button>
   );
 }
+
+const SEV_STYLE = {
+  info: "bg-sky-100 text-sky-700",
+  warn: "bg-amber-100 text-amber-700",
+  block: "bg-red-100 text-red-700",
+} as const;
+
+function SdrDraftsPanel() {
+  const drafts = useSdrDrafts();
+  const pendentes = drafts.filter((d) => d.status === "pendente");
+  const [editing, setEditing] = useState<string | null>(null);
+  const [text, setText] = useState("");
+
+  if (pendentes.length === 0) {
+    return (
+      <div className="rounded-xl border border-emerald-200 bg-emerald-50 dark:bg-emerald-950/20 p-4 flex gap-3 text-sm text-emerald-900 dark:text-emerald-200">
+        <Bot className="h-5 w-5 shrink-0" />
+        <div>
+          <div className="font-medium">Fila do SDR vazia</div>
+          <div className="text-xs mt-0.5">Nenhum rascunho aguardando aprovação. Novos rascunhos gerados pelo Simulador aparecem aqui automaticamente.</div>
+        </div>
+      </div>
+    );
+  }
+
+  const approve = (id: string, novoTexto?: string) => {
+    updateSdrDraft(id, { status: novoTexto ? "editado" : "aprovado", ...(novoTexto && { draftReply: novoTexto }) });
+    toast.success("Rascunho aprovado (sandbox — sem envio real).");
+    setEditing(null);
+  };
+  const discard = (id: string) => {
+    updateSdrDraft(id, { status: "descartado" });
+    toast.message("Rascunho descartado.");
+  };
+
+  return (
+    <div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Bot className="h-4 w-4 text-primary" />
+          <h3 className="font-semibold text-foreground text-sm">Fila do SDR — {pendentes.length} rascunho(s) aguardando aprovação</h3>
+        </div>
+        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">Semiautomático</span>
+      </div>
+      {pendentes.map((d) => {
+        const blocked = d.guardrails.some((g) => g.severity === "block");
+        return (
+          <div key={d.id} className="rounded-lg border border-border bg-card p-3 space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <div className="text-foreground"><b>{d.empresa}</b> · {d.contato}</div>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <span>fonte: <b>{d.source}</b></span>
+                <span>· conf. <b className={d.confidence >= 75 ? "text-emerald-600" : d.confidence >= 50 ? "text-amber-600" : "text-red-600"}>{d.confidence}%</b></span>
+              </div>
+            </div>
+            <div className="text-xs text-muted-foreground italic border-l-2 border-border pl-2">Lead: "{d.leadMessage}"</div>
+            {editing === d.id ? (
+              <textarea value={text} onChange={(e) => setText(e.target.value)} rows={3} className="w-full text-sm px-3 py-2 rounded border border-border bg-background" />
+            ) : (
+              <div className="text-sm text-foreground bg-muted/40 rounded p-2">{d.draftReply}</div>
+            )}
+            {d.guardrails.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {d.guardrails.map((g, i) => (
+                  <span key={i} className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded font-medium ${SEV_STYLE[g.severity]}`} title={g.detail}>
+                    {g.severity === "block" && <AlertTriangle className="h-3 w-3" />}
+                    {g.rule}
+                  </span>
+                ))}
+              </div>
+            )}
+            {blocked && (
+              <div className="text-xs text-red-700 bg-red-50 border border-red-200 rounded p-2">Guardrail bloqueou envio automático. Revise ou encaminhe para handoff.</div>
+            )}
+            <div className="flex items-center justify-end gap-2">
+              {editing === d.id ? (
+                <>
+                  <button onClick={() => setEditing(null)} className="px-3 py-1.5 rounded text-xs border border-border hover:bg-muted">Cancelar</button>
+                  <button onClick={() => approve(d.id, text)} className="px-3 py-1.5 rounded text-xs bg-primary text-primary-foreground font-medium hover:bg-primary/90 inline-flex items-center gap-1"><Send className="h-3 w-3" /> Aprovar edição</button>
+                </>
+              ) : (
+                <>
+                  <button onClick={() => discard(d.id)} className="px-3 py-1.5 rounded text-xs border border-border hover:bg-muted inline-flex items-center gap-1"><Trash2 className="h-3 w-3" /> Descartar</button>
+                  <button onClick={() => { setEditing(d.id); setText(d.draftReply); }} className="px-3 py-1.5 rounded text-xs border border-border hover:bg-muted inline-flex items-center gap-1"><Pencil className="h-3 w-3" /> Editar</button>
+                  <button onClick={() => approve(d.id)} disabled={blocked} className="px-3 py-1.5 rounded text-xs bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 inline-flex items-center gap-1"><Send className="h-3 w-3" /> Aprovar e enviar</button>
+                </>
+              )}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+

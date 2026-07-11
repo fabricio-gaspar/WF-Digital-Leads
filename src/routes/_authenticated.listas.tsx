@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { AppShell } from "@/app/AppShell";
 import { useLeadLists, useServicesList } from "@/domain/sdrVirtual";
-import { List, CheckCircle2, XCircle, Copy } from "lucide-react";
+import { List, CheckCircle2, XCircle, Copy, Upload } from "lucide-react";
+import { LeadListImporter } from "@/components/LeadListImporter";
 
 export const Route = createFileRoute("/_authenticated/listas")({
   head: () => ({ meta: [{ title: "Listas de Leads — WF Digital Leads" }] }),
@@ -11,17 +13,25 @@ export const Route = createFileRoute("/_authenticated/listas")({
 function ListasPage() {
   const lists = useLeadLists();
   const services = useServicesList();
+  const [importing, setImporting] = useState(false);
   const getServiceName = (id: string) => services.find((s) => s.id === id)?.nome ?? "—";
 
   return (
     <AppShell title="Listas de Leads" subtitle="Resultados de buscas transformados em listas trabalháveis">
       <div className="max-w-6xl mx-auto space-y-4">
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] px-2 py-1 rounded-full bg-amber-100 text-amber-700 font-medium">SANDBOX DEMO — dados em memória, sem envio real</span>
+          <button onClick={() => setImporting(true)} className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90">
+            <Upload className="h-4 w-4" /> Importar CSV/XLSX
+          </button>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           <Stat label="Total de listas" value={lists.length} />
           <Stat label="Leads válidos" value={lists.reduce((a, l) => a + l.validos, 0)} tone="emerald" />
           <Stat label="Duplicados" value={lists.reduce((a, l) => a + l.duplicados, 0)} tone="amber" />
           <Stat label="Bloqueados" value={lists.reduce((a, l) => a + l.bloqueados, 0)} tone="red" />
         </div>
+
 
         <div className="rounded-xl border border-border bg-card overflow-hidden">
           <table className="w-full text-sm">
@@ -72,9 +82,11 @@ function ListasPage() {
           <span>Listas geradas por buscas Vibe/Apify/Importação sandbox — clique em uma busca em <Link to="/prospeccao" className="text-primary hover:underline">Prospecção</Link> para criar uma nova.</span>
         </div>
       </div>
+      {importing && <LeadListImporter onClose={() => setImporting(false)} />}
     </AppShell>
   );
 }
+
 
 function Stat({ label, value, tone }: { label: string; value: number; tone?: "emerald" | "amber" | "red" }) {
   const cls = tone === "emerald" ? "text-emerald-600" : tone === "amber" ? "text-amber-600" : tone === "red" ? "text-red-600" : "text-foreground";
