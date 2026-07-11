@@ -6,6 +6,7 @@ import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { X, Upload, FileSpreadsheet, CheckCircle2, AlertTriangle } from "lucide-react";
 import { addLeadList, useServicesList } from "@/domain/sdrVirtual";
+import { recordImportBatch } from "@/domain/DemoDataProvider";
 import { toast } from "sonner";
 
 type RawRow = Record<string, string>;
