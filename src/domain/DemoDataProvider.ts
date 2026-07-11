@@ -324,10 +324,136 @@ export async function batchApproveDrafts(
 export { _useSdrDrafts as useSdrDrafts };
 export const useDraftsFromProvider = _useSdrDrafts;
 
+// ============================================================
+// Fase 2+: Entidades canônicas — ImportBatch, SearchRun, EnrichmentEvent
+// Persistidas em localStorage, sempre escopadas por organizationId.
+// ============================================================
+
+export interface ImportBatch {
+  id: string;
+  organizationId: string;
+  userId: string;
+  fileName: string;
+  format: "csv" | "xlsx";
+  listaId?: string;
+  servicoId?: string;
+  totalRows: number;
+  validos: number;
+  duplicados: number;
+  bloqueados: number;
+  createdAt: string;
+}
+
+const importBatchStore = createPersistedStore<ImportBatch>("wfdl:import-batches", []);
+export const useImportBatches = () =>
+  useSyncExternalStore(importBatchStore.subscribe, importBatchStore.get, () => importBatchStore.get());
+
+export function recordImportBatch(
+  input: Omit<ImportBatch, "id" | "organizationId" | "userId" | "createdAt"> & { userId?: string },
+): ImportBatch {
+  const batch: ImportBatch = {
+    id: `ib-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    organizationId: ORGANIZATION_ID,
+    userId: input.userId ?? CURRENT_USER_ID,
+    fileName: input.fileName,
+    format: input.format,
+    listaId: input.listaId,
+    servicoId: input.servicoId,
+    totalRows: input.totalRows,
+    validos: input.validos,
+    duplicados: input.duplicados,
+    bloqueados: input.bloqueados,
+    createdAt: new Date().toISOString(),
+  };
+  importBatchStore.set((d) => [batch, ...d].slice(0, 200));
+  appendAudit({
+    action: "draft.approved",
+    entityType: "import_batch",
+    entityId: batch.id,
+    metadata: {
+      fileName: batch.fileName,
+      totalRows: batch.totalRows,
+      validos: batch.validos,
+    },
+  });
+  return batch;
+}
+
+export interface SearchRun {
+  id: string;
+  organizationId: string;
+  userId: string;
+  perfilId?: string;
+  query: string;
+  location?: string;
+  totalFound: number;
+  qualified: number;
+  status: "sandbox" | "concluida";
+  createdAt: string;
+}
+
+const searchRunStore = createPersistedStore<SearchRun>("wfdl:search-runs", []);
+export const useSearchRuns = () =>
+  useSyncExternalStore(searchRunStore.subscribe, searchRunStore.get, () => searchRunStore.get());
+
+export function recordSearchRun(
+  input: Omit<SearchRun, "id" | "organizationId" | "userId" | "createdAt" | "status"> & {
+    userId?: string;
+    status?: SearchRun["status"];
+  },
+): SearchRun {
+  const run: SearchRun = {
+    id: `sr-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    organizationId: ORGANIZATION_ID,
+    userId: input.userId ?? CURRENT_USER_ID,
+    perfilId: input.perfilId,
+    query: input.query,
+    location: input.location,
+    totalFound: input.totalFound,
+    qualified: input.qualified,
+    status: input.status ?? "sandbox",
+    createdAt: new Date().toISOString(),
+  };
+  searchRunStore.set((d) => [run, ...d].slice(0, 200));
+  return run;
+}
+
+export interface EnrichmentEvent {
+  id: string;
+  organizationId: string;
+  leadRef: string;
+  source: "gmaps" | "linkedin" | "web" | "manual";
+  hit: boolean;
+  fields: string[];
+  createdAt: string;
+}
+
+const enrichmentStore = createPersistedStore<EnrichmentEvent>("wfdl:enrichment-events", []);
+export const useEnrichmentEvents = () =>
+  useSyncExternalStore(enrichmentStore.subscribe, enrichmentStore.get, () => enrichmentStore.get());
+
+export function recordEnrichment(
+  input: Omit<EnrichmentEvent, "id" | "organizationId" | "createdAt">,
+): EnrichmentEvent {
+  const ev: EnrichmentEvent = {
+    id: `en-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    organizationId: ORGANIZATION_ID,
+    ...input,
+    createdAt: new Date().toISOString(),
+  };
+  enrichmentStore.set((d) => [ev, ...d].slice(0, 500));
+  return ev;
+}
+
 // Test-only utilities
 export const __test__ = {
   resetSentMessages: () => sentMessagesStore.reset(),
   resetAuditLog: () => auditLogStore.reset(),
+  resetImportBatches: () => importBatchStore.reset(),
+  resetSearchRuns: () => searchRunStore.reset(),
+  resetEnrichment: () => enrichmentStore.reset(),
   getSentMessages: () => sentMessagesStore.get(),
   getAuditLog: () => auditLogStore.get(),
+  getImportBatches: () => importBatchStore.get(),
+  getSearchRuns: () => searchRunStore.get(),
 };

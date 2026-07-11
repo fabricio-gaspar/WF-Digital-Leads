@@ -6,6 +6,7 @@ import Papa from "papaparse";
 import * as XLSX from "xlsx";
 import { X, Upload, FileSpreadsheet, CheckCircle2, AlertTriangle } from "lucide-react";
 import { addLeadList, useServicesList } from "@/domain/sdrVirtual";
+import { recordImportBatch } from "@/domain/DemoDataProvider";
 import { toast } from "sonner";
 
 type RawRow = Record<string, string>;
@@ -115,17 +116,27 @@ export function LeadListImporter({ onClose }: { onClose: () => void }) {
 
   const doImport = () => {
     if (!canImport) return;
+    const format: "csv" | "xlsx" = /\.csv$/i.test(fileName) ? "csv" : "xlsx";
     addLeadList({
       nome: nome.trim(),
       descricao: `Importação ${fileName}`,
       servicoId,
-      origem: `Importação manual (${/\.csv$/i.test(fileName) ? "CSV" : "XLSX"})`,
+      origem: `Importação manual (${format.toUpperCase()})`,
       responsavelId: "u-gestor",
       quantidade: rows.length,
       validos: analysis.validos,
       duplicados: analysis.duplicados,
       bloqueados: analysis.bloqueados,
       status: "Ativa",
+    });
+    recordImportBatch({
+      fileName,
+      format,
+      servicoId,
+      totalRows: rows.length,
+      validos: analysis.validos,
+      duplicados: analysis.duplicados,
+      bloqueados: analysis.bloqueados,
     });
     toast.success(`Lista "${nome}" criada com ${analysis.validos} leads válidos`);
     onClose();
