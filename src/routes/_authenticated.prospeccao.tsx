@@ -1,13 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/app/AppShell";
 import { useProspectingResults, useLeads } from "@/repositories/hooks";
-import { stores } from "@/repositories/demo";
+import { stores, generateId, nowIso } from "@/repositories/demo";
 import { useAuth } from "@/auth/AuthProvider";
 import { useState } from "react";
 import { Search, Sparkles, Import, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
-import { generateId, nowIso } from "@/repositories/demo";
 
 export const Route = createFileRoute("/_authenticated/prospeccao")({
   head: () => ({ meta: [{ title: "Prospecção — WF Digital CRM" }] }),
@@ -22,32 +21,38 @@ function ProspectingPage() {
   const [tab, setTab] = useState<"apify" | "vibe">("apify");
   const [query, setQuery] = useState("");
   const [running, setRunning] = useState(false);
-
-  const leadCompanyIds = new Set(leads.map((l) => l.companyId));
+  const [importedIds, setImportedIds] = useState<Set<string>>(new Set());
 
   function runSearch() {
     if (!query.trim()) return toast.error("Informe um termo de busca");
     setRunning(true);
     setTimeout(() => {
-      // Sandbox: gera resultados fake
+      const searchId = generateId("ps");
+      stores.prospectingSearches?.upsert?.({
+        id: searchId,
+        createdBy: session!.user.id,
+        createdAt: nowIso(),
+        provider: tab,
+        params: { query },
+        resultCount: 8,
+      } as never);
       const segmentos = ["Metalurgia", "Alimentos", "Logística", "TI", "Construção"];
-      const cidades = [["São Paulo", "SP"], ["Curitiba", "PR"], ["Belo Horizonte", "MG"], ["Porto Alegre", "RS"]];
+      const cidades: [string, string][] = [["São Paulo", "SP"], ["Curitiba", "PR"], ["Belo Horizonte", "MG"], ["Porto Alegre", "RS"]];
       for (let i = 0; i < 8; i++) {
         const c = cidades[i % cidades.length];
         stores.prospectingResults.upsert({
           id: generateId("pr"),
-          source: tab,
-          query,
-          razaoSocial: `${query} ${["Indústria", "Comércio", "Serviços"][i % 3]} Ltda`,
-          nomeFantasia: `${query} #${i + 1}`,
+          searchId,
+          empresa: `${query} ${["Indústria", "Comércio", "Serviços"][i % 3]} Ltda`,
           cnpj: `${10 + i}.${100 + i}.${200 + i}/0001-${10 + i}`,
           segmento: segmentos[i % segmentos.length],
           cidade: c[0],
           uf: c[1],
           telefone: `+55 ${11 + (i % 20)} 9${1000 + i}-${1000 + i}`,
-          site: `https://exemplo${i}.com.br`,
-          score: 40 + ((i * 7) % 60),
-          fetchedAt: nowIso(),
+          source: tab,
+          collectedAt: nowIso(),
+          confidence: 0.4 + ((i * 7) % 60) / 100,
+          status: "novo",
         });
       }
       qc.invalidateQueries({ queryKey: ["prospectingResults"] });
@@ -59,29 +64,30 @@ function ProspectingPage() {
   function importLead(id: string) {
     const r = stores.prospectingResults.get(id);
     if (!r) return;
-    const company = stores.companies.upsert({
-      id: generateId("co"),
-      razaoSocial: r.razaoSocial,
-      nomeFantasia: r.nomeFantasia,
+    const companyId = generateId("co");
+    stores.companies.upsert({
+      id: companyId,
+      razaoSocial: r.empresa,
+      nomeFantasia: r.empresa,
       cnpj: r.cnpj,
       segmento: r.segmento,
       cidade: r.cidade,
       uf: r.uf,
-      telefone: r.telefone,
-      site: r.site,
       createdAt: nowIso(),
     });
     stores.leads.upsert({
       id: generateId("ld"),
-      companyId: company.id,
+      companyId,
       ownerId: session!.user.id,
-      stage: "novo",
+      stage: "prospeccao",
       temperature: "frio",
-      score: r.score,
-      estimatedValue: 5000 + Math.round(r.score * 100),
-      source: r.source,
+      score: Math.round(r.confidence * 100),
+      estimatedValue: 5000 + Math.round(r.confidence * 10000),
+      source: "busca_ativa",
       createdAt: nowIso(),
+      updatedAt: nowIso(),
     });
+    setImportedIds((s) => new Set(s).add(id));
     qc.invalidateQueries();
     toast.success("Lead importado para o pipeline");
   }
@@ -121,23 +127,23 @@ function ProspectingPage() {
                 <th className="text-left px-3 py-2">Segmento</th>
                 <th className="text-left px-3 py-2">Local</th>
                 <th className="text-left px-3 py-2">Telefone</th>
-                <th className="text-right px-3 py-2">Score</th>
+                <th className="text-right px-3 py-2">Confiança</th>
                 <th className="text-right px-3 py-2">Ação</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((r) => {
-                const imported = leadCompanyIds.has(r.id);
+                const imported = importedIds.has(r.id);
                 return (
                   <tr key={r.id} className="border-t border-border hover:bg-muted/40">
                     <td className="px-3 py-2">
-                      <div className="font-medium">{r.nomeFantasia ?? r.razaoSocial}</div>
+                      <div className="font-medium">{r.empresa}</div>
                       <div className="text-[11px] text-muted-foreground">{r.cnpj}</div>
                     </td>
                     <td className="px-3 py-2 text-muted-foreground">{r.segmento}</td>
                     <td className="px-3 py-2 text-muted-foreground">{r.cidade}/{r.uf}</td>
                     <td className="px-3 py-2 text-muted-foreground">{r.telefone ?? "—"}</td>
-                    <td className="px-3 py-2 text-right font-medium">{r.score}</td>
+                    <td className="px-3 py-2 text-right font-medium">{Math.round(r.confidence * 100)}%</td>
                     <td className="px-3 py-2 text-right">
                       <button onClick={() => importLead(r.id)} disabled={imported} className="inline-flex items-center gap-1 h-8 px-2.5 rounded-md text-[12px] bg-primary-soft text-primary-strong hover:bg-primary hover:text-primary-foreground disabled:opacity-50">
                         <Import className="h-3.5 w-3.5" /> {imported ? "Importado" : "Importar"}
