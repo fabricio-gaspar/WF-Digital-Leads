@@ -120,6 +120,10 @@ function OrcamentosPage() {
   );
 }
 
+function lineSub(l: LinhaOrcamento) {
+  return l.quantidade * l.precoUnitario * (1 - l.desconto / 100);
+}
+
 function CreateOrcamentoCard({
   oportunidades,
   produtos,
@@ -139,7 +143,6 @@ function CreateOrcamentoCard({
   const linhasCompletas: LinhaOrcamento[] = linhas.map((l, i) => {
     const p = produtos.find((x) => x.id === l.produtoId);
     const precoUnit = p?.precoBase ?? 0;
-    const subtotal = precoUnit * l.qtd * (1 - l.desconto / 100);
     return {
       id: `line-${i}`,
       produtoId: l.produtoId,
@@ -147,31 +150,32 @@ function CreateOrcamentoCard({
       quantidade: l.qtd,
       precoUnitario: precoUnit,
       desconto: l.desconto,
-      subtotal,
     };
   });
 
-  const subtotal = linhasCompletas.reduce((s, l) => s + l.subtotal, 0);
+  const subtotal = linhasCompletas.reduce((s, l) => s + lineSub(l), 0);
   const total = subtotal * (1 - descontoGeral / 100);
 
   const submit = () => {
     if (!opId) return toast.error("Selecione a oportunidade");
     if (linhasCompletas.length === 0) return toast.error("Adicione pelo menos uma linha");
+    const op = oportunidades.find((x) => x.id === opId);
+    if (!op) return toast.error("Oportunidade inválida");
     const requerAprovacao = descontoGeral > 15 || linhasCompletas.some((l) => l.desconto > 20);
     createOrcamento({
       oportunidadeId: opId,
+      empresaId: op.empresaId,
+      vendedorId: op.vendedorId,
       linhas: linhasCompletas,
-      subtotal,
       descontoGeral,
-      total,
       status: requerAprovacao ? "Aguardando aprovação" : "Rascunho",
       validadeDias: 30,
-      versao: 1,
       observacoes: "",
     });
     toast.success(requerAprovacao ? "Orçamento criado · requer aprovação (desconto > 15%)" : "Orçamento criado");
     onClose();
   };
+
 
   return (
     <div className="rounded-xl border border-primary/40 bg-primary/5 p-4 space-y-3">
