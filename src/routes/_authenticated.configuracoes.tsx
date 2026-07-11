@@ -121,9 +121,6 @@ function SettingsPage() {
 }
 
 function IntegrationsTab({ channels }: { channels: { id: string; alias: string; phone?: string; status: string }[] }) {
-  // Import dinâmico evita ciclo com AppShell / router
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { providerStatus } = require("@/providers") as typeof import("@/providers");
   const status = providerStatus();
   return (
     <div>
