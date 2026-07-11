@@ -20,6 +20,7 @@ import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedPlaybooksRouteImport } from './routes/_authenticated.playbooks'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated.leads'
 import { Route as AuthenticatedEstrategiaRouteImport } from './routes/_authenticated.estrategia'
+import { Route as AuthenticatedEmpresaServicosRouteImport } from './routes/_authenticated.empresa-servicos'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated.configuracoes'
 import { Route as AuthenticatedCampanhasRouteImport } from './routes/_authenticated.campanhas'
@@ -80,6 +81,12 @@ const AuthenticatedEstrategiaRoute = AuthenticatedEstrategiaRouteImport.update({
   path: '/estrategia',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedEmpresaServicosRoute =
+  AuthenticatedEmpresaServicosRouteImport.update({
+    id: '/empresa-servicos',
+    path: '/empresa-servicos',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -117,6 +124,7 @@ export interface FileRoutesByFullPath {
   '/campanhas': typeof AuthenticatedCampanhasRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/empresa-servicos': typeof AuthenticatedEmpresaServicosRoute
   '/estrategia': typeof AuthenticatedEstrategiaRoute
   '/leads': typeof AuthenticatedLeadsRouteWithChildren
   '/playbooks': typeof AuthenticatedPlaybooksRoute
@@ -134,6 +142,7 @@ export interface FileRoutesByTo {
   '/campanhas': typeof AuthenticatedCampanhasRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/empresa-servicos': typeof AuthenticatedEmpresaServicosRoute
   '/estrategia': typeof AuthenticatedEstrategiaRoute
   '/leads': typeof AuthenticatedLeadsRouteWithChildren
   '/playbooks': typeof AuthenticatedPlaybooksRoute
@@ -153,6 +162,7 @@ export interface FileRoutesById {
   '/_authenticated/campanhas': typeof AuthenticatedCampanhasRoute
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/empresa-servicos': typeof AuthenticatedEmpresaServicosRoute
   '/_authenticated/estrategia': typeof AuthenticatedEstrategiaRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRouteWithChildren
   '/_authenticated/playbooks': typeof AuthenticatedPlaybooksRoute
@@ -172,6 +182,7 @@ export interface FileRouteTypes {
     | '/campanhas'
     | '/configuracoes'
     | '/dashboard'
+    | '/empresa-servicos'
     | '/estrategia'
     | '/leads'
     | '/playbooks'
@@ -189,6 +200,7 @@ export interface FileRouteTypes {
     | '/campanhas'
     | '/configuracoes'
     | '/dashboard'
+    | '/empresa-servicos'
     | '/estrategia'
     | '/leads'
     | '/playbooks'
@@ -207,6 +219,7 @@ export interface FileRouteTypes {
     | '/_authenticated/campanhas'
     | '/_authenticated/configuracoes'
     | '/_authenticated/dashboard'
+    | '/_authenticated/empresa-servicos'
     | '/_authenticated/estrategia'
     | '/_authenticated/leads'
     | '/_authenticated/playbooks'
@@ -303,6 +316,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedEstrategiaRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/empresa-servicos': {
+      id: '/_authenticated/empresa-servicos'
+      path: '/empresa-servicos'
+      fullPath: '/empresa-servicos'
+      preLoaderRoute: typeof AuthenticatedEmpresaServicosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -357,6 +377,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCampanhasRoute: typeof AuthenticatedCampanhasRoute
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedEmpresaServicosRoute: typeof AuthenticatedEmpresaServicosRoute
   AuthenticatedEstrategiaRoute: typeof AuthenticatedEstrategiaRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRouteWithChildren
   AuthenticatedPlaybooksRoute: typeof AuthenticatedPlaybooksRoute
@@ -371,6 +392,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCampanhasRoute: AuthenticatedCampanhasRoute,
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedEmpresaServicosRoute: AuthenticatedEmpresaServicosRoute,
   AuthenticatedEstrategiaRoute: AuthenticatedEstrategiaRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRouteWithChildren,
   AuthenticatedPlaybooksRoute: AuthenticatedPlaybooksRoute,
