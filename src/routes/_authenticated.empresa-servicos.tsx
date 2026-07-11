@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/app/AppShell";
 import { useCompanyProfile, useServicesList, useKnowledgeBase, sdrPolicies, toggleServiceSdr } from "@/domain/sdrVirtual";
-import { Building2, Package, BookOpen, Shield, CheckCircle2, AlertTriangle, Power, PowerOff } from "lucide-react";
+import { useProdutos, useOfertas, upsertProduto, removeProduto, upsertOferta, removeOferta } from "@/domain/canonical";
+import { Building2, Package, BookOpen, Shield, CheckCircle2, AlertTriangle, Power, PowerOff, ShoppingBag, Tag, Trash2, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/empresa-servicos")({
@@ -10,17 +11,21 @@ export const Route = createFileRoute("/_authenticated/empresa-servicos")({
   component: EmpresaServicosPage,
 });
 
-type Tab = "empresa" | "servicos" | "conhecimento" | "limites" | "revisao";
+type Tab = "empresa" | "servicos" | "produtos" | "ofertas" | "conhecimento" | "limites" | "revisao";
 
 function EmpresaServicosPage() {
   const [tab, setTab] = useState<Tab>("empresa");
   const company = useCompanyProfile();
   const services = useServicesList();
   const knowledge = useKnowledgeBase();
+  const produtos = useProdutos();
+  const ofertas = useOfertas();
 
   const tabs: { id: Tab; label: string; icon: typeof Building2 }[] = [
     { id: "empresa", label: "Empresa", icon: Building2 },
     { id: "servicos", label: "Serviços", icon: Package },
+    { id: "produtos", label: "Produtos", icon: ShoppingBag },
+    { id: "ofertas", label: "Ofertas", icon: Tag },
     { id: "conhecimento", label: "Conhecimento SDR", icon: BookOpen },
     { id: "limites", label: "Limites SDR", icon: Shield },
     { id: "revisao", label: "Revisão", icon: CheckCircle2 },
