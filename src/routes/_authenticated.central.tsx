@@ -51,6 +51,8 @@ function CentralPage() {
 
 
         <div className="space-y-3">
+          <SdrDraftsPanel />
+
           <div className="rounded-xl border border-border bg-card overflow-hidden">
             {conversas.map((c) => (
               <div key={c.id} className="flex items-start gap-3 p-4 border-b border-border last:border-0 hover:bg-muted/30 cursor-pointer">
