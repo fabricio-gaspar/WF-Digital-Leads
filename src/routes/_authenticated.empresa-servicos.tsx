@@ -196,6 +196,9 @@ function EmpresaServicosPage() {
           </div>
         )}
 
+        {tab === "produtos" && <ProdutosTab produtos={produtos} />}
+        {tab === "ofertas" && <OfertasTab ofertas={ofertas} produtos={produtos} services={services} />}
+
         {tab === "limites" && (
           <div className="space-y-4">
             <div className="rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-950/20 p-4 flex gap-3">
