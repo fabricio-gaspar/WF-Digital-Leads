@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/app/AppShell";
-import { useProspectingResults, useLeads } from "@/repositories/hooks";
+import { useProspectingResults } from "@/repositories/hooks";
 import { stores, generateId, nowIso } from "@/repositories/demo";
 import { useAuth } from "@/auth/AuthProvider";
 import { useState } from "react";
