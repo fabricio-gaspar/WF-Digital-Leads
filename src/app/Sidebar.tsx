@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/estrategia", label: "Estratégia", icon: Compass },
   { to: "/leads", label: "Leads", icon: Users, badgeKey: "leads" as const },
   { to: "/prospeccao", label: "Prospecção", icon: Search },
   { to: "/atendimentos", label: "Atendimentos", icon: MessagesSquare, badgeKey: "conversas" as const },
