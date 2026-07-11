@@ -8,7 +8,14 @@ import {
   useImportBatches,
   useSearchRuns,
 } from "@/domain/DemoDataProvider";
-import { Activity, MessageSquare, Upload, Search } from "lucide-react";
+import {
+  useAutonomyLevel,
+  setAutonomyLevel,
+  useKillSwitch,
+  setKillSwitch,
+  type AutonomyLevel,
+} from "@/domain/canonical";
+import { Activity, MessageSquare, Upload, Search, Power, ShieldAlert, Eye, Users as UsersIcon, Gauge, Zap } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/observabilidade")({
   head: () => ({
