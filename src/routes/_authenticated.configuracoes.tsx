@@ -101,24 +101,7 @@ function SettingsPage() {
               </ul>
             </div>
           )}
-          {tab === "integracoes" && (
-            <div>
-              <h3 className="text-[14px] font-semibold mb-1">Integrações</h3>
-              <p className="text-[12px] text-muted-foreground mb-3">Todos os tokens ficam no backend seguro. O front nunca acessa credenciais.</p>
-              <ul className="space-y-2">
-                {channels.map((c) => (
-                  <li key={c.id} className="p-3 rounded-lg border border-border flex items-center justify-between">
-                    <div>
-                      <div className="text-[13px] font-medium">Z-API · {c.alias}</div>
-                      <div className="text-[11px] text-muted-foreground">{c.phone ?? "sem número"}</div>
-                    </div>
-                    <span className={`text-[11px] px-2 py-0.5 rounded-full ${c.status === "conectado" ? "bg-emerald-500/10 text-emerald-700" : "bg-muted text-muted-foreground"}`}>{c.status.replace("_", " ")}</span>
-                  </li>
-                ))}
-                <li className="p-3 rounded-lg border border-dashed border-border text-[12px] text-muted-foreground">Apify e Vibe Prospecting — configurados no backend seguro.</li>
-              </ul>
-            </div>
-          )}
+          {tab === "integracoes" && <IntegrationsTab channels={channels} />}
           {tab === "seguranca" && (
             <div>
               <h3 className="text-[14px] font-semibold mb-3">Segurança</h3>
