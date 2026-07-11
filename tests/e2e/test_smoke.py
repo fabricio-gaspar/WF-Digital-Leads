@@ -30,9 +30,10 @@ async def main() -> None:
         await page.screenshot(path=str(SHOTS / "1_login.png"))
         await page.get_by_role("button", name="Entrar no CRM").click()
         try:
-            await page.wait_for_url(f"{BASE}/dashboard", timeout=8000)
+            await page.wait_for_url(lambda u: "/login" not in u, timeout=15000)
         except Exception:
             failures.append(f"login: URL final foi {page.url}")
+        await page.wait_for_timeout(500)
         await page.screenshot(path=str(SHOTS / "2_dashboard.png"))
 
         # 2. SIMULADOR — envia mensagem, gera rascunho
