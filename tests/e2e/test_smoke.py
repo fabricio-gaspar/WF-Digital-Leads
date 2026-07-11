@@ -25,7 +25,8 @@ async def main() -> None:
 
         # 1. LOGIN
         await page.goto(f"{BASE}/login", wait_until="domcontentloaded")
-        await page.get_by_text("fabricio@wfdigital.com.br").first.click()
+        await page.locator("#email").press_sequentially("fabricio@wfdigital.com.br", delay=10)
+        await page.locator("#password").press_sequentially("demo123", delay=10)
         await page.screenshot(path=str(SHOTS / "1_login.png"))
         await page.get_by_role("button", name="Entrar no CRM").click()
         await page.wait_for_timeout(2500)
