@@ -4,6 +4,7 @@ import { useAuth } from "@/auth/AuthProvider";
 import { useUsers, useTeams, useTemplates, useChannels } from "@/repositories/hooks";
 import { useState } from "react";
 import { Users, Layers, MessageSquare, Plug, Shield } from "lucide-react";
+import { providerStatus } from "@/providers";
 
 export const Route = createFileRoute("/_authenticated/configuracoes")({
   head: () => ({ meta: [{ title: "Configurações — WF Digital CRM" }] }),
