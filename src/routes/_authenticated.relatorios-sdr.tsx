@@ -7,7 +7,8 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
   PieChart, Pie, Cell, Legend,
 } from "recharts";
-import { ArrowRightLeft, CheckCircle2, Clock, TrendingUp, Flame } from "lucide-react";
+import { ArrowRightLeft, CheckCircle2, Clock, TrendingUp, Flame, Download } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/relatorios-sdr")({
   head: () => ({ meta: [{ title: "Relatórios do SDR — WF Digital" }] }),
