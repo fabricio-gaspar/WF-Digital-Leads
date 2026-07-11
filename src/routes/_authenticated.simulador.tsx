@@ -85,6 +85,22 @@ function SimuladorPage() {
     setMessages((prev) => [...prev, userMsg, sdrMsg]);
     setState(reply.nextState);
     setInput("");
+
+    // Modo Semiautomático (padrão da demo): enfileira rascunho para aprovação humana na Central.
+    if (DEFAULT_SDR_MODE === "Semiautomático") {
+      addSdrDraft({
+        conversaId: `sim-${Date.now()}`,
+        empresa: companyName,
+        contato: leadName,
+        leadMessage: trimmed,
+        draftReply: reply.text,
+        source: reply.source,
+        confidence: reply.confidence,
+        requiresHuman: reply.requiresHuman,
+        guardrails: reply.guardrails,
+      });
+      toast.message("Rascunho enviado para a Central", { description: "Aguardando aprovação humana antes do envio (modo Semiautomático)." });
+    }
   }
 
   function reset() {
