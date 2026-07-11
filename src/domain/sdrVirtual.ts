@@ -82,6 +82,7 @@ export interface Service {
   nome: string;
   categoria: string;
   status: "Ativo" | "Rascunho" | "Pausado";
+  sdrAtivo?: boolean; // kill-switch por serviço — quando false, SDR não gera rascunhos para este serviço
   descricaoCurta: string;
   descricaoCompleta: string;
   publicoAdequado: string[];
