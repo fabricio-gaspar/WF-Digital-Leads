@@ -278,13 +278,13 @@ function BatchApprovalDialog({
     });
   };
 
-  const runBatch = () => {
-    let count = 0;
-    toApprove.forEach((d) => {
-      updateSdrDraft(d.id, { status: "aprovado" });
-      count++;
-    });
-    toast.success(`${count} rascunho(s) aprovado(s) em lote (sandbox — sem envio real).`);
+  const runBatch = async () => {
+    const res = await batchApproveDrafts(toApprove);
+    if (res.blocked > 0) {
+      toast.warning(`${res.approved} aprovados, ${res.blocked} bloqueados por guardrails.`);
+    } else {
+      toast.success(`${res.approved} rascunho(s) aprovado(s) em lote (sandbox).`);
+    }
     onClose();
   };
 
