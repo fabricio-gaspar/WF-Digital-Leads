@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/app/AppShell";
+import { PageHero } from "@/app/PageHero";
 import { usePlaybooks } from "@/domain/playbooks";
 import { STAGE_MAP } from "@/domain/constants";
 import { BookOpen, CheckCircle2, Target } from "lucide-react";
