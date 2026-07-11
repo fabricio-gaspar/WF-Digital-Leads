@@ -17,6 +17,7 @@ import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authentic
 import { Route as AuthenticatedProspeccaoRouteImport } from './routes/_authenticated.prospeccao'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated.leads'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
+import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated.configuracoes'
 import { Route as AuthenticatedAtendimentosRouteImport } from './routes/_authenticated.atendimentos'
 import { Route as AuthenticatedLeadsLeadIdRouteImport } from './routes/_authenticated.leads.$leadId'
 
@@ -59,6 +60,12 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedConfiguracoesRoute =
+  AuthenticatedConfiguracoesRouteImport.update({
+    id: '/configuracoes',
+    path: '/configuracoes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedAtendimentosRoute =
   AuthenticatedAtendimentosRouteImport.update({
     id: '/atendimentos',
@@ -77,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/atendimentos': typeof AuthenticatedAtendimentosRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/leads': typeof AuthenticatedLeadsRouteWithChildren
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
@@ -88,6 +96,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/atendimentos': typeof AuthenticatedAtendimentosRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/leads': typeof AuthenticatedLeadsRouteWithChildren
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
@@ -101,6 +110,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/_authenticated/atendimentos': typeof AuthenticatedAtendimentosRoute
+  '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRouteWithChildren
   '/_authenticated/prospeccao': typeof AuthenticatedProspeccaoRoute
@@ -114,6 +124,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/recuperar-senha'
     | '/atendimentos'
+    | '/configuracoes'
     | '/dashboard'
     | '/leads'
     | '/prospeccao'
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/recuperar-senha'
     | '/atendimentos'
+    | '/configuracoes'
     | '/dashboard'
     | '/leads'
     | '/prospeccao'
@@ -137,6 +149,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/recuperar-senha'
     | '/_authenticated/atendimentos'
+    | '/_authenticated/configuracoes'
     | '/_authenticated/dashboard'
     | '/_authenticated/leads'
     | '/_authenticated/prospeccao'
@@ -209,6 +222,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/configuracoes': {
+      id: '/_authenticated/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/atendimentos': {
       id: '/_authenticated/atendimentos'
       path: '/atendimentos'
@@ -239,6 +259,7 @@ const AuthenticatedLeadsRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAtendimentosRoute: typeof AuthenticatedAtendimentosRoute
+  AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRouteWithChildren
   AuthenticatedProspeccaoRoute: typeof AuthenticatedProspeccaoRoute
@@ -247,6 +268,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAtendimentosRoute: AuthenticatedAtendimentosRoute,
+  AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRouteWithChildren,
   AuthenticatedProspeccaoRoute: AuthenticatedProspeccaoRoute,
