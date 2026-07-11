@@ -43,10 +43,12 @@ function CentralPage() {
           <div className="pt-3 mt-3 border-t border-border">
             <div className="text-[10px] text-muted-foreground uppercase tracking-wide px-2 mb-1.5">Modo SDR</div>
             <div className="px-2 py-1.5 rounded-md bg-primary/10 text-primary text-xs font-medium flex items-center gap-1.5">
-              <Bot className="h-3.5 w-3.5" /> {sdrPolicies.modo}
+              <Bot className="h-3.5 w-3.5" /> {DEFAULT_SDR_MODE}
             </div>
+            <div className="text-[10px] text-muted-foreground px-2 mt-1">Rascunhos exigem aprovação humana antes do envio.</div>
           </div>
         </aside>
+
 
         <div className="space-y-3">
           <div className="rounded-xl border border-border bg-card overflow-hidden">
