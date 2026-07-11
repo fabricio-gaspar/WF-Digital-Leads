@@ -26,7 +26,7 @@ function SettingsPage() {
   const { data: templates = [] } = useTemplates();
   const { data: channels = [] } = useChannels();
 
-  const readonly = !can("manage:users");
+  const readonly = !hasPermission("manage:users");
 
   return (
     <AppShell title="Configurações" subtitle="Administração da plataforma">
