@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/app/AppShell";
-import { useCompanyProfile, useServicesList, useKnowledgeBase, sdrPolicies } from "@/domain/sdrVirtual";
-import { Building2, Package, BookOpen, Shield, CheckCircle2, AlertTriangle } from "lucide-react";
+import { useCompanyProfile, useServicesList, useKnowledgeBase, sdrPolicies, toggleServiceSdr } from "@/domain/sdrVirtual";
+import { Building2, Package, BookOpen, Shield, CheckCircle2, AlertTriangle, Power, PowerOff } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/empresa-servicos")({
   head: () => ({ meta: [{ title: "Empresa e Serviços — WF Digital Leads" }] }),
@@ -100,29 +101,60 @@ function EmpresaServicosPage() {
 
         {tab === "servicos" && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {services.map((s) => (
-              <div key={s.id} className="rounded-xl border border-border bg-card p-5 space-y-3">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="text-xs text-muted-foreground uppercase tracking-wide">{s.categoria}</div>
-                    <h3 className="text-base font-semibold text-foreground mt-0.5">{s.nome}</h3>
+            {services.map((s) => {
+              const sdrOn = s.sdrAtivo !== false;
+              return (
+                <div key={s.id} data-testid={`service-card-${s.id}`} className="rounded-xl border border-border bg-card p-5 space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="text-xs text-muted-foreground uppercase tracking-wide">{s.categoria}</div>
+                      <h3 className="text-base font-semibold text-foreground mt-0.5">{s.nome}</h3>
+                    </div>
+                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">{s.status}</span>
                   </div>
-                  <span className="text-[11px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">{s.status}</span>
+                  <p className="text-sm text-muted-foreground">{s.descricaoCurta}</p>
+
+                  <div className={`rounded-lg border p-3 flex items-center justify-between gap-3 ${sdrOn ? "border-emerald-200 bg-emerald-50/60 dark:bg-emerald-950/20" : "border-red-200 bg-red-50/60 dark:bg-red-950/20"}`}>
+                    <div className="flex items-center gap-2 min-w-0">
+                      {sdrOn ? <Power className="h-4 w-4 text-emerald-600 shrink-0" /> : <PowerOff className="h-4 w-4 text-red-600 shrink-0" />}
+                      <div className="min-w-0">
+                        <div className={`text-xs font-medium ${sdrOn ? "text-emerald-800 dark:text-emerald-200" : "text-red-800 dark:text-red-200"}`}>
+                          SDR {sdrOn ? "ativo" : "pausado"} para este serviço
+                        </div>
+                        <div className="text-[10px] text-muted-foreground">
+                          {sdrOn ? "Rascunhos serão gerados normalmente." : "Kill-switch acionado — nenhum rascunho será gerado."}
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        toggleServiceSdr(s.id);
+                        toast.message(sdrOn ? `SDR pausado para ${s.nome}` : `SDR reativado para ${s.nome}`);
+                      }}
+                      data-testid={`sdr-toggle-${s.id}`}
+                      role="switch"
+                      aria-checked={sdrOn}
+                      aria-label={`Alternar SDR para ${s.nome}`}
+                      className={`shrink-0 h-6 w-11 rounded-full relative transition-colors ${sdrOn ? "bg-emerald-500" : "bg-red-400"}`}
+                    >
+                      <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-all ${sdrOn ? "right-0.5" : "left-0.5"}`} />
+                    </button>
+                  </div>
+
+                  <div className="text-xs space-y-1.5 pt-2 border-t border-border">
+                    <div><span className="text-muted-foreground">Problema:</span> <span className="text-foreground">{s.problemaPrincipal}</span></div>
+                    <div><span className="text-muted-foreground">Ticket:</span> <span className="text-foreground">{s.faixaTicket ?? "—"}</span></div>
+                    <div><span className="text-muted-foreground">Preço:</span> <span className="text-foreground">{s.politicaPreco}</span></div>
+                    <div><span className="text-muted-foreground">Prazo:</span> <span className="text-foreground">{s.prazoInformavel}</span></div>
+                    <div><span className="text-muted-foreground">Personas:</span> <span className="text-foreground">{s.personas.join(", ")}</span></div>
+                  </div>
+                  <div className="pt-2 border-t border-border">
+                    <div className="text-xs text-muted-foreground mb-1.5">Mensagem inicial autorizada</div>
+                    <p className="text-xs bg-muted/50 rounded-md p-2.5 text-foreground italic">{s.mensagemInicial}</p>
+                  </div>
                 </div>
-                <p className="text-sm text-muted-foreground">{s.descricaoCurta}</p>
-                <div className="text-xs space-y-1.5 pt-2 border-t border-border">
-                  <div><span className="text-muted-foreground">Problema:</span> <span className="text-foreground">{s.problemaPrincipal}</span></div>
-                  <div><span className="text-muted-foreground">Ticket:</span> <span className="text-foreground">{s.faixaTicket ?? "—"}</span></div>
-                  <div><span className="text-muted-foreground">Preço:</span> <span className="text-foreground">{s.politicaPreco}</span></div>
-                  <div><span className="text-muted-foreground">Prazo:</span> <span className="text-foreground">{s.prazoInformavel}</span></div>
-                  <div><span className="text-muted-foreground">Personas:</span> <span className="text-foreground">{s.personas.join(", ")}</span></div>
-                </div>
-                <div className="pt-2 border-t border-border">
-                  <div className="text-xs text-muted-foreground mb-1.5">Mensagem inicial autorizada</div>
-                  <p className="text-xs bg-muted/50 rounded-md p-2.5 text-foreground italic">{s.mensagemInicial}</p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
 

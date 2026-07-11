@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/app/AppShell";
 import { integrations, useSdrDrafts, updateSdrDraft, DEFAULT_SDR_MODE, type IntegrationStatus } from "@/domain/sdrVirtual";
-import { Plug, Bot, MessageCircle, Radio, Sparkles, ShieldCheck, Send, Pencil, Trash2, AlertTriangle } from "lucide-react";
+import { Plug, Bot, MessageCircle, Radio, Sparkles, ShieldCheck, Send, Pencil, Trash2, AlertTriangle, CheckSquare, X } from "lucide-react";
 import { toast } from "sonner";
 
 
@@ -136,6 +136,7 @@ function SdrDraftsPanel() {
   const pendentes = drafts.filter((d) => d.status === "pendente");
   const [editing, setEditing] = useState<string | null>(null);
   const [text, setText] = useState("");
+  const [batchOpen, setBatchOpen] = useState(false);
 
   if (pendentes.length === 0) {
     return (
@@ -159,19 +160,32 @@ function SdrDraftsPanel() {
     toast.message("Rascunho descartado.");
   };
 
+  const elegiveis = pendentes.filter((d) => !d.guardrails.some((g) => g.severity === "block"));
+  const bloqueados = pendentes.length - elegiveis.length;
+
   return (
     <div className="rounded-xl border-2 border-primary/30 bg-primary/5 p-4 space-y-3">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <Bot className="h-4 w-4 text-primary" />
           <h3 className="font-semibold text-foreground text-sm">Fila do SDR — {pendentes.length} rascunho(s) aguardando aprovação</h3>
         </div>
-        <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">Semiautomático</span>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setBatchOpen(true)}
+            disabled={elegiveis.length === 0}
+            data-testid="batch-open"
+            className="text-xs px-3 py-1.5 rounded border border-primary/40 bg-white text-primary font-medium hover:bg-primary/10 disabled:opacity-50 inline-flex items-center gap-1.5"
+          >
+            <CheckSquare className="h-3.5 w-3.5" /> Aprovar em lote ({elegiveis.length})
+          </button>
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 font-medium">Semiautomático</span>
+        </div>
       </div>
       {pendentes.map((d) => {
         const blocked = d.guardrails.some((g) => g.severity === "block");
         return (
-          <div key={d.id} className="rounded-lg border border-border bg-card p-3 space-y-2">
+          <div key={d.id} data-testid={`draft-card-${d.id}`} className="rounded-lg border border-border bg-card p-3 space-y-2">
             <div className="flex items-center justify-between text-xs">
               <div className="text-foreground"><b>{d.empresa}</b> · {d.contato}</div>
               <div className="flex items-center gap-2 text-muted-foreground">
@@ -208,14 +222,143 @@ function SdrDraftsPanel() {
                 <>
                   <button onClick={() => discard(d.id)} className="px-3 py-1.5 rounded text-xs border border-border hover:bg-muted inline-flex items-center gap-1"><Trash2 className="h-3 w-3" /> Descartar</button>
                   <button onClick={() => { setEditing(d.id); setText(d.draftReply); }} className="px-3 py-1.5 rounded text-xs border border-border hover:bg-muted inline-flex items-center gap-1"><Pencil className="h-3 w-3" /> Editar</button>
-                  <button onClick={() => approve(d.id)} disabled={blocked} className="px-3 py-1.5 rounded text-xs bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 inline-flex items-center gap-1"><Send className="h-3 w-3" /> Aprovar e enviar</button>
+                  <button
+                    onClick={() => approve(d.id)}
+                    disabled={blocked}
+                    data-testid={`approve-${d.id}`}
+                    className="px-3 py-1.5 rounded text-xs bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 inline-flex items-center gap-1"
+                  >
+                    <Send className="h-3 w-3" /> Aprovar e enviar
+                  </button>
                 </>
               )}
             </div>
           </div>
         );
       })}
+
+      {batchOpen && (
+        <BatchApprovalDialog
+          elegiveis={elegiveis}
+          bloqueados={bloqueados}
+          onClose={() => setBatchOpen(false)}
+        />
+      )}
     </div>
   );
 }
+
+function BatchApprovalDialog({
+  elegiveis,
+  bloqueados,
+  onClose,
+}: {
+  elegiveis: ReturnType<typeof useSdrDrafts>;
+  bloqueados: number;
+  onClose: () => void;
+}) {
+  const [minConfidence, setMinConfidence] = useState(70);
+  const [selected, setSelected] = useState<Set<string>>(new Set(elegiveis.map((d) => d.id)));
+
+  const filtrados = elegiveis.filter((d) => d.confidence >= minConfidence);
+  const toApprove = filtrados.filter((d) => selected.has(d.id));
+
+  const toggle = (id: string) => {
+    setSelected((s) => {
+      const n = new Set(s);
+      if (n.has(id)) n.delete(id); else n.add(id);
+      return n;
+    });
+  };
+
+  const runBatch = () => {
+    let count = 0;
+    toApprove.forEach((d) => {
+      updateSdrDraft(d.id, { status: "aprovado" });
+      count++;
+    });
+    toast.success(`${count} rascunho(s) aprovado(s) em lote (sandbox — sem envio real).`);
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center p-4 bg-foreground/40 backdrop-blur-sm">
+      <div className="w-full max-w-2xl rounded-xl border border-border bg-card shadow-xl overflow-hidden">
+        <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <CheckSquare className="h-4 w-4 text-primary" />
+            <h3 className="font-semibold text-foreground">Aprovação em lote</h3>
+          </div>
+          <button onClick={onClose} aria-label="Fechar" className="p-1 rounded hover:bg-muted text-muted-foreground">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="px-5 py-4 space-y-3 max-h-[70vh] overflow-y-auto">
+          <div className="rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-950/20 p-3 text-xs text-amber-900 dark:text-amber-200 flex gap-2">
+            <AlertTriangle className="h-4 w-4 shrink-0" />
+            <div>
+              <b>Sandbox demo — nenhum envio real.</b> Guardrails com severidade <b>block</b> são automaticamente excluídos da fila em lote.
+              {bloqueados > 0 && <> {bloqueados} rascunho(s) bloqueado(s) por guardrail e não aparecem abaixo.</>}
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 text-sm">
+            <label htmlFor="min-conf" className="text-muted-foreground">Confiança mínima:</label>
+            <input
+              id="min-conf"
+              type="range"
+              min={0}
+              max={100}
+              step={5}
+              value={minConfidence}
+              onChange={(e) => setMinConfidence(Number(e.target.value))}
+              className="flex-1"
+            />
+            <b className="tabular-nums text-foreground w-10 text-right">{minConfidence}%</b>
+          </div>
+
+          <div className="border border-border rounded-lg divide-y divide-border">
+            {filtrados.length === 0 ? (
+              <div className="p-4 text-sm text-muted-foreground text-center">Nenhum rascunho passa no filtro atual.</div>
+            ) : filtrados.map((d) => (
+              <label key={d.id} className="flex items-start gap-3 p-3 cursor-pointer hover:bg-muted/30">
+                <input
+                  type="checkbox"
+                  checked={selected.has(d.id)}
+                  onChange={() => toggle(d.id)}
+                  className="mt-1 accent-primary"
+                  data-testid={`batch-check-${d.id}`}
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="font-medium text-foreground">{d.empresa} · {d.contato}</span>
+                    <span className={`font-medium ${d.confidence >= 75 ? "text-emerald-600" : "text-amber-600"}`}>{d.confidence}%</span>
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1 truncate">{d.draftReply}</div>
+                </div>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div className="px-5 py-3 border-t border-border bg-muted/30 flex items-center justify-between">
+          <span className="text-xs text-muted-foreground">{toApprove.length} de {elegiveis.length} selecionado(s)</span>
+          <div className="flex gap-2">
+            <button onClick={onClose} className="px-3 py-1.5 rounded text-xs border border-border hover:bg-muted">Cancelar</button>
+            <button
+              onClick={runBatch}
+              disabled={toApprove.length === 0}
+              data-testid="batch-confirm"
+              className="px-3 py-1.5 rounded text-xs bg-primary text-primary-foreground font-medium hover:bg-primary/90 disabled:opacity-50 inline-flex items-center gap-1.5"
+            >
+              <Send className="h-3.5 w-3.5" /> Aprovar {toApprove.length} rascunho(s)
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 

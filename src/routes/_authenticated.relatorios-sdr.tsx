@@ -7,7 +7,8 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
   PieChart, Pie, Cell, Legend,
 } from "recharts";
-import { ArrowRightLeft, CheckCircle2, Clock, TrendingUp, Flame } from "lucide-react";
+import { ArrowRightLeft, CheckCircle2, Clock, TrendingUp, Flame, Download } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/relatorios-sdr")({
   head: () => ({ meta: [{ title: "Relatórios do SDR — WF Digital" }] }),
@@ -28,9 +29,62 @@ function RelatoriosSdrPage() {
     { name: "Recusados", value: m.recusados },
   ].filter((d) => d.value > 0);
 
+  const exportCsv = () => {
+    const esc = (v: unknown) => {
+      const s = String(v ?? "");
+      return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+    };
+    const rows: (string | number)[][] = [
+      ["WF Digital Leads — Relatório do SDR", "", "gerado_em", new Date().toISOString()],
+      [],
+      ["Métrica", "Valor"],
+      ["Total de handoffs", m.totalHandoffs],
+      ["Aguardando vendedor", m.aguardando],
+      ["Aceitos", m.aceitos],
+      ["Concluídos", m.concluidos],
+      ["Devolvidos", m.devolvidos],
+      ["Recusados", m.recusados],
+      ["Taxa de aceite (%)", m.taxaAceite],
+      ["Heat médio", m.heatMedio],
+      [],
+      ["Handoffs por serviço"],
+      ["Serviço", "Quantidade"],
+      ...m.porServico.map((r) => [r.servico, r.qtd]),
+      [],
+      ["Motivos mais frequentes"],
+      ["Motivo", "Quantidade"],
+      ...m.motivosTop.map((r) => [r.motivo, r.qtd]),
+      [],
+      ["Distribuição por urgência"],
+      ["Urgência", "Quantidade"],
+      ...m.porUrgencia.map((r) => [r.urgencia, r.qtd]),
+    ];
+    const csv = rows.map((r) => r.map(esc).join(",")).join("\n");
+    const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `relatorio-sdr-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success("CSV exportado.");
+  };
+
   return (
     <AppShell title="Relatórios do SDR" subtitle="Métricas de conversas, qualificação e handoffs">
       <div className="max-w-7xl mx-auto space-y-4">
+        <div className="flex justify-end">
+          <button
+            onClick={exportCsv}
+            data-testid="export-csv"
+            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-border bg-card hover:bg-muted font-medium"
+          >
+            <Download className="h-3.5 w-3.5" /> Exportar CSV
+          </button>
+        </div>
+
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           <Kpi icon={ArrowRightLeft} label="Total de handoffs" value={m.totalHandoffs} />
           <Kpi icon={Clock} label="Aguardando vendedor" value={m.aguardando} tone="amber" />

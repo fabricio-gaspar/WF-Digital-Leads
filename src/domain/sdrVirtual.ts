@@ -82,6 +82,7 @@ export interface Service {
   nome: string;
   categoria: string;
   status: "Ativo" | "Rascunho" | "Pausado";
+  sdrAtivo?: boolean; // kill-switch por serviço — quando false, SDR não gera rascunhos para este serviço
   descricaoCurta: string;
   descricaoCompleta: string;
   publicoAdequado: string[];
@@ -527,9 +528,17 @@ export function useCompanyProfile() {
   );
 }
 
-const servicesStore = createStore(services);
+const servicesStore = createStore(services.map((s) => ({ ...s, sdrAtivo: s.sdrAtivo ?? true })));
 export const useServicesList = () =>
   useSyncExternalStore(servicesStore.subscribe, servicesStore.get, servicesStore.get);
+
+export function toggleServiceSdr(id: UUID) {
+  servicesStore.set((v) => v.map((s) => (s.id === id ? { ...s, sdrAtivo: !s.sdrAtivo } : s)));
+}
+export function isServiceSdrActive(id: UUID) {
+  const s = servicesStore.get().find((x) => x.id === id);
+  return s?.sdrAtivo !== false;
+}
 
 const knowledgeStore = createStore(knowledgeBase);
 export const useKnowledgeBase = () =>
