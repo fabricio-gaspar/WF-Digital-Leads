@@ -1,23 +1,27 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Search, Users, MessagesSquare,
-  BarChart3, Settings, LogOut, UserCircle2, Menu, X, Compass,
-  Target, Megaphone, BookOpen,
+  BarChart3, Settings, LogOut, UserCircle2, Menu, X,
+  Building2, Target, List, Megaphone, Zap, ArrowRightLeft, BookOpen,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/auth/AuthProvider";
 import { useConversations, useLeads } from "@/repositories/hooks";
+import { useHandoffs } from "@/domain/sdrVirtual";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/estrategia", label: "Estratégia", icon: Compass },
+  { to: "/prospeccao", label: "Buscar Leads", icon: Search },
+  { to: "/perfis-busca", label: "Perfis de Busca", icon: Target },
+  { to: "/listas", label: "Listas", icon: List },
   { to: "/leads", label: "Leads", icon: Users, badgeKey: "leads" as const },
-  { to: "/scoring", label: "Scoring", icon: Target },
   { to: "/campanhas", label: "Campanhas", icon: Megaphone },
+  { to: "/cadencias", label: "Cadências", icon: Zap },
+  { to: "/central", label: "Central", icon: MessagesSquare, badgeKey: "conversas" as const },
+  { to: "/handoffs", label: "Handoffs", icon: ArrowRightLeft, badgeKey: "handoffs" as const },
+  { to: "/empresa-servicos", label: "Empresa & Serviços", icon: Building2 },
   { to: "/playbooks", label: "Playbooks", icon: BookOpen },
-  { to: "/prospeccao", label: "Prospecção", icon: Search },
-  { to: "/atendimentos", label: "Atendimentos", icon: MessagesSquare, badgeKey: "conversas" as const },
   { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
   { to: "/portal", label: "Meu Portal", icon: UserCircle2 },
   { to: "/configuracoes", label: "Configurações", icon: Settings, adminOnly: true },
@@ -28,14 +32,16 @@ export function Sidebar() {
   const { session, signOut, hasRole } = useAuth();
   const { data: leads } = useLeads();
   const { data: conversations } = useConversations();
+  const handoffsList = useHandoffs();
   const [open, setOpen] = useState(false);
 
   // Fecha drawer ao trocar de rota
   useEffect(() => { setOpen(false); }, [pathname]);
 
-  const badges = {
+  const badges: Record<"leads" | "conversas" | "handoffs", number> = {
     leads: (leads ?? []).filter((l) => !l.lastContactAt).length,
     conversas: (conversations ?? []).reduce((n, c) => n + c.unreadCount, 0),
+    handoffs: handoffsList.filter((h) => h.status === "Aguardando vendedor").length,
   };
 
   const items = NAV.filter((n) => !n.adminOnly || hasRole("admin"));
