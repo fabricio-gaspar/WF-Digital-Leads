@@ -17,7 +17,7 @@ function ProspectingPage() {
   const { session } = useAuth();
   const qc = useQueryClient();
   const { data: results = [] } = useProspectingResults();
-  useLeads();
+  
   const [tab, setTab] = useState<"apify" | "vibe">("apify");
   const [query, setQuery] = useState("");
   const [running, setRunning] = useState(false);
