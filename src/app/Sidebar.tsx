@@ -167,7 +167,7 @@ export function Sidebar() {
         <Menu className="h-5 w-5" />
       </button>
 
-      <aside className="hidden md:flex md:flex-col w-[232px] border-r border-border bg-sidebar text-sidebar-foreground shrink-0">
+      <aside data-testid="app-sidebar" className="hidden md:flex md:flex-col w-[232px] border-r border-border bg-sidebar text-sidebar-foreground shrink-0">
         {NavContent}
       </aside>
 
