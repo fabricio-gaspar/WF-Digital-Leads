@@ -40,12 +40,28 @@ const currency = (v: number) =>
 function EstrategiaPage() {
   useStrategySync();
   const { tab } = useSearch({ from: Route.id });
+  const { data: icps = [] } = useICPs();
+  const { data: personas = [] } = usePersonas();
+  const { data: territories = [] } = useTerritories();
+  const { data: sellingProfiles = [] } = useSellingProfiles();
 
   return (
     <AppShell
       title="Estratégia"
       subtitle="Diagnóstico, ICP, personas, territórios e perfis de venda"
     >
+      <PageHero
+        icon={Compass}
+        eyebrow="Direção comercial"
+        title="Estratégia"
+        description="Diagnóstico, ICP, personas, territórios e perfis de venda que orientam a operação."
+        stats={[
+          { label: "ICPs", value: icps.length, tone: "primary" },
+          { label: "Personas", value: personas.length },
+          { label: "Territórios", value: territories.length },
+          { label: "Perfis de venda", value: sellingProfiles.length },
+        ]}
+      />
       <div className="flex flex-wrap gap-1 bg-muted/50 p-1 rounded-lg mb-6 w-fit">
         {TABS.map((t) => {
           const Icon = t.icon;
