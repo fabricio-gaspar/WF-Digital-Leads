@@ -2,6 +2,7 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Search, Users, MessagesSquare,
   BarChart3, Settings, LogOut, UserCircle2, Menu, X, Compass,
+  Target, Megaphone, BookOpen,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/auth/AuthProvider";
@@ -12,6 +13,9 @@ const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/estrategia", label: "Estratégia", icon: Compass },
   { to: "/leads", label: "Leads", icon: Users, badgeKey: "leads" as const },
+  { to: "/scoring", label: "Scoring", icon: Target },
+  { to: "/campanhas", label: "Campanhas", icon: Megaphone },
+  { to: "/playbooks", label: "Playbooks", icon: BookOpen },
   { to: "/prospeccao", label: "Prospecção", icon: Search },
   { to: "/atendimentos", label: "Atendimentos", icon: MessagesSquare, badgeKey: "conversas" as const },
   { to: "/relatorios", label: "Relatórios", icon: BarChart3 },

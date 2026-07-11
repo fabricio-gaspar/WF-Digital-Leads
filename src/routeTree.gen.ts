@@ -13,13 +13,16 @@ import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedScoringRouteImport } from './routes/_authenticated.scoring'
 import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated.relatorios'
 import { Route as AuthenticatedProspeccaoRouteImport } from './routes/_authenticated.prospeccao'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated.portal'
+import { Route as AuthenticatedPlaybooksRouteImport } from './routes/_authenticated.playbooks'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated.leads'
 import { Route as AuthenticatedEstrategiaRouteImport } from './routes/_authenticated.estrategia'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated.configuracoes'
+import { Route as AuthenticatedCampanhasRouteImport } from './routes/_authenticated.campanhas'
 import { Route as AuthenticatedAtendimentosRouteImport } from './routes/_authenticated.atendimentos'
 import { Route as AuthenticatedLeadsLeadIdRouteImport } from './routes/_authenticated.leads.$leadId'
 
@@ -42,6 +45,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedScoringRoute = AuthenticatedScoringRouteImport.update({
+  id: '/scoring',
+  path: '/scoring',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedRelatoriosRoute = AuthenticatedRelatoriosRouteImport.update({
   id: '/relatorios',
   path: '/relatorios',
@@ -55,6 +63,11 @@ const AuthenticatedProspeccaoRoute = AuthenticatedProspeccaoRouteImport.update({
 const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
   id: '/portal',
   path: '/portal',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPlaybooksRoute = AuthenticatedPlaybooksRouteImport.update({
+  id: '/playbooks',
+  path: '/playbooks',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedLeadsRoute = AuthenticatedLeadsRouteImport.update({
@@ -78,6 +91,11 @@ const AuthenticatedConfiguracoesRoute =
     path: '/configuracoes',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedCampanhasRoute = AuthenticatedCampanhasRouteImport.update({
+  id: '/campanhas',
+  path: '/campanhas',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedAtendimentosRoute =
   AuthenticatedAtendimentosRouteImport.update({
     id: '/atendimentos',
@@ -96,13 +114,16 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/atendimentos': typeof AuthenticatedAtendimentosRoute
+  '/campanhas': typeof AuthenticatedCampanhasRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/estrategia': typeof AuthenticatedEstrategiaRoute
   '/leads': typeof AuthenticatedLeadsRouteWithChildren
+  '/playbooks': typeof AuthenticatedPlaybooksRoute
   '/portal': typeof AuthenticatedPortalRoute
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/scoring': typeof AuthenticatedScoringRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
 }
 export interface FileRoutesByTo {
@@ -110,13 +131,16 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/atendimentos': typeof AuthenticatedAtendimentosRoute
+  '/campanhas': typeof AuthenticatedCampanhasRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/estrategia': typeof AuthenticatedEstrategiaRoute
   '/leads': typeof AuthenticatedLeadsRouteWithChildren
+  '/playbooks': typeof AuthenticatedPlaybooksRoute
   '/portal': typeof AuthenticatedPortalRoute
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/scoring': typeof AuthenticatedScoringRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
 }
 export interface FileRoutesById {
@@ -126,13 +150,16 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/recuperar-senha': typeof RecuperarSenhaRoute
   '/_authenticated/atendimentos': typeof AuthenticatedAtendimentosRoute
+  '/_authenticated/campanhas': typeof AuthenticatedCampanhasRoute
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/estrategia': typeof AuthenticatedEstrategiaRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRouteWithChildren
+  '/_authenticated/playbooks': typeof AuthenticatedPlaybooksRoute
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
   '/_authenticated/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/_authenticated/scoring': typeof AuthenticatedScoringRoute
   '/_authenticated/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
 }
 export interface FileRouteTypes {
@@ -142,13 +169,16 @@ export interface FileRouteTypes {
     | '/login'
     | '/recuperar-senha'
     | '/atendimentos'
+    | '/campanhas'
     | '/configuracoes'
     | '/dashboard'
     | '/estrategia'
     | '/leads'
+    | '/playbooks'
     | '/portal'
     | '/prospeccao'
     | '/relatorios'
+    | '/scoring'
     | '/leads/$leadId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -156,13 +186,16 @@ export interface FileRouteTypes {
     | '/login'
     | '/recuperar-senha'
     | '/atendimentos'
+    | '/campanhas'
     | '/configuracoes'
     | '/dashboard'
     | '/estrategia'
     | '/leads'
+    | '/playbooks'
     | '/portal'
     | '/prospeccao'
     | '/relatorios'
+    | '/scoring'
     | '/leads/$leadId'
   id:
     | '__root__'
@@ -171,13 +204,16 @@ export interface FileRouteTypes {
     | '/login'
     | '/recuperar-senha'
     | '/_authenticated/atendimentos'
+    | '/_authenticated/campanhas'
     | '/_authenticated/configuracoes'
     | '/_authenticated/dashboard'
     | '/_authenticated/estrategia'
     | '/_authenticated/leads'
+    | '/_authenticated/playbooks'
     | '/_authenticated/portal'
     | '/_authenticated/prospeccao'
     | '/_authenticated/relatorios'
+    | '/_authenticated/scoring'
     | '/_authenticated/leads/$leadId'
   fileRoutesById: FileRoutesById
 }
@@ -218,6 +254,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/scoring': {
+      id: '/_authenticated/scoring'
+      path: '/scoring'
+      fullPath: '/scoring'
+      preLoaderRoute: typeof AuthenticatedScoringRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/relatorios': {
       id: '/_authenticated/relatorios'
       path: '/relatorios'
@@ -237,6 +280,13 @@ declare module '@tanstack/react-router' {
       path: '/portal'
       fullPath: '/portal'
       preLoaderRoute: typeof AuthenticatedPortalRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/playbooks': {
+      id: '/_authenticated/playbooks'
+      path: '/playbooks'
+      fullPath: '/playbooks'
+      preLoaderRoute: typeof AuthenticatedPlaybooksRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/leads': {
@@ -265,6 +315,13 @@ declare module '@tanstack/react-router' {
       path: '/configuracoes'
       fullPath: '/configuracoes'
       preLoaderRoute: typeof AuthenticatedConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/campanhas': {
+      id: '/_authenticated/campanhas'
+      path: '/campanhas'
+      fullPath: '/campanhas'
+      preLoaderRoute: typeof AuthenticatedCampanhasRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/atendimentos': {
@@ -297,24 +354,30 @@ const AuthenticatedLeadsRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAtendimentosRoute: typeof AuthenticatedAtendimentosRoute
+  AuthenticatedCampanhasRoute: typeof AuthenticatedCampanhasRoute
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedEstrategiaRoute: typeof AuthenticatedEstrategiaRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRouteWithChildren
+  AuthenticatedPlaybooksRoute: typeof AuthenticatedPlaybooksRoute
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
   AuthenticatedProspeccaoRoute: typeof AuthenticatedProspeccaoRoute
   AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
+  AuthenticatedScoringRoute: typeof AuthenticatedScoringRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAtendimentosRoute: AuthenticatedAtendimentosRoute,
+  AuthenticatedCampanhasRoute: AuthenticatedCampanhasRoute,
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedEstrategiaRoute: AuthenticatedEstrategiaRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRouteWithChildren,
+  AuthenticatedPlaybooksRoute: AuthenticatedPlaybooksRoute,
   AuthenticatedPortalRoute: AuthenticatedPortalRoute,
   AuthenticatedProspeccaoRoute: AuthenticatedProspeccaoRoute,
   AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
+  AuthenticatedScoringRoute: AuthenticatedScoringRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
