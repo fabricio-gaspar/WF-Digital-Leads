@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated.relatorios'
 import { Route as AuthenticatedProspeccaoRouteImport } from './routes/_authenticated.prospeccao'
+import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated.portal'
 import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated.leads'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
 import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated.configuracoes'
@@ -48,6 +49,11 @@ const AuthenticatedRelatoriosRoute = AuthenticatedRelatoriosRouteImport.update({
 const AuthenticatedProspeccaoRoute = AuthenticatedProspeccaoRouteImport.update({
   id: '/prospeccao',
   path: '/prospeccao',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
+  id: '/portal',
+  path: '/portal',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedLeadsRoute = AuthenticatedLeadsRouteImport.update({
@@ -87,6 +93,7 @@ export interface FileRoutesByFullPath {
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/leads': typeof AuthenticatedLeadsRouteWithChildren
+  '/portal': typeof AuthenticatedPortalRoute
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/leads': typeof AuthenticatedLeadsRouteWithChildren
+  '/portal': typeof AuthenticatedPortalRoute
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRouteWithChildren
+  '/_authenticated/portal': typeof AuthenticatedPortalRoute
   '/_authenticated/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
   '/_authenticated/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
@@ -127,6 +136,7 @@ export interface FileRouteTypes {
     | '/configuracoes'
     | '/dashboard'
     | '/leads'
+    | '/portal'
     | '/prospeccao'
     | '/relatorios'
     | '/leads/$leadId'
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/configuracoes'
     | '/dashboard'
     | '/leads'
+    | '/portal'
     | '/prospeccao'
     | '/relatorios'
     | '/leads/$leadId'
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/_authenticated/configuracoes'
     | '/_authenticated/dashboard'
     | '/_authenticated/leads'
+    | '/_authenticated/portal'
     | '/_authenticated/prospeccao'
     | '/_authenticated/relatorios'
     | '/_authenticated/leads/$leadId'
@@ -208,6 +220,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProspeccaoRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/portal': {
+      id: '/_authenticated/portal'
+      path: '/portal'
+      fullPath: '/portal'
+      preLoaderRoute: typeof AuthenticatedPortalRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/leads': {
       id: '/_authenticated/leads'
       path: '/leads'
@@ -262,6 +281,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRouteWithChildren
+  AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
   AuthenticatedProspeccaoRoute: typeof AuthenticatedProspeccaoRoute
   AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
 }
@@ -271,6 +291,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRouteWithChildren,
+  AuthenticatedPortalRoute: AuthenticatedPortalRoute,
   AuthenticatedProspeccaoRoute: AuthenticatedProspeccaoRoute,
   AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
 }
