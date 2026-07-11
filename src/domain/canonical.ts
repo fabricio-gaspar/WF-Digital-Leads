@@ -495,6 +495,17 @@ export function updateOrcamento(id: string, patch: Partial<Orcamento>) {
     d.map((o) => (o.id === id ? { ...o, ...patch, atualizadoEm: new Date().toISOString() } : o)),
   );
 }
+export function aprovarOrcamento(id: string, aprovado: boolean, aprovadoPor?: string) {
+  updateOrcamento(id, {
+    status: aprovado ? "Aprovado" : "Rascunho",
+    aprovadoPor: aprovado ? aprovadoPor ?? "gestor@wfdl" : undefined,
+  });
+  appendAudit({
+    action: aprovado ? "handoff.accepted" : "handoff.rejected",
+    entityType: "orcamento",
+    entityId: id,
+    metadata: {},
+  });
 export function nextVersaoOrcamento(id: string) {
   const orig = orcamentosStore.get().find((o) => o.id === id);
   if (!orig) return null;
