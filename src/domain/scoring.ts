@@ -78,7 +78,7 @@ class RuleStore {
     this.emit();
   }
   reset() { this.data = [...DEFAULT_RULES]; this.emit(); }
-  subscribe(l: Listener) { this.listeners.add(l); return () => this.listeners.delete(l); }
+  subscribe(l: Listener) { this.listeners.add(l); return () => { this.listeners.delete(l); }; }
   private emit() { this.listeners.forEach((l) => l()); }
 }
 export const ruleStore = new RuleStore();

@@ -104,7 +104,7 @@ class CampaignStore {
     const next: CampaignStatus = c.status === "ativa" ? "pausada" : c.status === "pausada" ? "ativa" : c.status;
     this.upsert({ ...c, status: next, updatedAt: new Date().toISOString() });
   }
-  subscribe(l: Listener) { this.listeners.add(l); return () => this.listeners.delete(l); }
+  subscribe(l: Listener) { this.listeners.add(l); return () => { this.listeners.delete(l); }; }
   private emit() { this.listeners.forEach((l) => l()); }
 }
 export const campaignStore = new CampaignStore();

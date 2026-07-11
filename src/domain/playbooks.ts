@@ -108,7 +108,7 @@ class PlaybookStore {
   private listeners = new Set<Listener>();
   list() { return [...this.data]; }
   get(id: string) { return this.data.find((p) => p.id === id); }
-  subscribe(l: Listener) { this.listeners.add(l); return () => this.listeners.delete(l); }
+  subscribe(l: Listener) { this.listeners.add(l); return () => { this.listeners.delete(l); }; }
 }
 export const playbookStore = new PlaybookStore();
 
