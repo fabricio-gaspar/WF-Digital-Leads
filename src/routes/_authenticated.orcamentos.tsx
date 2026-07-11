@@ -8,8 +8,10 @@ import {
   createOrcamento,
   updateOrcamento,
   aprovarOrcamento,
+  computeOrcamentoTotals,
   type StatusOrcamento,
   type LinhaOrcamento,
+  type Orcamento,
 } from "@/domain/canonical";
 import { FileText, Plus, CheckCircle2, XCircle, Download, Clock } from "lucide-react";
 import { useState } from "react";
