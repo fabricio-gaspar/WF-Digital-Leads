@@ -89,7 +89,7 @@ async def main() -> None:
         # 6. Kill-switch por serviço presente
         await page.goto(f"{BASE}/empresa-servicos", wait_until="domcontentloaded")
         await page.wait_for_timeout(400)
-        await page.get_by_role("button", name="Serviços").click()
+        await page.locator("button", has_text="Serviços").first.click()
         await page.wait_for_timeout(300)
         toggles = page.locator('[data-testid^="sdr-toggle-"]')
         n = await toggles.count()
