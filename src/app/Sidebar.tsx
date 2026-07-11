@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
-  LayoutDashboard, Building2, Wrench, Search, Users, MessagesSquare,
-  BarChart3, Settings, LogOut,
+  LayoutDashboard, Search, Users, MessagesSquare,
+  BarChart3, Settings, LogOut, UserCircle2,
 } from "lucide-react";
 import { useAuth } from "@/auth/AuthProvider";
 import { useConversations, useLeads } from "@/repositories/hooks";
@@ -9,14 +9,14 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/empresas", label: "Empresas", icon: Building2 },
-  { to: "/servicos", label: "Serviços", icon: Wrench },
-  { to: "/prospeccao", label: "Prospecção", icon: Search },
   { to: "/leads", label: "Leads", icon: Users, badgeKey: "leads" as const },
+  { to: "/prospeccao", label: "Prospecção", icon: Search },
   { to: "/atendimentos", label: "Atendimentos", icon: MessagesSquare, badgeKey: "conversas" as const },
   { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
+  { to: "/portal", label: "Meu Portal", icon: UserCircle2 },
   { to: "/configuracoes", label: "Configurações", icon: Settings, adminOnly: true },
 ];
+
 
 export function Sidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
