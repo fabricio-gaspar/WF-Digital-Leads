@@ -300,7 +300,7 @@ function OrcamentoDetail({ id, onClose }: { id: string; onClose: () => void }) {
                   <td className="text-right">{l.quantidade}</td>
                   <td className="text-right">R$ {l.precoUnitario.toLocaleString("pt-BR")}</td>
                   <td className="text-right">{l.desconto}%</td>
-                  <td className="text-right font-medium">R$ {l.subtotal.toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td>
+                  <td className="text-right font-medium">R$ {lineSub(l).toLocaleString("pt-BR", { minimumFractionDigits: 2 })}</td>
                 </tr>
               ))}
             </tbody>
