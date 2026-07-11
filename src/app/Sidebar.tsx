@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Search, Users, MessagesSquare,
   BarChart3, Settings, LogOut, UserCircle2, Menu, X,
   Building2, Target, List, Megaphone, Zap, ArrowRightLeft, BookOpen,
-  Bot, LineChart, ChevronDown, ChevronRight, Sparkles, Compass, Gauge,
+  Bot, LineChart, ChevronDown, ChevronRight, Sparkles, Compass, Gauge, Activity,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/auth/AuthProvider";
