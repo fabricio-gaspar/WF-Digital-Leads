@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/app/AppShell";
 import { integrations, useSdrDrafts, updateSdrDraft, DEFAULT_SDR_MODE, type IntegrationStatus } from "@/domain/sdrVirtual";
+import { sendApprovedDraft, batchApproveDrafts } from "@/domain/DemoDataProvider";
 import { Plug, Bot, MessageCircle, Radio, Sparkles, ShieldCheck, Send, Pencil, Trash2, AlertTriangle, CheckSquare, X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -150,10 +151,16 @@ function SdrDraftsPanel() {
     );
   }
 
-  const approve = (id: string, novoTexto?: string) => {
-    updateSdrDraft(id, { status: novoTexto ? "editado" : "aprovado", ...(novoTexto && { draftReply: novoTexto }) });
-    toast.success("Rascunho aprovado (sandbox — sem envio real).");
-    setEditing(null);
+  const approve = async (id: string, novoTexto?: string) => {
+    const draft = pendentes.find((d) => d.id === id);
+    if (!draft) return;
+    const res = await sendApprovedDraft({ draft, editedBody: novoTexto });
+    if (res.ok) {
+      toast.success("Rascunho aprovado e mensagem registrada (sandbox).");
+      setEditing(null);
+    } else {
+      toast.error(res.reason ?? "Falha ao enviar rascunho.");
+    }
   };
   const discard = (id: string) => {
     updateSdrDraft(id, { status: "descartado" });
@@ -271,13 +278,13 @@ function BatchApprovalDialog({
     });
   };
 
-  const runBatch = () => {
-    let count = 0;
-    toApprove.forEach((d) => {
-      updateSdrDraft(d.id, { status: "aprovado" });
-      count++;
-    });
-    toast.success(`${count} rascunho(s) aprovado(s) em lote (sandbox — sem envio real).`);
+  const runBatch = async () => {
+    const res = await batchApproveDrafts(toApprove);
+    if (res.blocked > 0) {
+      toast.warning(`${res.approved} aprovados, ${res.blocked} bloqueados por guardrails.`);
+    } else {
+      toast.success(`${res.approved} rascunho(s) aprovado(s) em lote (sandbox).`);
+    }
     onClose();
   };
 
