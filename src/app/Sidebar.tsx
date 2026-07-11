@@ -32,14 +32,16 @@ export function Sidebar() {
   const { session, signOut, hasRole } = useAuth();
   const { data: leads } = useLeads();
   const { data: conversations } = useConversations();
+  const handoffsList = useHandoffs();
   const [open, setOpen] = useState(false);
 
   // Fecha drawer ao trocar de rota
   useEffect(() => { setOpen(false); }, [pathname]);
 
-  const badges = {
+  const badges: Record<"leads" | "conversas" | "handoffs", number> = {
     leads: (leads ?? []).filter((l) => !l.lastContactAt).length,
     conversas: (conversations ?? []).reduce((n, c) => n + c.unreadCount, 0),
+    handoffs: handoffsList.filter((h) => h.status === "Aguardando vendedor").length,
   };
 
   const items = NAV.filter((n) => !n.adminOnly || hasRole("admin"));
