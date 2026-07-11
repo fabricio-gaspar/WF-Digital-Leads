@@ -1,395 +1,530 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/app/AppShell";
-import { PageHero } from "@/app/PageHero";
-import { useCompanyProfile, useServicesList, useKnowledgeBase, sdrPolicies, toggleServiceSdr } from "@/domain/sdrVirtual";
-import { useProdutos, useOfertas, upsertProduto, removeProduto, upsertOferta, removeOferta } from "@/domain/canonical";
-import { Building2, Package, BookOpen, Shield, CheckCircle2, AlertTriangle, Power, PowerOff, ShoppingBag, Tag, Trash2, Plus } from "lucide-react";
-import { toast } from "sonner";
+import { useCompanyProfile, useServicesList } from "@/domain/sdrVirtual";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/empresa-servicos")({
-  head: () => ({ meta: [{ title: "Empresa e Serviços — WF Digital Leads" }] }),
-  component: EmpresaServicosPage,
+  head: () => ({ meta: [{ title: "Minha Empresa — WF Digital CRM" }] }),
+  component: MinhaEmpresaPage,
 });
 
-type Tab = "empresa" | "servicos" | "produtos" | "ofertas" | "conhecimento" | "limites" | "revisao";
+type Tab = "dados" | "ideal" | "servicos" | "cerebro";
 
-function EmpresaServicosPage() {
-  const [tab, setTab] = useState<Tab>("empresa");
-  const company = useCompanyProfile();
-  const services = useServicesList();
-  const knowledge = useKnowledgeBase();
-  const produtos = useProdutos();
-  const ofertas = useOfertas();
+const TABS: { id: Tab; label: string }[] = [
+  { id: "dados", label: "Dados cadastrais" },
+  { id: "ideal", label: "Cliente ideal & score" },
+  { id: "servicos", label: "Serviços que presto" },
+  { id: "cerebro", label: "Cérebro do vendedor virtual" },
+];
 
-  const tabs: { id: Tab; label: string; icon: typeof Building2 }[] = [
-    { id: "empresa", label: "Empresa", icon: Building2 },
-    { id: "servicos", label: "Serviços", icon: Package },
-    { id: "produtos", label: "Produtos", icon: ShoppingBag },
-    { id: "ofertas", label: "Ofertas", icon: Tag },
-    { id: "conhecimento", label: "Conhecimento SDR", icon: BookOpen },
-    { id: "limites", label: "Limites SDR", icon: Shield },
-    { id: "revisao", label: "Revisão", icon: CheckCircle2 },
-  ];
+function MinhaEmpresaPage() {
+  const [tab, setTab] = useState<Tab>("dados");
 
   return (
-    <AppShell title="Empresa e Serviços" subtitle="Perfil da empresa, catálogo e base do SDR">
-      <div className="max-w-6xl mx-auto">
-        <PageHero
-          icon={Building2}
-          eyebrow="Fundação Comercial"
-          title="Empresa & Catálogo"
-          description="Identidade, serviços, produtos, ofertas e base de conhecimento que alimentam o SDR virtual."
-          stats={[
-            { label: "Serviços ativos", value: services.filter((s) => s.sdrAtivo !== false).length, tone: "primary" },
-            { label: "Produtos", value: produtos.length },
-            { label: "Ofertas", value: ofertas.length },
-            { label: "Docs SDR", value: knowledge.length, hint: "Base de conhecimento" },
-          ]}
-        />
+    <AppShell
+      title="Minha Empresa"
+      subtitle="Os dados daqui alimentam o score de leads e o vendedor virtual"
+    >
+      <p className="text-[13px] text-muted-foreground mb-5">
+        Fundação do sistema: tudo que a IA sabe sobre o que você vende, para quem vende e como fala vem desta tela.
+      </p>
+
+      <div className="flex flex-wrap gap-1 mb-5">
+        {TABS.map((t) => {
+          const active = tab === t.id;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={cn(
+                "px-4 py-2 rounded-md text-[13px] font-medium transition-colors",
+                active
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {t.label}
+            </button>
+          );
+        })}
       </div>
-      <div className="max-w-6xl mx-auto space-y-6">
 
-
-
-        <div className="flex gap-1 border-b border-border">
-          {tabs.map((t) => {
-            const Icon = t.icon;
-            const active = tab === t.id;
-            return (
-              <button
-                key={t.id}
-                onClick={() => setTab(t.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
-                  active ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <Icon className="h-4 w-4" />
-                {t.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {tab === "empresa" && (
-          <div className="space-y-4">
-            <Card title="Identidade">
-              <Row label="Nome Fantasia" value={company.nomeFantasia} />
-              <Row label="Razão Social" value={company.razaoSocial} />
-              <Row label="Segmento" value={company.segmento} />
-              <Row label="Tipo" value={company.tipo} />
-              <Row label="Cidade/UF" value={company.cidadeUf} />
-              <Row label="Atendimento" value={company.modoAtendimento} />
-              <Row label="Regiões" value={company.regioesAtendidas.join(", ")} />
-              <Row label="Site" value={company.site} />
-            </Card>
-
-            <Card title="Apresentação Autorizada">
-              <div className="space-y-3 text-sm">
-                <div><div className="text-muted-foreground text-xs uppercase tracking-wide mb-1">Uma frase</div><p className="text-foreground italic">{company.frase}</p></div>
-                <div><div className="text-muted-foreground text-xs uppercase tracking-wide mb-1">Curta (300 caracteres)</div><p className="text-foreground">{company.apresentacaoCurta}</p></div>
-                <div><div className="text-muted-foreground text-xs uppercase tracking-wide mb-1">Completa</div><p className="text-foreground">{company.apresentacaoCompleta}</p></div>
-                <div><div className="text-muted-foreground text-xs uppercase tracking-wide mb-1">Proposta de valor</div><p className="text-foreground">{company.propostaValor}</p></div>
-              </div>
-            </Card>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Card title="Problemas que resolvemos">
-                <ul className="space-y-1.5 text-sm">
-                  {company.problemasQueResolve.map((p) => <li key={p} className="flex gap-2"><span className="text-primary">•</span>{p}</li>)}
-                </ul>
-              </Card>
-              <Card title="Diferenciais">
-                <ul className="space-y-1.5 text-sm">
-                  {company.diferenciais.map((d) => <li key={d} className="flex gap-2"><span className="text-primary">•</span>{d}</li>)}
-                </ul>
-              </Card>
-            </div>
-
-            <Card title="Comunicação">
-              <Row label="Tom" value={company.tom} />
-              <Row label="Formalidade" value={company.formalidade} />
-              <Row label="CTA principal" value={company.ctaPrincipal} />
-              <Row label="Palavras preferidas" value={company.palavrasPreferidas.join(", ")} />
-              <Row label="Palavras proibidas" value={company.palavrasProibidas.join(", ")} />
-              <Row label="Assuntos proibidos" value={company.assuntosProibidos.join(", ")} />
-              <Row label="Horário comercial" value={company.horarioComercial} />
-              <Row label="Responsável handoff" value={company.responsavelHandoff} />
-              <Row label="SLA vendedor" value={company.slaVendedor} />
-            </Card>
-          </div>
-        )}
-
-        {tab === "servicos" && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {services.map((s) => {
-              const sdrOn = s.sdrAtivo !== false;
-              return (
-                <div key={s.id} data-testid={`service-card-${s.id}`} className="rounded-xl border border-border bg-card p-5 space-y-3">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <div className="text-xs text-muted-foreground uppercase tracking-wide">{s.categoria}</div>
-                      <h3 className="text-base font-semibold text-foreground mt-0.5">{s.nome}</h3>
-                    </div>
-                    <span className="text-[11px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">{s.status}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground">{s.descricaoCurta}</p>
-
-                  <div className={`rounded-lg border p-3 flex items-center justify-between gap-3 ${sdrOn ? "border-emerald-200 bg-emerald-50/60 dark:bg-emerald-950/20" : "border-red-200 bg-red-50/60 dark:bg-red-950/20"}`}>
-                    <div className="flex items-center gap-2 min-w-0">
-                      {sdrOn ? <Power className="h-4 w-4 text-emerald-600 shrink-0" /> : <PowerOff className="h-4 w-4 text-red-600 shrink-0" />}
-                      <div className="min-w-0">
-                        <div className={`text-xs font-medium ${sdrOn ? "text-emerald-800 dark:text-emerald-200" : "text-red-800 dark:text-red-200"}`}>
-                          SDR {sdrOn ? "ativo" : "pausado"} para este serviço
-                        </div>
-                        <div className="text-[10px] text-muted-foreground">
-                          {sdrOn ? "Rascunhos serão gerados normalmente." : "Kill-switch acionado — nenhum rascunho será gerado."}
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => {
-                        toggleServiceSdr(s.id);
-                        toast.message(sdrOn ? `SDR pausado para ${s.nome}` : `SDR reativado para ${s.nome}`);
-                      }}
-                      data-testid={`sdr-toggle-${s.id}`}
-                      role="switch"
-                      aria-checked={sdrOn}
-                      aria-label={`Alternar SDR para ${s.nome}`}
-                      className={`shrink-0 h-6 w-11 rounded-full relative transition-colors ${sdrOn ? "bg-emerald-500" : "bg-red-400"}`}
-                    >
-                      <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-all ${sdrOn ? "right-0.5" : "left-0.5"}`} />
-                    </button>
-                  </div>
-
-                  <div className="text-xs space-y-1.5 pt-2 border-t border-border">
-                    <div><span className="text-muted-foreground">Problema:</span> <span className="text-foreground">{s.problemaPrincipal}</span></div>
-                    <div><span className="text-muted-foreground">Ticket:</span> <span className="text-foreground">{s.faixaTicket ?? "—"}</span></div>
-                    <div><span className="text-muted-foreground">Preço:</span> <span className="text-foreground">{s.politicaPreco}</span></div>
-                    <div><span className="text-muted-foreground">Prazo:</span> <span className="text-foreground">{s.prazoInformavel}</span></div>
-                    <div><span className="text-muted-foreground">Personas:</span> <span className="text-foreground">{s.personas.join(", ")}</span></div>
-                  </div>
-                  <div className="pt-2 border-t border-border">
-                    <div className="text-xs text-muted-foreground mb-1.5">Mensagem inicial autorizada</div>
-                    <p className="text-xs bg-muted/50 rounded-md p-2.5 text-foreground italic">{s.mensagemInicial}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {tab === "conhecimento" && (
-          <div className="rounded-xl border border-border bg-card overflow-hidden">
-            <table className="w-full text-sm">
-              <thead className="bg-muted/50 border-b border-border">
-                <tr className="text-xs text-muted-foreground uppercase tracking-wide">
-                  <th className="text-left px-4 py-2.5">Categoria</th>
-                  <th className="text-left px-4 py-2.5">Pergunta</th>
-                  <th className="text-left px-4 py-2.5">Resposta autorizada</th>
-                  <th className="text-left px-4 py-2.5">Auto</th>
-                </tr>
-              </thead>
-              <tbody>
-                {knowledge.map((k) => (
-                  <tr key={k.id} className="border-b border-border last:border-0">
-                    <td className="px-4 py-3"><span className="text-[11px] px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">{k.categoria}</span></td>
-                    <td className="px-4 py-3 font-medium text-foreground">{k.pergunta}</td>
-                    <td className="px-4 py-3 text-muted-foreground max-w-md">{k.resposta}</td>
-                    <td className="px-4 py-3">
-                      {k.podeEnviarAuto ? (
-                        <span className="text-emerald-600 text-xs font-medium">Sim</span>
-                      ) : k.exigeVendedor ? (
-                        <span className="text-amber-600 text-xs font-medium">Vendedor</span>
-                      ) : (
-                        <span className="text-muted-foreground text-xs">Revisar</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {tab === "produtos" && <ProdutosTab produtos={produtos} />}
-        {tab === "ofertas" && <OfertasTab ofertas={ofertas} produtos={produtos} services={services} />}
-
-        {tab === "limites" && (
-          <div className="space-y-4">
-            <div className="rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-950/20 p-4 flex gap-3">
-              <AlertTriangle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
-              <div className="text-sm text-amber-900 dark:text-amber-200">
-                Estas regras são absolutas. O SDR Virtual NUNCA as viola, mesmo quando o cliente pede explicitamente.
-              </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Toggle label="Sempre se identificar como assistente virtual" on={sdrPolicies.sempreIdentificar} />
-              <Toggle label="Nunca inventar informação" on={sdrPolicies.naoInventar} />
-              <Toggle label="Não prometer prazo não cadastrado" on={sdrPolicies.naoPrometerPrazo} />
-              <Toggle label="Não informar preço fora da política" on={sdrPolicies.naoInformarPreco} />
-              <Toggle label="Não conceder desconto" on={sdrPolicies.naoConcederDesconto} />
-              <Toggle label="Não negociar contrato" on={sdrPolicies.naoNegociarContrato} />
-              <Toggle label="Não falar mal de concorrentes" on={sdrPolicies.naoFalarMalConcorrente} />
-              <Toggle label="Não insistir após recusa" on={sdrPolicies.naoInsistirAposRecusa} />
-              <Toggle label="Encerrar em opt-out" on={sdrPolicies.encerrarEmOptOut} />
-              <Toggle label="Encaminhar em baixa confiança" on={sdrPolicies.encaminharBaixaConfianca} />
-              <Toggle label="Pausar quando humano assumir" on={sdrPolicies.pausarQuandoHumano} />
-            </div>
-            <Card title="Parâmetros">
-              <Row label="Modo operacional" value={sdrPolicies.modo} highlight />
-              <Row label="Confiança mínima para envio auto" value={`${(sdrPolicies.confiancaMinima * 100).toFixed(0)}%`} />
-              <Row label="Máx. mensagens por conversa" value={String(sdrPolicies.maxMensagensPorConversa)} />
-              <Row label="Máx. perguntas consecutivas" value={String(sdrPolicies.maxPerguntasConsecutivas)} />
-              <Row label="Termos de handoff imediato" value={sdrPolicies.termosHandoff.join(", ")} />
-              <Row label="Termos de opt-out" value={sdrPolicies.termosOptOut.join(", ")} />
-            </Card>
-          </div>
-        )}
-
-        {tab === "revisao" && (
-          <div className="rounded-xl border border-emerald-200 bg-emerald-50 dark:bg-emerald-950/20 p-6 space-y-3">
-            <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-200">
-              <CheckCircle2 className="h-5 w-5" />
-              <h3 className="font-semibold">Configuração pronta para uso demonstrativo</h3>
-            </div>
-            <ul className="space-y-1.5 text-sm text-emerald-900 dark:text-emerald-200/90">
-              <li>✓ Perfil da empresa completo com apresentação autorizada</li>
-              <li>✓ {services.length} serviços cadastrados com política de preço e mensagens iniciais</li>
-              <li>✓ {knowledge.length} entradas na base de conhecimento</li>
-              <li>✓ Limites do SDR configurados em modo {sdrPolicies.modo}</li>
-              <li>✓ Templates de handoff e opt-out definidos</li>
-            </ul>
-          </div>
-        )}
-      </div>
+      {tab === "dados" && <DadosTab />}
+      {tab === "ideal" && <IdealTab />}
+      {tab === "servicos" && <ServicosTab />}
+      {tab === "cerebro" && <CerebroTab />}
     </AppShell>
   );
 }
 
-function Card({ title, children }: { title: string; children: React.ReactNode }) {
+/* ================================================================
+ * TAB 1 — Dados cadastrais
+ * ================================================================ */
+function DadosTab() {
+  const company = useCompanyProfile();
+
   return (
-    <div className="rounded-xl border border-border bg-card">
-      <div className="px-5 py-3 border-b border-border">
-        <h3 className="font-semibold text-sm text-foreground">{title}</h3>
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-5">
+      <div className="space-y-5">
+        <Section title="Identificação">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Field label="Razão social" defaultValue={company.razaoSocial} />
+            <Field label="Nome fantasia" defaultValue={company.nomeFantasia} />
+            <Field label="CNPJ" defaultValue="12.345.678/0001-90" />
+            <Field label="Inscrição estadual" defaultValue="Isento" />
+            <Select label="Porte" options={["MEI", "ME", "EPP", "Média", "Grande"]} defaultValue="EPP" />
+            <div />
+            <Field label="Segmento" defaultValue={company.segmento} />
+            <Field label="CNAE principal" defaultValue="6201-5/01" />
+            <Field label="Endereço" defaultValue="Av. Brasil, 1420 — Centro" />
+            <Field label="CEP" defaultValue="18130-000" />
+            <Field label="Cidade" defaultValue="São Roque" />
+            <div className="grid grid-cols-[80px_1fr] gap-3">
+              <Field label="UF" defaultValue="SP" />
+              <Field label="Site" defaultValue={company.site.replace(/^https?:\/\//, "")} />
+            </div>
+            <Field label="Telefone" defaultValue="(11) 3200-4400" />
+            <Field label="WhatsApp comercial" defaultValue="(11) 99100-4400" />
+            <Field label="E-mail comercial" defaultValue="comercial@wfdigital.com.br" />
+          </div>
+        </Section>
+
+        <div className="flex items-center gap-3">
+          <button className="h-10 px-5 rounded-md bg-primary text-primary-foreground text-[13px] font-medium hover:bg-primary/90">
+            Salvar alterações
+          </button>
+          <button className="h-10 px-5 rounded-md border border-border bg-card text-[13px] font-medium hover:bg-muted">
+            Cancelar
+          </button>
+        </div>
       </div>
-      <div className="p-5 space-y-2">{children}</div>
-    </div>
-  );
-}
-function Row({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
-  return (
-    <div className="flex gap-3 text-sm py-1">
-      <div className="w-56 shrink-0 text-muted-foreground">{label}</div>
-      <div className={`flex-1 ${highlight ? "font-semibold text-primary" : "text-foreground"}`}>{value}</div>
-    </div>
-  );
-}
-function Toggle({ label, on }: { label: string; on: boolean }) {
-  return (
-    <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-card p-3">
-      <span className="text-sm text-foreground">{label}</span>
-      <div className={`h-5 w-9 rounded-full ${on ? "bg-primary" : "bg-muted"} relative transition-colors`}>
-        <div className={`absolute top-0.5 ${on ? "right-0.5" : "left-0.5"} h-4 w-4 rounded-full bg-white shadow-sm transition-all`} />
+
+      <div className="space-y-4">
+        <Section title="Identidade visual" compact>
+          <div className="border border-dashed border-border rounded-lg py-6 px-4 text-center">
+            <div className="text-[13px] font-medium text-foreground">Enviar logo</div>
+            <div className="text-[11px] text-muted-foreground mt-1">PNG ou SVG — aparece nas propostas</div>
+          </div>
+          <div className="mt-4">
+            <div className="text-[11px] text-muted-foreground mb-1.5">Cor da marca</div>
+            <div className="flex items-center gap-2">
+              <div className="h-9 w-9 rounded-md border border-border" style={{ background: "#0E6B61" }} />
+              <input
+                defaultValue="#0E6B61"
+                className="flex-1 h-9 px-2 rounded-md border border-input bg-background text-[13px]"
+              />
+            </div>
+          </div>
+        </Section>
+
+        <Section title="Horário comercial" compact>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Abre às" defaultValue="08:00" />
+            <Field label="Fecha às" defaultValue="18:00" />
+          </div>
+          <div className="mt-3">
+            <div className="text-[11px] text-muted-foreground mb-1.5">Dias</div>
+            <div className="flex flex-wrap gap-1.5">
+              {["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"].map((d, i) => (
+                <span
+                  key={d}
+                  className={cn(
+                    "text-[12px] px-2.5 py-1 rounded-full border",
+                    i < 5
+                      ? "border-primary/40 text-primary bg-primary/5"
+                      : "border-border text-muted-foreground",
+                  )}
+                >
+                  {d}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="mt-4 pt-4 border-t border-border flex items-start justify-between gap-3">
+            <div>
+              <div className="text-[13px] font-medium text-foreground">IA responde fora do horário</div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">
+                Mantém o lead aquecido de madrugada e no fim de semana
+              </div>
+            </div>
+            <Toggle defaultOn />
+          </div>
+        </Section>
       </div>
     </div>
   );
 }
 
-function ProdutosTab({ produtos }: { produtos: ReturnType<typeof useProdutos> }) {
-  const [form, setForm] = useState({ nome: "", descricao: "", precoBase: 0, unidade: "projeto", categoria: "" });
-  const submit = () => {
-    if (!form.nome.trim()) return toast.error("Nome é obrigatório");
-    upsertProduto({ ...form, ativo: true });
-    toast.success("Produto salvo");
-    setForm({ nome: "", descricao: "", precoBase: 0, unidade: "projeto", categoria: "" });
-  };
+/* ================================================================
+ * TAB 2 — Cliente ideal & score
+ * ================================================================ */
+function IdealTab() {
+  const segmentos = ["Indústria Metalúrgica", "Construção Civil", "Logística e Transporte", "Serviços Contábeis"];
+  const sinais = [
+    { t: "Segmento bate com os alvos", d: "Aderência ao ICP", p: 30 },
+    { t: "Tem WhatsApp válido", d: "Sem canal, não há negociação autônoma", p: 20 },
+    { t: "Site ativo", d: "Empresa em operação", p: 15 },
+    { t: "Porte na faixa-alvo", d: "Capacidade de pagar o ticket", p: 15 },
+    { t: "Boa reputação pública", d: "Google acima de 4,0", p: 10 },
+    { t: "Está na região de atuação", d: "", p: 10 },
+  ];
+
   return (
-    <div className="space-y-4">
-      <div className="rounded-xl border border-border bg-card p-4 space-y-2">
-        <h3 className="text-sm font-semibold text-foreground flex items-center gap-2"><Plus className="h-4 w-4" /> Novo produto</h3>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-2">
-          <input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Nome" className="h-9 px-2 rounded-md border border-input bg-background text-sm md:col-span-2" />
-          <input value={form.categoria} onChange={(e) => setForm({ ...form, categoria: e.target.value })} placeholder="Categoria" className="h-9 px-2 rounded-md border border-input bg-background text-sm" />
-          <input type="number" value={form.precoBase} onChange={(e) => setForm({ ...form, precoBase: parseFloat(e.target.value) || 0 })} placeholder="Preço" className="h-9 px-2 rounded-md border border-input bg-background text-sm" />
-          <input value={form.unidade} onChange={(e) => setForm({ ...form, unidade: e.target.value })} placeholder="Unidade" className="h-9 px-2 rounded-md border border-input bg-background text-sm" />
-        </div>
-        <textarea value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} placeholder="Descrição" rows={2} className="w-full px-2 py-1.5 rounded-md border border-input bg-background text-sm" />
-        <button onClick={submit} className="h-9 px-3 rounded-lg bg-primary text-primary-foreground text-sm font-medium">Adicionar</button>
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-5">
+      <div className="space-y-5">
+        <Section
+          title="Perfil de cliente ideal"
+          hint="a régua que a Prospecção usa"
+        >
+          <div>
+            <div className="text-[11px] text-muted-foreground mb-1.5">Segmentos-alvo</div>
+            <div className="flex flex-wrap gap-1.5">
+              {segmentos.map((s) => (
+                <span
+                  key={s}
+                  className="text-[12px] px-2.5 py-1 rounded-full bg-primary/10 text-primary flex items-center gap-1.5"
+                >
+                  {s}
+                  <button className="text-primary/60 hover:text-primary">×</button>
+                </span>
+              ))}
+              <button className="text-[12px] px-2.5 py-1 rounded-full border border-dashed border-border text-muted-foreground hover:border-primary hover:text-primary">
+                + adicionar
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <Select label="Porte-alvo" options={["MEI", "ME", "EPP a Média", "Média a Grande"]} defaultValue="EPP a Média" />
+            <Field label="Ticket médio esperado" defaultValue="R$ 18.000" />
+            <Field label="Região de atuação" defaultValue="São Paulo, Santa Catarina, Paraná" />
+            <Field label="Ciclo de venda médio" defaultValue="21 dias" />
+          </div>
+        </Section>
+
+        <Section title="Sinais que valorizam um lead" hint="o peso define alta / média / baixa chance">
+          <div className="divide-y divide-border -mx-5">
+            {sinais.map((s) => (
+              <div key={s.t} className="px-5 py-3 flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <div className="text-[13px] font-medium text-foreground">{s.t}</div>
+                  {s.d && <div className="text-[11px] text-muted-foreground mt-0.5">{s.d}</div>}
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <input
+                    type="number"
+                    defaultValue={s.p}
+                    className="w-16 h-9 px-2 rounded-md border border-input bg-background text-[13px] text-right"
+                  />
+                  <span className="text-[11px] text-muted-foreground">pts</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Section>
       </div>
-      <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-muted/50 text-xs uppercase text-muted-foreground">
-            <tr><th className="text-left px-4 py-2">Nome</th><th className="text-left px-4 py-2">Categoria</th><th className="text-right px-4 py-2">Preço</th><th className="text-left px-4 py-2">Unidade</th><th className="text-right px-4 py-2">Ação</th></tr>
+
+      <div className="space-y-4">
+        <Section title="Faixas do score" compact>
+          <div className="space-y-3">
+            <RangeRow color="bg-orange-100 text-orange-700" icon="🔥" label="Alta chance" range="75 a 100 pontos" />
+            <RangeRow color="bg-primary/10 text-primary" icon="◆" label="Média chance" range="45 a 74 pontos" />
+            <RangeRow color="bg-sky-100 text-sky-700" icon="❄" label="Baixa chance" range="abaixo de 45" />
+          </div>
+          <p className="text-[11px] text-muted-foreground mt-3 leading-relaxed">
+            Na Prospecção, o vendedor clica no selo e vê o cálculo aberto — por que aquele lead é alta chance.
+          </p>
+        </Section>
+
+        <Section title="Descartar automaticamente" compact>
+          <div className="space-y-3">
+            <ToggleRow label="Empresas sem telefone nem WhatsApp" defaultOn />
+            <ToggleRow label="Leads abordados nos últimos 90 dias" hint="Evita queimar o número" defaultOn />
+            <ToggleRow label="Concorrentes diretos" defaultOn />
+          </div>
+        </Section>
+      </div>
+    </div>
+  );
+}
+
+/* ================================================================
+ * TAB 3 — Serviços que presto
+ * ================================================================ */
+function ServicosTab() {
+  const services = useServicesList();
+  const rows = [
+    { nome: "Sistema de gestão sob medida", cat: "Software", desc: "ERP customizado para a operação do cliente", preco: "R$ 24.000", unid: "projeto", prazo: "90 dias", desc_ia: "até 10%" },
+    { nome: "Automação de atendimento", cat: "IA / WhatsApp", desc: "Assistente virtual no WhatsApp do cliente", preco: "R$ 1.890", unid: "/mês", prazo: "15 dias", desc_ia: "até 15%" },
+    { nome: "Site institucional", cat: "Web", desc: "Site responsivo com SEO e captação", preco: "R$ 6.500", unid: "projeto", prazo: "30 dias", desc_ia: "até 12%" },
+    { nome: "Suporte e sustentação", cat: "Recorrente", desc: "Manutenção mensal com SLA de 4 horas", preco: "R$ 950", unid: "/mês", prazo: "imediato", desc_ia: "até 8%" },
+  ];
+  // fallback: still show more if domain has additional services
+  const extra = services.slice(rows.length).map((s) => ({
+    nome: s.nome,
+    cat: s.categoria,
+    desc: s.descricaoCurta,
+    preco: s.faixaTicket ?? "—",
+    unid: "",
+    prazo: s.prazoInformavel,
+    desc_ia: "—",
+  }));
+  const all = [...rows, ...extra];
+
+  return (
+    <Section
+      title="Serviços prestados"
+      hint="a IA só oferece o que estiver aqui"
+      action={
+        <button className="h-9 px-3 rounded-md bg-primary text-primary-foreground text-[13px] font-medium hover:bg-primary/90">
+          + Novo serviço
+        </button>
+      }
+    >
+      <div className="-mx-5">
+        <table className="w-full text-[13px]">
+          <thead>
+            <tr className="text-left text-[11px] uppercase tracking-wide text-muted-foreground border-b border-border">
+              <th className="px-5 py-2.5 font-medium">Serviço</th>
+              <th className="px-5 py-2.5 font-medium">Descrição</th>
+              <th className="px-5 py-2.5 font-medium">Preço base</th>
+              <th className="px-5 py-2.5 font-medium">Prazo</th>
+              <th className="px-5 py-2.5 font-medium">Desconto máx. da IA</th>
+              <th className="px-5 py-2.5" />
+            </tr>
           </thead>
           <tbody>
-            {produtos.map((p) => (
-              <tr key={p.id} className="border-t border-border">
-                <td className="px-4 py-2"><div className="font-medium">{p.nome}</div><div className="text-xs text-muted-foreground">{p.descricao}</div></td>
-                <td className="px-4 py-2 text-muted-foreground">{p.categoria}</td>
-                <td className="px-4 py-2 text-right font-medium">R$ {p.precoBase.toLocaleString("pt-BR")}</td>
-                <td className="px-4 py-2 text-muted-foreground">{p.unidade}</td>
-                <td className="px-4 py-2 text-right"><button onClick={() => removeProduto(p.id)} className="text-red-600 hover:opacity-70"><Trash2 className="h-4 w-4" /></button></td>
+            {all.map((r, i) => (
+              <tr key={i} className="border-b border-border last:border-0">
+                <td className="px-5 py-3.5">
+                  <div className="font-medium text-foreground">{r.nome}</div>
+                  <div className="text-[11px] text-muted-foreground mt-0.5">{r.cat}</div>
+                </td>
+                <td className="px-5 py-3.5 text-muted-foreground max-w-sm">{r.desc}</td>
+                <td className="px-5 py-3.5">
+                  <div className="font-semibold text-foreground">{r.preco}</div>
+                  {r.unid && <div className="text-[11px] text-muted-foreground">{r.unid}</div>}
+                </td>
+                <td className="px-5 py-3.5 text-foreground">{r.prazo}</td>
+                <td className="px-5 py-3.5">
+                  <span className="text-[12px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium">
+                    {r.desc_ia}
+                  </span>
+                </td>
+                <td className="px-5 py-3.5 text-right pr-5">
+                  <button className="h-8 px-3 rounded-md border border-border bg-card text-[12px] font-medium hover:bg-muted">
+                    Editar
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+    </Section>
+  );
+}
+
+/* ================================================================
+ * TAB 4 — Cérebro do vendedor virtual
+ * ================================================================ */
+function CerebroTab() {
+  const objecoes = [
+    { q: "\u201CEstá caro\u201D", a: "Reposiciona pelo custo de um atendente contratado e oferece o plano mensal sem fidelidade." },
+    { q: "\u201CVou pensar\u201D", a: "Agenda retorno em 3 dias e envia um caso de sucesso do mesmo segmento." },
+    { q: "\u201CJá tenho fornecedor\u201D", a: "Pergunta o que falta no atual e propõe teste paralelo de 14 dias." },
+  ];
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-5">
+      <div className="space-y-5">
+        <Section title="Como o vendedor virtual se comporta">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Field label="Nome do assistente" defaultValue="Ana" />
+            <Select label="Tom de voz" options={["Consultivo e direto", "Amigável", "Formal", "Descontraído"]} defaultValue="Consultivo e direto" />
+            <Select label="Trata o cliente por" options={["Você", "Senhor(a)", "Primeiro nome"]} defaultValue="Você" />
+          </div>
+
+          <div className="mt-4">
+            <div className="text-[11px] text-muted-foreground mb-1.5">Mensagem de abertura</div>
+            <textarea
+              rows={3}
+              defaultValue="Olá, {primeiro_nome}! Aqui é a Ana, da WF Digital. Vi que a {empresa} atua com {segmento} e trabalhamos com automação de atendimento para empresas como a sua. Faz sentido eu te mostrar como funciona em 5 minutos?"
+              className="w-full px-3 py-2 rounded-md border border-input bg-background text-[13px] resize-none"
+            />
+            <div className="text-[11px] text-primary/80 mt-1">Variáveis: {"{primeiro_nome} {empresa} {segmento} {cidade}"}</div>
+          </div>
+
+          <div className="mt-4">
+            <div className="text-[11px] text-muted-foreground mb-1.5">Argumentos de venda</div>
+            <textarea
+              rows={5}
+              defaultValue={`— Atendimento 24h sem aumentar o time\n— Implantação em 15 dias, sem trocar o número de WhatsApp\n— Cliente médio recupera o investimento em 3 meses\n— Contrato mensal, sem fidelidade`}
+              className="w-full px-3 py-2 rounded-md border border-input bg-background text-[13px] resize-none font-medium text-foreground"
+            />
+          </div>
+        </Section>
+
+        <Section
+          title="Objeções e respostas"
+          hint="a IA usa exatamente estas respostas"
+          action={
+            <button className="h-9 px-3 rounded-md border border-border bg-card text-[13px] font-medium hover:bg-muted">
+              + Nova
+            </button>
+          }
+        >
+          <div className="-mx-5">
+            <div className="grid grid-cols-[1fr_1.6fr_auto] gap-4 px-5 py-2 text-[11px] uppercase tracking-wide text-muted-foreground border-b border-border">
+              <div>Quando o cliente disser</div>
+              <div>A IA responde</div>
+              <div />
+            </div>
+            {objecoes.map((o) => (
+              <div
+                key={o.q}
+                className="grid grid-cols-[1fr_1.6fr_auto] gap-4 px-5 py-3.5 items-start border-b border-border last:border-0"
+              >
+                <div className="font-medium text-foreground text-[13px]">{o.q}</div>
+                <div className="text-[13px] text-muted-foreground">{o.a}</div>
+                <button className="h-8 px-3 rounded-md border border-border bg-card text-[12px] font-medium hover:bg-muted">
+                  Editar
+                </button>
+              </div>
+            ))}
+          </div>
+        </Section>
+      </div>
+
+      <div className="space-y-4">
+        <Section title="Testar a IA" compact>
+          <p className="text-[12px] text-muted-foreground mb-3">
+            Converse como um lead faria, antes de soltá-la em produção.
+          </p>
+          <div className="space-y-2 text-[12px]">
+            <div className="rounded-lg bg-primary/5 border border-primary/20 px-3 py-2">
+              <span className="font-semibold text-primary">Ana:</span> Olá, Marcos! Aqui é a Ana, da WF Digital…
+            </div>
+            <div className="rounded-lg bg-muted px-3 py-2 text-foreground">
+              <span className="font-semibold">Você:</span> tá caro isso aí
+            </div>
+            <div className="rounded-lg bg-primary/5 border border-primary/20 px-3 py-2">
+              <span className="font-semibold text-primary">Ana:</span> Entendo. Um atendente dedicado custa cerca de R$ 3.200/mês com encargos…
+            </div>
+          </div>
+          <input
+            placeholder="Escreva como se fosse o cliente…"
+            className="w-full h-10 px-3 mt-3 rounded-md border border-input bg-background text-[13px]"
+          />
+          <button className="w-full h-10 mt-2 rounded-md bg-primary text-primary-foreground text-[13px] font-semibold hover:bg-primary/90">
+            Simular conversa
+          </button>
+        </Section>
+
+        <div className="rounded-xl border border-amber-200 bg-amber-50/80 p-4">
+          <div className="text-[13px] font-semibold text-amber-900">Nada aqui é opcional.</div>
+          <div className="text-[12px] text-amber-800 mt-1">
+            Campos em branco viram improviso da IA na frente do cliente.
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-function OfertasTab({ ofertas, produtos, services }: { ofertas: ReturnType<typeof useOfertas>; produtos: ReturnType<typeof useProdutos>; services: ReturnType<typeof useServicesList> }) {
-  const [form, setForm] = useState({ nome: "", servicoId: "", produtoIds: [] as string[], desconto: 0, observacao: "" });
-  const toggleProduto = (id: string) => setForm((f) => ({ ...f, produtoIds: f.produtoIds.includes(id) ? f.produtoIds.filter((x) => x !== id) : [...f.produtoIds, id] }));
-  const submit = () => {
-    if (!form.nome.trim()) return toast.error("Nome da oferta é obrigatório");
-    upsertOferta({ ...form, ativa: true });
-    toast.success("Oferta salva");
-    setForm({ nome: "", servicoId: "", produtoIds: [], desconto: 0, observacao: "" });
-  };
+/* ================================================================
+ * Reusable primitives
+ * ================================================================ */
+function Section({
+  title,
+  hint,
+  action,
+  compact,
+  children,
+}: {
+  title: string;
+  hint?: string;
+  action?: React.ReactNode;
+  compact?: boolean;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="space-y-4">
-      <div className="rounded-xl border border-border bg-card p-4 space-y-2">
-        <h3 className="text-sm font-semibold text-foreground flex items-center gap-2"><Plus className="h-4 w-4" /> Nova oferta</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-          <input value={form.nome} onChange={(e) => setForm({ ...form, nome: e.target.value })} placeholder="Nome" className="h-9 px-2 rounded-md border border-input bg-background text-sm" />
-          <select value={form.servicoId} onChange={(e) => setForm({ ...form, servicoId: e.target.value })} className="h-9 px-2 rounded-md border border-input bg-background text-sm">
-            <option value="">Serviço (opcional)</option>
-            {services.map((s) => <option key={s.id} value={s.id}>{s.nome}</option>)}
-          </select>
-          <input type="number" value={form.desconto} onChange={(e) => setForm({ ...form, desconto: parseFloat(e.target.value) || 0 })} placeholder="Desconto %" className="h-9 px-2 rounded-md border border-input bg-background text-sm" />
+    <section className="rounded-xl border border-border bg-card">
+      <div className={cn("flex items-center justify-between gap-3 px-5 border-b border-border", compact ? "py-2.5" : "py-3")}>
+        <div className="min-w-0">
+          <div className="text-[11px] uppercase tracking-[0.14em] text-muted-foreground font-semibold">{title}</div>
+          {hint && <div className="text-[11px] text-muted-foreground/80 mt-0.5">{hint}</div>}
         </div>
-        <div>
-          <div className="text-xs text-muted-foreground mb-1">Produtos inclusos:</div>
-          <div className="flex gap-1.5 flex-wrap">
-            {produtos.map((p) => (
-              <button key={p.id} onClick={() => toggleProduto(p.id)} className={`text-xs px-2 py-1 rounded-full border ${form.produtoIds.includes(p.id) ? "bg-primary text-primary-foreground border-primary" : "border-border text-muted-foreground"}`}>
-                {p.nome}
-              </button>
-            ))}
-          </div>
-        </div>
-        <input value={form.observacao} onChange={(e) => setForm({ ...form, observacao: e.target.value })} placeholder="Observação" className="w-full h-9 px-2 rounded-md border border-input bg-background text-sm" />
-        <button onClick={submit} className="h-9 px-3 rounded-lg bg-primary text-primary-foreground text-sm font-medium">Adicionar</button>
+        {action}
       </div>
-      <div className="space-y-2">
-        {ofertas.map((o) => (
-          <div key={o.id} className="rounded-xl border border-border bg-card p-4">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="font-semibold text-foreground">{o.nome}</div>
-                <div className="text-xs text-muted-foreground">{o.observacao}</div>
-                <div className="text-xs text-muted-foreground mt-1">Produtos: {o.produtoIds.map((id) => produtos.find((p) => p.id === id)?.nome).filter(Boolean).join(", ") || "—"}</div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700">-{o.desconto}%</span>
-                <button onClick={() => removeOferta(o.id)} className="text-red-600 hover:opacity-70"><Trash2 className="h-4 w-4" /></button>
-              </div>
-            </div>
-          </div>
+      <div className={cn(compact ? "p-4" : "p-5")}>{children}</div>
+    </section>
+  );
+}
+
+function Field({ label, defaultValue }: { label: string; defaultValue?: string }) {
+  return (
+    <label className="block">
+      <div className="text-[11px] text-muted-foreground mb-1.5">{label}</div>
+      <input
+        defaultValue={defaultValue}
+        className="w-full h-10 px-3 rounded-md border border-input bg-background text-[13px] text-foreground"
+      />
+    </label>
+  );
+}
+
+function Select({ label, options, defaultValue }: { label: string; options: string[]; defaultValue?: string }) {
+  return (
+    <label className="block">
+      <div className="text-[11px] text-muted-foreground mb-1.5">{label}</div>
+      <select
+        defaultValue={defaultValue}
+        className="w-full h-10 px-3 rounded-md border border-input bg-background text-[13px] text-foreground"
+      >
+        {options.map((o) => (
+          <option key={o}>{o}</option>
         ))}
+      </select>
+    </label>
+  );
+}
+
+function Toggle({ defaultOn }: { defaultOn?: boolean }) {
+  const [on, setOn] = useState(!!defaultOn);
+  return (
+    <button
+      onClick={() => setOn(!on)}
+      role="switch"
+      aria-checked={on}
+      className={cn("shrink-0 h-6 w-11 rounded-full relative transition-colors", on ? "bg-primary" : "bg-muted")}
+    >
+      <span className={cn("absolute top-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-all", on ? "right-0.5" : "left-0.5")} />
+    </button>
+  );
+}
+
+function ToggleRow({ label, hint, defaultOn }: { label: string; hint?: string; defaultOn?: boolean }) {
+  return (
+    <div className="flex items-start justify-between gap-3">
+      <div className="min-w-0">
+        <div className="text-[13px] font-medium text-foreground">{label}</div>
+        {hint && <div className="text-[11px] text-muted-foreground mt-0.5">{hint}</div>}
       </div>
+      <Toggle defaultOn={defaultOn} />
+    </div>
+  );
+}
+
+function RangeRow({ color, icon, label, range }: { color: string; icon: string; label: string; range: string }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className={cn("inline-flex items-center gap-1.5 text-[12px] px-2.5 py-1 rounded-full font-medium", color)}>
+        <span>{icon}</span>
+        {label}
+      </span>
+      <span className="text-[12px] text-muted-foreground">{range}</span>
     </div>
   );
 }
