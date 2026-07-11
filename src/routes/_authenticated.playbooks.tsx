@@ -18,6 +18,18 @@ function PlaybooksPage() {
 
   return (
     <AppShell title="Playbooks" subtitle="Biblioteca de roteiros por etapa e persona">
+      <PageHero
+        icon={BookOpen}
+        eyebrow="Roteiros comerciais"
+        title="Playbooks"
+        description="Roteiros passo-a-passo por etapa do funil, com critérios de sucesso e scripts prontos."
+        stats={[
+          { label: "Playbooks", value: playbooks.length, tone: "primary" },
+          { label: "Passos totais", value: playbooks.reduce((s, p) => s + p.steps.length, 0) },
+          { label: "Etapas cobertas", value: new Set(playbooks.map((p) => p.stage)).size },
+          { label: "Selecionado", value: active?.steps.length ?? 0, hint: "Passos no ativo" },
+        ]}
+      />
       <div className="grid grid-cols-1 lg:grid-cols-[300px,1fr] gap-4">
         <div className="space-y-2">
           {playbooks.map((p) => {
