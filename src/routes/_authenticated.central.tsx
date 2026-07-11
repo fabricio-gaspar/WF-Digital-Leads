@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/app/AppShell";
 import { integrations, useSdrDrafts, updateSdrDraft, DEFAULT_SDR_MODE, type IntegrationStatus } from "@/domain/sdrVirtual";
+import { sendApprovedDraft, batchApproveDrafts } from "@/domain/DemoDataProvider";
 import { Plug, Bot, MessageCircle, Radio, Sparkles, ShieldCheck, Send, Pencil, Trash2, AlertTriangle, CheckSquare, X } from "lucide-react";
 import { toast } from "sonner";
 
