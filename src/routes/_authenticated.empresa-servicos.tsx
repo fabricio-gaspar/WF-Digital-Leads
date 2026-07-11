@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/app/AppShell";
+import { PageHero } from "@/app/PageHero";
 import { useCompanyProfile, useServicesList, useKnowledgeBase, sdrPolicies, toggleServiceSdr } from "@/domain/sdrVirtual";
 import { useProdutos, useOfertas, upsertProduto, removeProduto, upsertOferta, removeOferta } from "@/domain/canonical";
 import { Building2, Package, BookOpen, Shield, CheckCircle2, AlertTriangle, Power, PowerOff, ShoppingBag, Tag, Trash2, Plus } from "lucide-react";
@@ -33,7 +34,22 @@ function EmpresaServicosPage() {
 
   return (
     <AppShell title="Empresa e Serviços" subtitle="Perfil da empresa, catálogo e base do SDR">
+      <div className="max-w-6xl mx-auto">
+        <PageHero
+          icon={Building2}
+          eyebrow="Fundação Comercial"
+          title="Empresa & Catálogo"
+          description="Identidade, serviços, produtos, ofertas e base de conhecimento que alimentam o SDR virtual."
+          stats={[
+            { label: "Serviços ativos", value: services.filter((s) => s.sdrAtivo !== false).length, tone: "primary" },
+            { label: "Produtos", value: produtos.length },
+            { label: "Ofertas", value: ofertas.length },
+            { label: "Docs SDR", value: knowledge.length, hint: "Base de conhecimento" },
+          ]}
+        />
+      </div>
       <div className="max-w-6xl mx-auto space-y-6">
+
 
 
         <div className="flex gap-1 border-b border-border">

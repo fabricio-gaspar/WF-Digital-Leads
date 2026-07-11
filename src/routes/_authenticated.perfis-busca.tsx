@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/app/AppShell";
+import { PageHero } from "@/app/PageHero";
 import { useSearchProfiles, useServicesList } from "@/domain/sdrVirtual";
-import { Target, MapPin, Users } from "lucide-react";
+import { Target, MapPin, Users, Crosshair } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/perfis-busca")({
   head: () => ({ meta: [{ title: "Perfis de Busca — WF Digital Leads" }] }),
@@ -16,9 +17,19 @@ function PerfisBuscaPage() {
   return (
     <AppShell title="Perfis de Busca" subtitle="Configuração compacta de ICP, persona, território e serviço">
       <div className="max-w-6xl mx-auto space-y-4">
-        <div className="rounded-xl border border-border bg-card p-4 text-sm text-muted-foreground">
-          O Perfil de Busca substitui, nesta versão compacta, telas separadas de ICP, Persona, Território e Selling Profile. Cada perfil concentra: empresa-alvo, geografia, decisor e critérios eliminatórios — pronto para reutilizar em cada busca.
-        </div>
+        <PageHero
+          icon={Crosshair}
+          eyebrow="ICP unificado"
+          title="Perfis de Busca"
+          description="Cada perfil concentra empresa-alvo, geografia, decisor e critérios eliminatórios — pronto para reutilizar em cada busca."
+          stats={[
+            { label: "Perfis", value: profiles.length, tone: "primary" },
+            { label: "Ativos", value: profiles.filter((p) => p.status === "Ativo").length, tone: "success" },
+            { label: "Em teste", value: profiles.filter((p) => p.status === "Em teste").length, tone: "warning" },
+            { label: "Serviços cobertos", value: new Set(profiles.map((p) => p.servicoId)).size },
+          ]}
+        />
+
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {profiles.map((p) => (
