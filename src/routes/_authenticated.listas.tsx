@@ -82,9 +82,11 @@ function ListasPage() {
           <span>Listas geradas por buscas Vibe/Apify/Importação sandbox — clique em uma busca em <Link to="/prospeccao" className="text-primary hover:underline">Prospecção</Link> para criar uma nova.</span>
         </div>
       </div>
+      {importing && <LeadListImporter onClose={() => setImporting(false)} />}
     </AppShell>
   );
 }
+
 
 function Stat({ label, value, tone }: { label: string; value: number; tone?: "emerald" | "amber" | "red" }) {
   const cls = tone === "emerald" ? "text-emerald-600" : tone === "amber" ? "text-amber-600" : tone === "red" ? "text-red-600" : "text-foreground";
