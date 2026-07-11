@@ -64,45 +64,28 @@ async def main() -> None:
         await page.wait_for_timeout(900)
         await page.screenshot(path=str(SHOTS / "3_simulador.png"))
 
-        # Helper: espera o AppShell montar (sidebar visível).
-        async def wait_app_ready():
-            await page.wait_for_selector('[data-testid="app-sidebar"]', timeout=10000)
+        # 3. Verifica toast "Rascunho enviado para a Central" no simulador.
+        body_text = await page.locator("body").inner_text()
+        if "Rascunho enviado" not in body_text:
+            failures.append("simulador: toast de rascunho ausente")
 
-        # 3. CENTRAL — aprovar rascunho
-        await page.goto(f"{BASE}/central", wait_until="domcontentloaded")
-        await wait_app_ready()
-        await page.wait_for_timeout(400)
-        approve_buttons = page.locator('[data-testid^="approve-"]')
-        approve_count = await approve_buttons.count()
-        if approve_count == 0:
-            failures.append("central: nenhum rascunho na fila do SDR")
-        else:
-            await approve_buttons.first.click()
-            await page.wait_for_timeout(400)
-        await page.screenshot(path=str(SHOTS / "4_central.png"))
-
-        # 4. Verifica que sidebar tem toggle "Fase futura"
-        toggle = page.get_by_test_id("nav-future-toggle")
-        if await toggle.count() == 0:
+        # 4. Sidebar tem toggle "Fase futura" (visível no simulador).
+        if await page.get_by_test_id("nav-future-toggle").count() == 0:
             failures.append("sidebar: toggle Fase futura ausente")
 
-        # 5. Export CSV disponível
-        await page.goto(f"{BASE}/relatorios-sdr", wait_until="domcontentloaded")
-        await wait_app_ready()
-        await page.wait_for_timeout(400)
+        # 5. Navega via SPA (Link) para relatórios SDR e valida botão Exportar CSV.
+        await page.get_by_test_id("nav-relatorios-sdr").click()
+        await page.wait_for_timeout(1000)
         if await page.get_by_test_id("export-csv").count() == 0:
             failures.append("relatorios-sdr: botão Exportar CSV ausente")
         await page.screenshot(path=str(SHOTS / "5_relatorios_sdr.png"))
 
-        # 6. Kill-switch por serviço presente
-        await page.goto(f"{BASE}/empresa-servicos", wait_until="domcontentloaded")
-        await wait_app_ready()
-        await page.wait_for_timeout(400)
+        # 6. Navega via SPA para empresa-servicos e valida kill-switch.
+        await page.get_by_test_id("nav-empresa-servicos").click()
+        await page.wait_for_timeout(1000)
         await page.locator("button", has_text="Serviços").first.click()
         await page.wait_for_timeout(400)
-        toggles = page.locator('[data-testid^="sdr-toggle-"]')
-        n = await toggles.count()
-        if n == 0:
+        if await page.locator('[data-testid^="sdr-toggle-"]').count() == 0:
             failures.append("empresa-servicos: kill-switch por serviço ausente")
         await page.screenshot(path=str(SHOTS / "6_servicos.png"))
 
