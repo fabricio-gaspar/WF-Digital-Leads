@@ -22,6 +22,8 @@ async def main() -> None:
         browser = await p.chromium.launch(headless=True)
         ctx = await browser.new_context(viewport={"width": 1280, "height": 1800})
         page = await ctx.new_page()
+        page.on("pageerror", lambda e: print("PAGEERROR:", e))
+        page.on("console", lambda m: (m.type == "error") and print("CONSOLE:", m.text))
         # 1. LOGIN — injeta sessão demo direto no sessionStorage (o AuthProvider
         # carrega a partir dali no mount). Evita flakiness com inputs controlados
         # em ambientes headless.
