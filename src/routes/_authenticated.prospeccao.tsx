@@ -8,8 +8,8 @@ import { Search, Sparkles, Import, Loader2, Target, Zap, MapPin, CheckCircle2 } 
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSearchProfiles, useServicesList } from "@/domain/sdrVirtual";
-import { recordSearchRun, recordEnrichment, upsertEmpresa, useEnrichmentEvents } from "@/domain/DemoDataProvider";
-import { checkEligibility } from "@/domain/canonical";
+import { recordSearchRun, recordEnrichment, useEnrichmentEvents } from "@/domain/DemoDataProvider";
+import { checkEligibility, upsertEmpresa } from "@/domain/canonical";
 
 export const Route = createFileRoute("/_authenticated/prospeccao")({
   head: () => ({ meta: [{ title: "Prospecção — WF Digital CRM" }] }),
