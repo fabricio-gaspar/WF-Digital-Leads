@@ -13,6 +13,7 @@ import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedSimuladorRouteImport } from './routes/_authenticated.simulador'
 import { Route as AuthenticatedScoringRouteImport } from './routes/_authenticated.scoring'
 import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated.relatorios'
 import { Route as AuthenticatedProspeccaoRouteImport } from './routes/_authenticated.prospeccao'
@@ -50,6 +51,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedSimuladorRoute = AuthenticatedSimuladorRouteImport.update({
+  id: '/simulador',
+  path: '/simulador',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedScoringRoute = AuthenticatedScoringRouteImport.update({
   id: '/scoring',
@@ -168,6 +174,7 @@ export interface FileRoutesByFullPath {
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/scoring': typeof AuthenticatedScoringRoute
+  '/simulador': typeof AuthenticatedSimuladorRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
 }
 export interface FileRoutesByTo {
@@ -191,6 +198,7 @@ export interface FileRoutesByTo {
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/scoring': typeof AuthenticatedScoringRoute
+  '/simulador': typeof AuthenticatedSimuladorRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
 }
 export interface FileRoutesById {
@@ -216,6 +224,7 @@ export interface FileRoutesById {
   '/_authenticated/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
   '/_authenticated/scoring': typeof AuthenticatedScoringRoute
+  '/_authenticated/simulador': typeof AuthenticatedSimuladorRoute
   '/_authenticated/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
 }
 export interface FileRouteTypes {
@@ -241,6 +250,7 @@ export interface FileRouteTypes {
     | '/prospeccao'
     | '/relatorios'
     | '/scoring'
+    | '/simulador'
     | '/leads/$leadId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -264,6 +274,7 @@ export interface FileRouteTypes {
     | '/prospeccao'
     | '/relatorios'
     | '/scoring'
+    | '/simulador'
     | '/leads/$leadId'
   id:
     | '__root__'
@@ -288,6 +299,7 @@ export interface FileRouteTypes {
     | '/_authenticated/prospeccao'
     | '/_authenticated/relatorios'
     | '/_authenticated/scoring'
+    | '/_authenticated/simulador'
     | '/_authenticated/leads/$leadId'
   fileRoutesById: FileRoutesById
 }
@@ -327,6 +339,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/simulador': {
+      id: '/_authenticated/simulador'
+      path: '/simulador'
+      fullPath: '/simulador'
+      preLoaderRoute: typeof AuthenticatedSimuladorRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/scoring': {
       id: '/_authenticated/scoring'
@@ -486,6 +505,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedProspeccaoRoute: typeof AuthenticatedProspeccaoRoute
   AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
   AuthenticatedScoringRoute: typeof AuthenticatedScoringRoute
+  AuthenticatedSimuladorRoute: typeof AuthenticatedSimuladorRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -506,6 +526,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedProspeccaoRoute: AuthenticatedProspeccaoRoute,
   AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
   AuthenticatedScoringRoute: AuthenticatedScoringRoute,
+  AuthenticatedSimuladorRoute: AuthenticatedSimuladorRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
