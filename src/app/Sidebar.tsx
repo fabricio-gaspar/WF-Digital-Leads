@@ -1,7 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Search, Users, MessagesSquare,
-  BarChart3, Settings, LogOut, UserCircle2, Menu, X,
+  BarChart3, Settings, LogOut, UserCircle2, Menu, X, Compass,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/auth/AuthProvider";
@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/estrategia", label: "Estratégia", icon: Compass },
   { to: "/leads", label: "Leads", icon: Users, badgeKey: "leads" as const },
   { to: "/prospeccao", label: "Prospecção", icon: Search },
   { to: "/atendimentos", label: "Atendimentos", icon: MessagesSquare, badgeKey: "conversas" as const },
