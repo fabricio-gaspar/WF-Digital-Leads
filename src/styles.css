@@ -63,40 +63,41 @@
 
 :root {
   --radius: 0.75rem;
-  /* Canvas geral quase branco com toque azulado */
-  --background: oklch(0.985 0.005 240);
-  --foreground: oklch(0.22 0.04 250);
+  /* Canvas cinza-neutro (bg #F4F6F7) */
+  --background: oklch(0.972 0.003 220);
+  --foreground: oklch(0.21 0.03 260);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.04 250);
+  --card-foreground: oklch(0.21 0.03 260);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.04 250);
-  /* Verde-petróleo WF */
-  --primary: oklch(0.46 0.09 175);
-  --primary-foreground: oklch(0.985 0.005 180);
-  --primary-soft: oklch(0.94 0.04 175);
-  --primary-strong: oklch(0.38 0.09 175);
-  --secondary: oklch(0.965 0.008 240);
-  --secondary-foreground: oklch(0.28 0.04 250);
-  --muted: oklch(0.965 0.008 240);
-  --muted-foreground: oklch(0.52 0.03 250);
-  --accent: oklch(0.94 0.04 175);
-  --accent-foreground: oklch(0.34 0.09 175);
-  --destructive: oklch(0.6 0.22 25);
+  --popover-foreground: oklch(0.21 0.03 260);
+  /* Teal WF #0E6B61 */
+  --primary: oklch(0.475 0.075 180);
+  --primary-foreground: oklch(1 0 0);
+  --primary-soft: oklch(0.955 0.02 180);
+  --primary-strong: oklch(0.395 0.07 180);
+  --secondary: oklch(0.97 0.005 220);
+  --secondary-foreground: oklch(0.28 0.03 260);
+  --muted: oklch(0.97 0.005 220);
+  --muted-foreground: oklch(0.53 0.02 250);
+  --accent: oklch(0.955 0.02 180);
+  --accent-foreground: oklch(0.395 0.07 180);
+  --destructive: oklch(0.62 0.22 25);
   --destructive-foreground: oklch(0.99 0.005 25);
-  --border: oklch(0.925 0.012 250);
-  --input: oklch(0.94 0.012 250);
-  --ring: oklch(0.46 0.09 175);
-  /* Etapas do funil */
-  --stage-prospeccao: oklch(0.62 0.16 245);   /* azul */
-  --stage-qualificado: oklch(0.58 0.18 275);  /* violeta */
-  --stage-proposta: oklch(0.72 0.18 60);      /* laranja */
-  --stage-negociacao: oklch(0.55 0.2 305);    /* roxo */
-  --stage-fechado: oklch(0.62 0.16 155);      /* verde */
-  --stage-perdido: oklch(0.62 0.2 20);        /* vermelho/rosa */
+  --border: oklch(0.915 0.006 230);
+  --input: oklch(0.94 0.006 230);
+  --ring: oklch(0.475 0.075 180);
+  /* Etapas do funil (mantém contraste do mock: azul, roxo, laranja, roxo escuro, verde, teal escuro, vermelho) */
+  --stage-prospeccao: oklch(0.7 0.16 235);
+  --stage-qualificado: oklch(0.62 0.2 285);
+  --stage-proposta: oklch(0.75 0.17 65);
+  --stage-negociacao: oklch(0.55 0.22 305);
+  --stage-fechado: oklch(0.7 0.16 160);
+  --stage-pedido: oklch(0.45 0.09 180);
+  --stage-perdido: oklch(0.62 0.22 25);
   /* Temperatura */
-  --temp-frio: oklch(0.65 0.11 235);
-  --temp-morno: oklch(0.72 0.16 70);
-  --temp-quente: oklch(0.62 0.22 25);
+  --temp-frio: oklch(0.72 0.13 230);
+  --temp-morno: oklch(0.75 0.17 65);
+  --temp-quente: oklch(0.68 0.2 45);
   --chart-1: var(--stage-prospeccao);
   --chart-2: var(--stage-qualificado);
   --chart-3: var(--stage-proposta);
