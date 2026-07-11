@@ -13,7 +13,9 @@ import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedSimuladorRouteImport } from './routes/_authenticated.simulador'
 import { Route as AuthenticatedScoringRouteImport } from './routes/_authenticated.scoring'
+import { Route as AuthenticatedRelatoriosSdrRouteImport } from './routes/_authenticated.relatorios-sdr'
 import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated.relatorios'
 import { Route as AuthenticatedProspeccaoRouteImport } from './routes/_authenticated.prospeccao'
 import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated.portal'
@@ -51,11 +53,22 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedSimuladorRoute = AuthenticatedSimuladorRouteImport.update({
+  id: '/simulador',
+  path: '/simulador',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedScoringRoute = AuthenticatedScoringRouteImport.update({
   id: '/scoring',
   path: '/scoring',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedRelatoriosSdrRoute =
+  AuthenticatedRelatoriosSdrRouteImport.update({
+    id: '/relatorios-sdr',
+    path: '/relatorios-sdr',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedRelatoriosRoute = AuthenticatedRelatoriosRouteImport.update({
   id: '/relatorios',
   path: '/relatorios',
@@ -167,7 +180,9 @@ export interface FileRoutesByFullPath {
   '/portal': typeof AuthenticatedPortalRoute
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/relatorios-sdr': typeof AuthenticatedRelatoriosSdrRoute
   '/scoring': typeof AuthenticatedScoringRoute
+  '/simulador': typeof AuthenticatedSimuladorRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
 }
 export interface FileRoutesByTo {
@@ -190,7 +205,9 @@ export interface FileRoutesByTo {
   '/portal': typeof AuthenticatedPortalRoute
   '/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/relatorios-sdr': typeof AuthenticatedRelatoriosSdrRoute
   '/scoring': typeof AuthenticatedScoringRoute
+  '/simulador': typeof AuthenticatedSimuladorRoute
   '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
 }
 export interface FileRoutesById {
@@ -215,7 +232,9 @@ export interface FileRoutesById {
   '/_authenticated/portal': typeof AuthenticatedPortalRoute
   '/_authenticated/prospeccao': typeof AuthenticatedProspeccaoRoute
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
+  '/_authenticated/relatorios-sdr': typeof AuthenticatedRelatoriosSdrRoute
   '/_authenticated/scoring': typeof AuthenticatedScoringRoute
+  '/_authenticated/simulador': typeof AuthenticatedSimuladorRoute
   '/_authenticated/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
 }
 export interface FileRouteTypes {
@@ -240,7 +259,9 @@ export interface FileRouteTypes {
     | '/portal'
     | '/prospeccao'
     | '/relatorios'
+    | '/relatorios-sdr'
     | '/scoring'
+    | '/simulador'
     | '/leads/$leadId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -263,7 +284,9 @@ export interface FileRouteTypes {
     | '/portal'
     | '/prospeccao'
     | '/relatorios'
+    | '/relatorios-sdr'
     | '/scoring'
+    | '/simulador'
     | '/leads/$leadId'
   id:
     | '__root__'
@@ -287,7 +310,9 @@ export interface FileRouteTypes {
     | '/_authenticated/portal'
     | '/_authenticated/prospeccao'
     | '/_authenticated/relatorios'
+    | '/_authenticated/relatorios-sdr'
     | '/_authenticated/scoring'
+    | '/_authenticated/simulador'
     | '/_authenticated/leads/$leadId'
   fileRoutesById: FileRoutesById
 }
@@ -328,11 +353,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/simulador': {
+      id: '/_authenticated/simulador'
+      path: '/simulador'
+      fullPath: '/simulador'
+      preLoaderRoute: typeof AuthenticatedSimuladorRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/scoring': {
       id: '/_authenticated/scoring'
       path: '/scoring'
       fullPath: '/scoring'
       preLoaderRoute: typeof AuthenticatedScoringRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/relatorios-sdr': {
+      id: '/_authenticated/relatorios-sdr'
+      path: '/relatorios-sdr'
+      fullPath: '/relatorios-sdr'
+      preLoaderRoute: typeof AuthenticatedRelatoriosSdrRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/relatorios': {
@@ -485,7 +524,9 @@ interface AuthenticatedRouteChildren {
   AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
   AuthenticatedProspeccaoRoute: typeof AuthenticatedProspeccaoRoute
   AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
+  AuthenticatedRelatoriosSdrRoute: typeof AuthenticatedRelatoriosSdrRoute
   AuthenticatedScoringRoute: typeof AuthenticatedScoringRoute
+  AuthenticatedSimuladorRoute: typeof AuthenticatedSimuladorRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -505,7 +546,9 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedPortalRoute: AuthenticatedPortalRoute,
   AuthenticatedProspeccaoRoute: AuthenticatedProspeccaoRoute,
   AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
+  AuthenticatedRelatoriosSdrRoute: AuthenticatedRelatoriosSdrRoute,
   AuthenticatedScoringRoute: AuthenticatedScoringRoute,
+  AuthenticatedSimuladorRoute: AuthenticatedSimuladorRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

@@ -3,6 +3,7 @@ import {
   LayoutDashboard, Search, Users, MessagesSquare,
   BarChart3, Settings, LogOut, UserCircle2, Menu, X,
   Building2, Target, List, Megaphone, Zap, ArrowRightLeft, BookOpen,
+  Bot, LineChart,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/auth/AuthProvider";
@@ -19,10 +20,12 @@ const NAV = [
   { to: "/campanhas", label: "Campanhas", icon: Megaphone },
   { to: "/cadencias", label: "Cadências", icon: Zap },
   { to: "/central", label: "Central", icon: MessagesSquare, badgeKey: "conversas" as const },
+  { to: "/simulador", label: "Simulador SDR", icon: Bot },
   { to: "/handoffs", label: "Handoffs", icon: ArrowRightLeft, badgeKey: "handoffs" as const },
   { to: "/empresa-servicos", label: "Empresa & Serviços", icon: Building2 },
   { to: "/playbooks", label: "Playbooks", icon: BookOpen },
   { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
+  { to: "/relatorios-sdr", label: "Relatórios SDR", icon: LineChart },
   { to: "/portal", label: "Meu Portal", icon: UserCircle2 },
   { to: "/configuracoes", label: "Configurações", icon: Settings, adminOnly: true },
 ];
