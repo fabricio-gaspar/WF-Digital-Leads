@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/app/AppShell";
-import { useCompanyProfile, useServicesList, useKnowledgeBase, sdrPolicies } from "@/domain/sdrVirtual";
-import { Building2, Package, BookOpen, Shield, CheckCircle2, AlertTriangle } from "lucide-react";
+import { useCompanyProfile, useServicesList, useKnowledgeBase, sdrPolicies, toggleServiceSdr } from "@/domain/sdrVirtual";
+import { Building2, Package, BookOpen, Shield, CheckCircle2, AlertTriangle, Power, PowerOff } from "lucide-react";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/empresa-servicos")({
   head: () => ({ meta: [{ title: "Empresa e Serviços — WF Digital Leads" }] }),
