@@ -45,7 +45,6 @@ function OrcamentosPage() {
   const [creating, setCreating] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
 
-  return (
   const totalCPQ = orcamentos.reduce((s, o) => s + computeOrcamentoTotals(o).total, 0);
   const aguardando = orcamentos.filter((o) => o.status === "Aguardando aprovação").length;
   const aceitos = orcamentos.filter((o) => o.status === "Aceito" || o.status === "Aprovado").length;
