@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState, useEffect } from "react";
 import { AppShell } from "@/app/AppShell";
+import { PageHero } from "@/app/PageHero";
 import {
   companyProfile,
   sdrPolicies,
