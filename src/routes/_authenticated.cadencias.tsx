@@ -29,6 +29,18 @@ function CadenciasPage() {
 
   return (
     <AppShell title="Cadências" subtitle="Sequências curtas e configuráveis — sem cadências agressivas">
+      <PageHero
+        icon={Zap}
+        eyebrow="Bloco Automação"
+        title="Cadências"
+        description="Sequências curtas por serviço — apresentação + follow-ups, com paradas automáticas em sinais de compra ou pedidos de humano."
+        stats={[
+          { label: "Cadências", value: cadences.length, tone: "primary" },
+          { label: "Ativas", value: cadences.filter((c) => c.status === "Ativa").length, tone: "success" },
+          { label: "Rascunhos", value: cadences.filter((c) => c.status === "Rascunho").length },
+          { label: "Passos totais", value: cadences.reduce((s, c) => s + c.steps.length, 0) },
+        ]}
+      />
       <div className="max-w-5xl mx-auto space-y-4">
         <div className="rounded-xl border border-amber-200 bg-amber-50 dark:bg-amber-950/20 p-4 text-sm text-amber-900 dark:text-amber-200 flex gap-3">
           <Zap className="h-5 w-5 shrink-0" />
