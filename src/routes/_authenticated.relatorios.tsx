@@ -58,19 +58,19 @@ function ReportsPage() {
 
   return (
     <AppShell title="Relatórios" subtitle="Indicadores de performance do time comercial">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-        {[
-          { l: "Taxa de conversão", v: `${conversion.toFixed(1)}%` },
-          { l: "Previsão ponderada", v: currency(forecast) },
-          { l: "Leads ativos", v: leads.filter((l) => l.stage !== "fechado" && l.stage !== "perdido").length },
-          { l: "Ticket médio", v: currency(leads.length ? leads.reduce((s, l) => s + l.estimatedValue, 0) / leads.length : 0) },
-        ].map((k) => (
-          <div key={k.l} className="bg-card border border-border rounded-xl p-4">
-            <div className="text-[12px] text-muted-foreground">{k.l}</div>
-            <div className="text-[20px] font-semibold">{k.v}</div>
-          </div>
-        ))}
-      </div>
+      <PageHero
+        icon={LineChartIcon}
+        eyebrow="Bloco Operação"
+        title="Relatórios comerciais"
+        description="Funil, performance por vendedor, origem dos leads e previsão ponderada — atualizados em tempo real."
+        stats={[
+          { label: "Taxa de conversão", value: `${conversion.toFixed(1)}%`, tone: "success" },
+          { label: "Previsão ponderada", value: currency(forecast), tone: "primary" },
+          { label: "Leads ativos", value: leads.filter((l) => l.stage !== "fechado" && l.stage !== "perdido").length },
+          { label: "Ticket médio", value: currency(leads.length ? leads.reduce((s, l) => s + l.estimatedValue, 0) / leads.length : 0) },
+        ]}
+      />
+
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="bg-card border border-border rounded-xl p-4">
