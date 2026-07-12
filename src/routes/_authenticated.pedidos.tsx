@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/app/AppShell";
-import { Package, ArrowRight } from "lucide-react";
+import { PageHero } from "@/app/PageHero";
+import { ArrowRight, Truck } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/pedidos")({
   head: () => ({ meta: [{ title: "Pedidos — WF Digital CRM" }] }),
@@ -26,24 +27,19 @@ function PedidosPage() {
   const total = ORDERS.reduce((s, o) => s + o.total, 0);
   return (
     <AppShell title="Pedidos" subtitle="Vitrine pós-fechamento: acompanhamento de entrega e faturamento">
-      <div className="grid gap-3.5 mb-5" style={{ gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))" }}>
-        {[
-          { label: "Pedidos abertos", value: ORDERS.length },
+      <PageHero
+        icon={Truck}
+        eyebrow="Bloco Operação"
+        title="Pedidos"
+        description="Pedidos gerados após o fechamento na Central. Acompanhe status de produção, faturamento e entrega."
+        stats={[
+          { label: "Pedidos abertos", value: ORDERS.length, tone: "primary" },
           { label: "Valor total", value: total.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }) },
-          { label: "Aguardando pagamento", value: ORDERS.filter(o => o.status === "Aguardando pagamento").length },
+          { label: "Aguardando pagamento", value: ORDERS.filter(o => o.status === "Aguardando pagamento").length, tone: "warning" },
           { label: "Em produção", value: ORDERS.filter(o => o.status === "Em produção").length },
-        ].map((k) => (
-          <div key={k.label} className="bg-card border border-border rounded-xl p-4 flex gap-3 items-start">
-            <div className="h-[34px] w-[34px] rounded-[9px] bg-[color:var(--primary-soft)] text-primary grid place-items-center shrink-0">
-              <Package className="h-[16px] w-[16px]" />
-            </div>
-            <div>
-              <div className="text-[11.5px] text-muted-foreground">{k.label}</div>
-              <div className="text-[22px] font-bold tracking-tight mt-0.5">{k.value}</div>
-            </div>
-          </div>
-        ))}
-      </div>
+        ]}
+      />
+
 
       <div className="bg-card border border-border rounded-xl overflow-hidden">
         <div className="px-[18px] py-3.5 border-b border-border/60 flex items-center gap-3">
