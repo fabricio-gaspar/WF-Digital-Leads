@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/app/AppShell";
-import { Package, ArrowRight } from "lucide-react";
+import { PageHero } from "@/app/PageHero";
+import { Package, ArrowRight, Truck } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/pedidos")({
   head: () => ({ meta: [{ title: "Pedidos — WF Digital CRM" }] }),
