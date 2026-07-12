@@ -32,6 +32,18 @@ function SettingsPage() {
 
   return (
     <AppShell title="Configurações" subtitle="Administração da plataforma">
+      <PageHero
+        icon={Settings}
+        eyebrow="Bloco Administração"
+        title="Configurações"
+        description="Usuários, times, templates, integrações e segurança — administração central da plataforma."
+        stats={[
+          { label: "Usuários", value: users.length, tone: "primary" },
+          { label: "Times", value: teams.length },
+          { label: "Templates", value: templates.length },
+          { label: "Canais", value: channels.length, tone: providerStatus.mode === "demo" ? "warning" : "success" },
+        ]}
+      />
       {readonly && (
         <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-800 px-3 py-2 text-[12px]">
           Você está no modo somente leitura. Apenas administradores podem editar.
