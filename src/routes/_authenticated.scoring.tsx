@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/app/AppShell";
+import { PageHero } from "@/app/PageHero";
 import { useScoringRules, QUALIFICATION_TIERS, computeScoreBreakdown, tierForScore, ruleStore } from "@/domain/scoring";
 import { useLeads, useCompanies } from "@/repositories/hooks";
-import { Sparkles, TrendingUp, RotateCcw } from "lucide-react";
+import { Sparkles, TrendingUp, RotateCcw, Target } from "lucide-react";
 import { useMemo } from "react";
 
 export const Route = createFileRoute("/_authenticated/scoring")({
@@ -30,18 +31,18 @@ function ScoringPage() {
 
   return (
     <AppShell title="Scoring & Qualificação" subtitle="Motor de pontuação BANT + CHAMP + fit ICP">
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
-        {QUALIFICATION_TIERS.map((t) => (
-          <div key={t.id} className="bg-card border border-border rounded-xl p-4">
-            <div className="flex items-center justify-between mb-2">
-              <div className="text-[11px] uppercase text-muted-foreground font-medium">{t.label}</div>
-              <span className="h-2 w-2 rounded-full" style={{ background: `var(${t.colorVar})` }} />
-            </div>
-            <div className="text-2xl font-semibold">{distribution[t.id]}</div>
-            <div className="text-[11px] text-muted-foreground mt-1">{t.min}–{t.max} pts · {t.description}</div>
-          </div>
-        ))}
-      </div>
+      <PageHero
+        icon={Target}
+        eyebrow="Bloco Automação"
+        title="Scoring & Qualificação"
+        description="Régua transparente de pontuação — BANT + CHAMP + fit ICP com pesos ajustáveis e faixas por temperatura."
+        stats={QUALIFICATION_TIERS.map((t) => ({
+          label: t.label,
+          value: distribution[t.id],
+          hint: `${t.min}–${t.max} pts`,
+        }))}
+      />
+
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 bg-card border border-border rounded-xl p-4">

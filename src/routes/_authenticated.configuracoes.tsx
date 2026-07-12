@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/app/AppShell";
+import { PageHero } from "@/app/PageHero";
 import { useAuth } from "@/auth/AuthProvider";
 import { useUsers, useTeams, useTemplates, useChannels } from "@/repositories/hooks";
 import { useState } from "react";
-import { Users, Layers, MessageSquare, Plug, Shield } from "lucide-react";
+import { Users, Layers, MessageSquare, Plug, Shield, Settings } from "lucide-react";
 import { providerStatus } from "@/providers";
 
 export const Route = createFileRoute("/_authenticated/configuracoes")({
@@ -31,6 +32,18 @@ function SettingsPage() {
 
   return (
     <AppShell title="Configurações" subtitle="Administração da plataforma">
+      <PageHero
+        icon={Settings}
+        eyebrow="Bloco Administração"
+        title="Configurações"
+        description="Usuários, times, templates, integrações e segurança — administração central da plataforma."
+        stats={[
+          { label: "Usuários", value: users.length, tone: "primary" },
+          { label: "Times", value: teams.length },
+          { label: "Templates", value: templates.length },
+          { label: "Canais", value: channels.length },
+        ]}
+      />
       {readonly && (
         <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/10 text-amber-800 px-3 py-2 text-[12px]">
           Você está no modo somente leitura. Apenas administradores podem editar.

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState, useEffect } from "react";
 import { AppShell } from "@/app/AppShell";
+import { PageHero } from "@/app/PageHero";
 import {
   companyProfile,
   sdrPolicies,
@@ -149,6 +150,18 @@ function SimuladorPage() {
       title="Simulador SDR Virtual"
       subtitle="Teste o cérebro configurado: tom, base de conhecimento e guardrails"
     >
+      <PageHero
+        icon={Bot}
+        eyebrow="Bloco Administração"
+        title="Simulador do SDR Virtual"
+        description="Simule uma conversa real com a Ana usando tom, argumentos e base de conhecimento — sem tocar em leads reais."
+        stats={[
+          { label: "Modo", value: sdrPolicies.modo, tone: "primary" },
+          { label: "Turnos", value: messages.filter((m) => m.role === "lead").length },
+          { label: "Estado", value: state },
+          { label: "Rascunhos gerados", value: messages.filter((m) => m.role === "sdr").length, tone: "success" },
+        ]}
+      />
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-4">
         {/* Chat */}
         <div className="rounded-xl border border-border bg-card flex flex-col min-h-[560px]">
