@@ -33,19 +33,19 @@ function PortalPage() {
 
   return (
     <AppShell title="Portal do Funcionário" subtitle="Minhas tarefas, produtividade e escala do time">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-        {[
-          { l: "Tarefas abertas", v: openTasks.length },
-          { l: "Concluídas hoje", v: doneToday },
-          { l: "Em atraso", v: overdue },
-          { l: "Meu papel", v: session!.user.role },
-        ].map((k) => (
-          <div key={k.l} className="bg-card border border-border rounded-xl p-4">
-            <div className="text-[12px] text-muted-foreground">{k.l}</div>
-            <div className="text-[20px] font-semibold capitalize">{k.v}</div>
-          </div>
-        ))}
-      </div>
+      <PageHero
+        icon={UserCircle2}
+        eyebrow="Bloco Operação"
+        title={`Olá, ${session!.user.name?.split(" ")[0] ?? "vendedor"}`}
+        description="Suas tarefas do dia, atividade recente e time online — tudo em um só lugar."
+        stats={[
+          { label: "Tarefas abertas", value: openTasks.length, tone: "primary" },
+          { label: "Concluídas hoje", value: doneToday, tone: "success" },
+          { label: "Em atraso", value: overdue, tone: overdue > 0 ? "warning" : "default" },
+          { label: "Meu papel", value: session!.user.role },
+        ]}
+      />
+
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <section className="lg:col-span-2 bg-card border border-border rounded-xl p-4">
