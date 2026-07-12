@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/app/AppShell";
+import { PageHero } from "@/app/PageHero";
 import { useCadences, useServicesList } from "@/domain/sdrVirtual";
 import { Zap, Clock, MessageSquare, HelpCircle, CheckSquare, GitBranch, Sprout, StopCircle, ArrowRight } from "lucide-react";
 import type { CadenceStepType } from "@/domain/sdrVirtual";
