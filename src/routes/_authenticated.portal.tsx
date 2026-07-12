@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/app/AppShell";
+import { PageHero } from "@/app/PageHero";
 import { useAuth } from "@/auth/AuthProvider";
 import { useTasks, useActivities, useUsers, useToggleTask } from "@/repositories/hooks";
 import { useMemo } from "react";
-import { CheckCircle2, Circle, Clock } from "lucide-react";
+import { CheckCircle2, Circle, Clock, UserCircle2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/portal")({
   head: () => ({ meta: [{ title: "Portal do Funcionário — WF Digital CRM" }] }),
