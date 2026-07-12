@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/app/AppShell";
+import { PageHero } from "@/app/PageHero";
 import { useLeads, useUsers } from "@/repositories/hooks";
 import { LEAD_STAGES, STAGE_MAP } from "@/domain/constants";
 import { useMemo } from "react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
+import { LineChart as LineChartIcon } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/relatorios")({
   head: () => ({ meta: [{ title: "Relatórios — WF Digital CRM" }] }),
