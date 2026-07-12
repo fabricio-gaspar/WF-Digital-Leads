@@ -46,13 +46,31 @@ function OrcamentosPage() {
   const [openId, setOpenId] = useState<string | null>(null);
 
   return (
+  const totalCPQ = orcamentos.reduce((s, o) => s + computeOrcamentoTotals(o).total, 0);
+  const aguardando = orcamentos.filter((o) => o.status === "Aguardando aprovação").length;
+  const aceitos = orcamentos.filter((o) => o.status === "Aceito" || o.status === "Aprovado").length;
+
+  return (
     <AppShell title="Orçamentos (CPQ)" subtitle="Configure, cote e envie propostas com regras de aprovação e versionamento">
-      <div className="max-w-7xl mx-auto space-y-4">
-        <div className="flex justify-end">
-          <button onClick={() => setCreating(true)} className="h-9 px-3 rounded-lg bg-primary text-primary-foreground text-sm font-medium inline-flex items-center gap-1.5">
+      <PageHero
+        icon={ClipboardList}
+        eyebrow="Bloco CPQ"
+        title="Orçamentos"
+        description="Monte propostas com produtos catalogados, aplique descontos com alçada e envie versões controladas."
+        actions={
+          <button onClick={() => setCreating(true)} className="h-9 px-3 rounded-lg bg-primary text-primary-foreground text-sm font-semibold inline-flex items-center gap-1.5">
             <Plus className="h-4 w-4" /> Novo orçamento
           </button>
-        </div>
+        }
+        stats={[
+          { label: "Total emitido", value: `R$ ${totalCPQ.toLocaleString("pt-BR", { maximumFractionDigits: 0 })}`, tone: "primary" },
+          { label: "Propostas", value: orcamentos.length },
+          { label: "Aguardando aprovação", value: aguardando, tone: aguardando > 0 ? "warning" : "default" },
+          { label: "Aceitos/Aprovados", value: aceitos, tone: "success" },
+        ]}
+      />
+      <div className="max-w-7xl mx-auto space-y-4">
+
 
         {creating && (
           <CreateOrcamentoCard
