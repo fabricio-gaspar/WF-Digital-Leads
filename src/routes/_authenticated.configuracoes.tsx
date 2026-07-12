@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/app/AppShell";
+import { PageHero } from "@/app/PageHero";
 import { useAuth } from "@/auth/AuthProvider";
 import { useUsers, useTeams, useTemplates, useChannels } from "@/repositories/hooks";
 import { useState } from "react";
-import { Users, Layers, MessageSquare, Plug, Shield } from "lucide-react";
+import { Users, Layers, MessageSquare, Plug, Shield, Settings } from "lucide-react";
 import { providerStatus } from "@/providers";
 
 export const Route = createFileRoute("/_authenticated/configuracoes")({
