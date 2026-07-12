@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/app/AppShell";
+import { PageHero } from "@/app/PageHero";
 import { useScoringRules, QUALIFICATION_TIERS, computeScoreBreakdown, tierForScore, ruleStore } from "@/domain/scoring";
 import { useLeads, useCompanies } from "@/repositories/hooks";
-import { Sparkles, TrendingUp, RotateCcw } from "lucide-react";
+import { Sparkles, TrendingUp, RotateCcw, Target } from "lucide-react";
 import { useMemo } from "react";
 
 export const Route = createFileRoute("/_authenticated/scoring")({
