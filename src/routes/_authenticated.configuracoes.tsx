@@ -41,7 +41,7 @@ function SettingsPage() {
           { label: "Usuários", value: users.length, tone: "primary" },
           { label: "Times", value: teams.length },
           { label: "Templates", value: templates.length },
-          { label: "Canais", value: channels.length, tone: providerStatus.mode === "demo" ? "warning" : "success" },
+          { label: "Canais", value: channels.length },
         ]}
       />
       {readonly && (
