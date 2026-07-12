@@ -38,7 +38,7 @@ function CadenciasPage() {
           { label: "Cadências", value: cadences.length, tone: "primary" },
           { label: "Ativas", value: cadences.filter((c) => c.status === "Ativa").length, tone: "success" },
           { label: "Rascunhos", value: cadences.filter((c) => c.status === "Rascunho").length },
-          { label: "Passos totais", value: cadences.reduce((s, c) => s + c.steps.length, 0) },
+          { label: "Passos totais", value: cadences.reduce((s, c) => s + c.passos.length, 0) },
         ]}
       />
       <div className="max-w-5xl mx-auto space-y-4">
