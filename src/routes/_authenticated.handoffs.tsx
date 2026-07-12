@@ -33,13 +33,20 @@ function HandoffsPage() {
 
   return (
     <AppShell title="Handoffs" subtitle="Transferência do SDR Virtual para o vendedor humano">
+      <PageHero
+        icon={ArrowRightLeft}
+        eyebrow="Bloco Automação"
+        title="Handoffs"
+        description="Passagem de bastão do SDR Virtual para o vendedor humano, com motivo, resumo e prioridade."
+        stats={[
+          { label: "Aguardando", value: handoffs.filter((h) => h.status === "Aguardando vendedor").length, tone: "primary" },
+          { label: "Aceitos", value: handoffs.filter((h) => h.status === "Aceito").length, tone: "success" },
+          { label: "Devolvidos", value: handoffs.filter((h) => h.status === "Devolvido").length, tone: "warning" },
+          { label: "Concluídos", value: handoffs.filter((h) => h.status === "Concluído").length, tone: "success" },
+        ]}
+      />
       <div className="max-w-6xl mx-auto space-y-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Stat label="Aguardando" value={handoffs.filter((h) => h.status === "Aguardando vendedor").length} icon={Clock} tone="primary" />
-          <Stat label="Aceitos" value={handoffs.filter((h) => h.status === "Aceito").length} icon={CheckCircle2} tone="emerald" />
-          <Stat label="Devolvidos" value={handoffs.filter((h) => h.status === "Devolvido").length} icon={RotateCcw} tone="amber" />
-          <Stat label="Concluídos" value={handoffs.filter((h) => h.status === "Concluído").length} icon={CheckCircle2} tone="emerald" />
-        </div>
+
 
         <div className="flex gap-2 flex-wrap">
           {filters.map((f) => (
