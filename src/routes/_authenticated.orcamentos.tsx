@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AppShell } from "@/app/AppShell";
+import { PageHero } from "@/app/PageHero";
 import {
   useOrcamentos,
   useOportunidades,
@@ -11,9 +12,8 @@ import {
   computeOrcamentoTotals,
   type StatusOrcamento,
   type LinhaOrcamento,
-  
 } from "@/domain/canonical";
-import { FileText, Plus, CheckCircle2, XCircle, Download, Clock } from "lucide-react";
+import { FileText, Plus, CheckCircle2, XCircle, Download, Clock, ClipboardList } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
