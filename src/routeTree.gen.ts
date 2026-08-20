@@ -9,666 +9,526 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as RecuperarSenhaRouteImport } from './routes/recuperar-senha'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedSimuladorRouteImport } from './routes/_authenticated.simulador'
-import { Route as AuthenticatedScoringRouteImport } from './routes/_authenticated.scoring'
-import { Route as AuthenticatedRelatoriosSdrRouteImport } from './routes/_authenticated.relatorios-sdr'
-import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated.relatorios'
-import { Route as AuthenticatedProspeccaoRouteImport } from './routes/_authenticated.prospeccao'
-import { Route as AuthenticatedPortalRouteImport } from './routes/_authenticated.portal'
-import { Route as AuthenticatedPlaybooksRouteImport } from './routes/_authenticated.playbooks'
-import { Route as AuthenticatedPerfisBuscaRouteImport } from './routes/_authenticated.perfis-busca'
-import { Route as AuthenticatedPedidosRouteImport } from './routes/_authenticated.pedidos'
-import { Route as AuthenticatedOrcamentosRouteImport } from './routes/_authenticated.orcamentos'
-import { Route as AuthenticatedOportunidadesRouteImport } from './routes/_authenticated.oportunidades'
-import { Route as AuthenticatedObservabilidadeRouteImport } from './routes/_authenticated.observabilidade'
-import { Route as AuthenticatedMissionControlRouteImport } from './routes/_authenticated.mission-control'
-import { Route as AuthenticatedListasRouteImport } from './routes/_authenticated.listas'
-import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated.leads'
-import { Route as AuthenticatedHandoffsRouteImport } from './routes/_authenticated.handoffs'
-import { Route as AuthenticatedEstrategiaRouteImport } from './routes/_authenticated.estrategia'
-import { Route as AuthenticatedEmpresaServicosRouteImport } from './routes/_authenticated.empresa-servicos'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated.dashboard'
-import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated.configuracoes'
-import { Route as AuthenticatedCentralRouteImport } from './routes/_authenticated.central'
-import { Route as AuthenticatedCampanhasRouteImport } from './routes/_authenticated.campanhas'
-import { Route as AuthenticatedCadenciasRouteImport } from './routes/_authenticated.cadencias'
-import { Route as AuthenticatedAtendimentosRouteImport } from './routes/_authenticated.atendimentos'
-import { Route as AuthenticatedLeadsLeadIdRouteImport } from './routes/_authenticated.leads.$leadId'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated/relatorios'
+import { Route as AuthenticatedPortalVendedorRouteImport } from './routes/_authenticated/portal-vendedor'
+import { Route as AuthenticatedPedidosRouteImport } from './routes/_authenticated/pedidos'
+import { Route as AuthenticatedOrcamentosRouteImport } from './routes/_authenticated/orcamentos'
+import { Route as AuthenticatedLeadsRouteImport } from './routes/_authenticated/leads'
+import { Route as AuthenticatedEmpresaRouteImport } from './routes/_authenticated/empresa'
+import { Route as AuthenticatedDiagnosticoRouteImport } from './routes/_authenticated/diagnostico'
+import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
+import { Route as AuthenticatedBuscaLeadsRouteImport } from './routes/_authenticated/busca-leads'
+import { Route as AuthenticatedAtendimentoRouteImport } from './routes/_authenticated/atendimento'
+import { Route as OauthGoogleCalendarReturnRouteImport } from './routes/oauth/google-calendar/return'
+import { Route as ApiPublicZapiWebhookRouteImport } from './routes/api/public/zapi-webhook'
+import { Route as ApiPublicResendWebhookRouteImport } from './routes/api/public/resend-webhook'
+import { Route as ApiPublicProspectingTickRouteImport } from './routes/api/public/prospecting-tick'
+import { Route as ApiPublicOutreachTickRouteImport } from './routes/api/public/outreach-tick'
+import { Route as ApiPublicLeadFlowTickRouteImport } from './routes/api/public/lead-flow-tick'
+import { Route as ApiPublicEvolutionWebhookRouteImport } from './routes/api/public/evolution-webhook'
+import { Route as AuthenticatedLeadsIdRouteImport } from './routes/_authenticated/leads.$id'
 
-const RecuperarSenhaRoute = RecuperarSenhaRouteImport.update({
-  id: '/recuperar-senha',
-  path: '/recuperar-senha',
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedSimuladorRoute = AuthenticatedSimuladorRouteImport.update({
-  id: '/simulador',
-  path: '/simulador',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedScoringRoute = AuthenticatedScoringRouteImport.update({
-  id: '/scoring',
-  path: '/scoring',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedRelatoriosSdrRoute =
-  AuthenticatedRelatoriosSdrRouteImport.update({
-    id: '/relatorios-sdr',
-    path: '/relatorios-sdr',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedRelatoriosRoute = AuthenticatedRelatoriosRouteImport.update({
   id: '/relatorios',
   path: '/relatorios',
-  getParentRoute: () => AuthenticatedRoute,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedProspeccaoRoute = AuthenticatedProspeccaoRouteImport.update({
-  id: '/prospeccao',
-  path: '/prospeccao',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedPortalRoute = AuthenticatedPortalRouteImport.update({
-  id: '/portal',
-  path: '/portal',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedPlaybooksRoute = AuthenticatedPlaybooksRouteImport.update({
-  id: '/playbooks',
-  path: '/playbooks',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedPerfisBuscaRoute =
-  AuthenticatedPerfisBuscaRouteImport.update({
-    id: '/perfis-busca',
-    path: '/perfis-busca',
-    getParentRoute: () => AuthenticatedRoute,
+const AuthenticatedPortalVendedorRoute =
+  AuthenticatedPortalVendedorRouteImport.update({
+    id: '/portal-vendedor',
+    path: '/portal-vendedor',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedPedidosRoute = AuthenticatedPedidosRouteImport.update({
   id: '/pedidos',
   path: '/pedidos',
-  getParentRoute: () => AuthenticatedRoute,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedOrcamentosRoute = AuthenticatedOrcamentosRouteImport.update({
   id: '/orcamentos',
   path: '/orcamentos',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedOportunidadesRoute =
-  AuthenticatedOportunidadesRouteImport.update({
-    id: '/oportunidades',
-    path: '/oportunidades',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedObservabilidadeRoute =
-  AuthenticatedObservabilidadeRouteImport.update({
-    id: '/observabilidade',
-    path: '/observabilidade',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedMissionControlRoute =
-  AuthenticatedMissionControlRouteImport.update({
-    id: '/mission-control',
-    path: '/mission-control',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedListasRoute = AuthenticatedListasRouteImport.update({
-  id: '/listas',
-  path: '/listas',
-  getParentRoute: () => AuthenticatedRoute,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedLeadsRoute = AuthenticatedLeadsRouteImport.update({
   id: '/leads',
   path: '/leads',
-  getParentRoute: () => AuthenticatedRoute,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedHandoffsRoute = AuthenticatedHandoffsRouteImport.update({
-  id: '/handoffs',
-  path: '/handoffs',
-  getParentRoute: () => AuthenticatedRoute,
+const AuthenticatedEmpresaRoute = AuthenticatedEmpresaRouteImport.update({
+  id: '/empresa',
+  path: '/empresa',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedEstrategiaRoute = AuthenticatedEstrategiaRouteImport.update({
-  id: '/estrategia',
-  path: '/estrategia',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedEmpresaServicosRoute =
-  AuthenticatedEmpresaServicosRouteImport.update({
-    id: '/empresa-servicos',
-    path: '/empresa-servicos',
-    getParentRoute: () => AuthenticatedRoute,
+const AuthenticatedDiagnosticoRoute =
+  AuthenticatedDiagnosticoRouteImport.update({
+    id: '/diagnostico',
+    path: '/diagnostico',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedConfiguracoesRoute =
   AuthenticatedConfiguracoesRouteImport.update({
     id: '/configuracoes',
     path: '/configuracoes',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedCentralRoute = AuthenticatedCentralRouteImport.update({
-  id: '/central',
-  path: '/central',
-  getParentRoute: () => AuthenticatedRoute,
+const AuthenticatedBuscaLeadsRoute = AuthenticatedBuscaLeadsRouteImport.update({
+  id: '/busca-leads',
+  path: '/busca-leads',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedCampanhasRoute = AuthenticatedCampanhasRouteImport.update({
-  id: '/campanhas',
-  path: '/campanhas',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedCadenciasRoute = AuthenticatedCadenciasRouteImport.update({
-  id: '/cadencias',
-  path: '/cadencias',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedAtendimentosRoute =
-  AuthenticatedAtendimentosRouteImport.update({
-    id: '/atendimentos',
-    path: '/atendimentos',
-    getParentRoute: () => AuthenticatedRoute,
+const AuthenticatedAtendimentoRoute =
+  AuthenticatedAtendimentoRouteImport.update({
+    id: '/atendimento',
+    path: '/atendimento',
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedLeadsLeadIdRoute =
-  AuthenticatedLeadsLeadIdRouteImport.update({
-    id: '/$leadId',
-    path: '/$leadId',
-    getParentRoute: () => AuthenticatedLeadsRoute,
+const OauthGoogleCalendarReturnRoute =
+  OauthGoogleCalendarReturnRouteImport.update({
+    id: '/oauth/google-calendar/return',
+    path: '/oauth/google-calendar/return',
+    getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicZapiWebhookRoute = ApiPublicZapiWebhookRouteImport.update({
+  id: '/api/public/zapi-webhook',
+  path: '/api/public/zapi-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicResendWebhookRoute = ApiPublicResendWebhookRouteImport.update({
+  id: '/api/public/resend-webhook',
+  path: '/api/public/resend-webhook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicProspectingTickRoute =
+  ApiPublicProspectingTickRouteImport.update({
+    id: '/api/public/prospecting-tick',
+    path: '/api/public/prospecting-tick',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicOutreachTickRoute = ApiPublicOutreachTickRouteImport.update({
+  id: '/api/public/outreach-tick',
+  path: '/api/public/outreach-tick',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicLeadFlowTickRoute = ApiPublicLeadFlowTickRouteImport.update({
+  id: '/api/public/lead-flow-tick',
+  path: '/api/public/lead-flow-tick',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicEvolutionWebhookRoute =
+  ApiPublicEvolutionWebhookRouteImport.update({
+    id: '/api/public/evolution-webhook',
+    path: '/api/public/evolution-webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedLeadsIdRoute = AuthenticatedLeadsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AuthenticatedLeadsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/recuperar-senha': typeof RecuperarSenhaRoute
-  '/atendimentos': typeof AuthenticatedAtendimentosRoute
-  '/cadencias': typeof AuthenticatedCadenciasRoute
-  '/campanhas': typeof AuthenticatedCampanhasRoute
-  '/central': typeof AuthenticatedCentralRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/atendimento': typeof AuthenticatedAtendimentoRoute
+  '/busca-leads': typeof AuthenticatedBuscaLeadsRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/empresa-servicos': typeof AuthenticatedEmpresaServicosRoute
-  '/estrategia': typeof AuthenticatedEstrategiaRoute
-  '/handoffs': typeof AuthenticatedHandoffsRoute
+  '/diagnostico': typeof AuthenticatedDiagnosticoRoute
+  '/empresa': typeof AuthenticatedEmpresaRoute
   '/leads': typeof AuthenticatedLeadsRouteWithChildren
-  '/listas': typeof AuthenticatedListasRoute
-  '/mission-control': typeof AuthenticatedMissionControlRoute
-  '/observabilidade': typeof AuthenticatedObservabilidadeRoute
-  '/oportunidades': typeof AuthenticatedOportunidadesRoute
   '/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/pedidos': typeof AuthenticatedPedidosRoute
-  '/perfis-busca': typeof AuthenticatedPerfisBuscaRoute
-  '/playbooks': typeof AuthenticatedPlaybooksRoute
-  '/portal': typeof AuthenticatedPortalRoute
-  '/prospeccao': typeof AuthenticatedProspeccaoRoute
+  '/portal-vendedor': typeof AuthenticatedPortalVendedorRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
-  '/relatorios-sdr': typeof AuthenticatedRelatoriosSdrRoute
-  '/scoring': typeof AuthenticatedScoringRoute
-  '/simulador': typeof AuthenticatedSimuladorRoute
-  '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
+  '/leads/$id': typeof AuthenticatedLeadsIdRoute
+  '/api/public/evolution-webhook': typeof ApiPublicEvolutionWebhookRoute
+  '/api/public/lead-flow-tick': typeof ApiPublicLeadFlowTickRoute
+  '/api/public/outreach-tick': typeof ApiPublicOutreachTickRoute
+  '/api/public/prospecting-tick': typeof ApiPublicProspectingTickRoute
+  '/api/public/resend-webhook': typeof ApiPublicResendWebhookRoute
+  '/api/public/zapi-webhook': typeof ApiPublicZapiWebhookRoute
+  '/oauth/google-calendar/return': typeof OauthGoogleCalendarReturnRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/login': typeof LoginRoute
-  '/recuperar-senha': typeof RecuperarSenhaRoute
-  '/atendimentos': typeof AuthenticatedAtendimentosRoute
-  '/cadencias': typeof AuthenticatedCadenciasRoute
-  '/campanhas': typeof AuthenticatedCampanhasRoute
-  '/central': typeof AuthenticatedCentralRoute
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/atendimento': typeof AuthenticatedAtendimentoRoute
+  '/busca-leads': typeof AuthenticatedBuscaLeadsRoute
   '/configuracoes': typeof AuthenticatedConfiguracoesRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/empresa-servicos': typeof AuthenticatedEmpresaServicosRoute
-  '/estrategia': typeof AuthenticatedEstrategiaRoute
-  '/handoffs': typeof AuthenticatedHandoffsRoute
+  '/diagnostico': typeof AuthenticatedDiagnosticoRoute
+  '/empresa': typeof AuthenticatedEmpresaRoute
   '/leads': typeof AuthenticatedLeadsRouteWithChildren
-  '/listas': typeof AuthenticatedListasRoute
-  '/mission-control': typeof AuthenticatedMissionControlRoute
-  '/observabilidade': typeof AuthenticatedObservabilidadeRoute
-  '/oportunidades': typeof AuthenticatedOportunidadesRoute
   '/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/pedidos': typeof AuthenticatedPedidosRoute
-  '/perfis-busca': typeof AuthenticatedPerfisBuscaRoute
-  '/playbooks': typeof AuthenticatedPlaybooksRoute
-  '/portal': typeof AuthenticatedPortalRoute
-  '/prospeccao': typeof AuthenticatedProspeccaoRoute
+  '/portal-vendedor': typeof AuthenticatedPortalVendedorRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
-  '/relatorios-sdr': typeof AuthenticatedRelatoriosSdrRoute
-  '/scoring': typeof AuthenticatedScoringRoute
-  '/simulador': typeof AuthenticatedSimuladorRoute
-  '/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/leads/$id': typeof AuthenticatedLeadsIdRoute
+  '/api/public/evolution-webhook': typeof ApiPublicEvolutionWebhookRoute
+  '/api/public/lead-flow-tick': typeof ApiPublicLeadFlowTickRoute
+  '/api/public/outreach-tick': typeof ApiPublicOutreachTickRoute
+  '/api/public/prospecting-tick': typeof ApiPublicProspectingTickRoute
+  '/api/public/resend-webhook': typeof ApiPublicResendWebhookRoute
+  '/api/public/zapi-webhook': typeof ApiPublicZapiWebhookRoute
+  '/oauth/google-calendar/return': typeof OauthGoogleCalendarReturnRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/login': typeof LoginRoute
-  '/recuperar-senha': typeof RecuperarSenhaRoute
-  '/_authenticated/atendimentos': typeof AuthenticatedAtendimentosRoute
-  '/_authenticated/cadencias': typeof AuthenticatedCadenciasRoute
-  '/_authenticated/campanhas': typeof AuthenticatedCampanhasRoute
-  '/_authenticated/central': typeof AuthenticatedCentralRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/atendimento': typeof AuthenticatedAtendimentoRoute
+  '/_authenticated/busca-leads': typeof AuthenticatedBuscaLeadsRoute
   '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
-  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/empresa-servicos': typeof AuthenticatedEmpresaServicosRoute
-  '/_authenticated/estrategia': typeof AuthenticatedEstrategiaRoute
-  '/_authenticated/handoffs': typeof AuthenticatedHandoffsRoute
+  '/_authenticated/diagnostico': typeof AuthenticatedDiagnosticoRoute
+  '/_authenticated/empresa': typeof AuthenticatedEmpresaRoute
   '/_authenticated/leads': typeof AuthenticatedLeadsRouteWithChildren
-  '/_authenticated/listas': typeof AuthenticatedListasRoute
-  '/_authenticated/mission-control': typeof AuthenticatedMissionControlRoute
-  '/_authenticated/observabilidade': typeof AuthenticatedObservabilidadeRoute
-  '/_authenticated/oportunidades': typeof AuthenticatedOportunidadesRoute
   '/_authenticated/orcamentos': typeof AuthenticatedOrcamentosRoute
   '/_authenticated/pedidos': typeof AuthenticatedPedidosRoute
-  '/_authenticated/perfis-busca': typeof AuthenticatedPerfisBuscaRoute
-  '/_authenticated/playbooks': typeof AuthenticatedPlaybooksRoute
-  '/_authenticated/portal': typeof AuthenticatedPortalRoute
-  '/_authenticated/prospeccao': typeof AuthenticatedProspeccaoRoute
+  '/_authenticated/portal-vendedor': typeof AuthenticatedPortalVendedorRoute
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
-  '/_authenticated/relatorios-sdr': typeof AuthenticatedRelatoriosSdrRoute
-  '/_authenticated/scoring': typeof AuthenticatedScoringRoute
-  '/_authenticated/simulador': typeof AuthenticatedSimuladorRoute
-  '/_authenticated/leads/$leadId': typeof AuthenticatedLeadsLeadIdRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/leads/$id': typeof AuthenticatedLeadsIdRoute
+  '/api/public/evolution-webhook': typeof ApiPublicEvolutionWebhookRoute
+  '/api/public/lead-flow-tick': typeof ApiPublicLeadFlowTickRoute
+  '/api/public/outreach-tick': typeof ApiPublicOutreachTickRoute
+  '/api/public/prospecting-tick': typeof ApiPublicProspectingTickRoute
+  '/api/public/resend-webhook': typeof ApiPublicResendWebhookRoute
+  '/api/public/zapi-webhook': typeof ApiPublicZapiWebhookRoute
+  '/oauth/google-calendar/return': typeof OauthGoogleCalendarReturnRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/login'
-    | '/recuperar-senha'
-    | '/atendimentos'
-    | '/cadencias'
-    | '/campanhas'
-    | '/central'
+    | '/auth'
+    | '/reset-password'
+    | '/atendimento'
+    | '/busca-leads'
     | '/configuracoes'
-    | '/dashboard'
-    | '/empresa-servicos'
-    | '/estrategia'
-    | '/handoffs'
+    | '/diagnostico'
+    | '/empresa'
     | '/leads'
-    | '/listas'
-    | '/mission-control'
-    | '/observabilidade'
-    | '/oportunidades'
     | '/orcamentos'
     | '/pedidos'
-    | '/perfis-busca'
-    | '/playbooks'
-    | '/portal'
-    | '/prospeccao'
+    | '/portal-vendedor'
     | '/relatorios'
-    | '/relatorios-sdr'
-    | '/scoring'
-    | '/simulador'
-    | '/leads/$leadId'
+    | '/leads/$id'
+    | '/api/public/evolution-webhook'
+    | '/api/public/lead-flow-tick'
+    | '/api/public/outreach-tick'
+    | '/api/public/prospecting-tick'
+    | '/api/public/resend-webhook'
+    | '/api/public/zapi-webhook'
+    | '/oauth/google-calendar/return'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
-    | '/login'
-    | '/recuperar-senha'
-    | '/atendimentos'
-    | '/cadencias'
-    | '/campanhas'
-    | '/central'
+    | '/auth'
+    | '/reset-password'
+    | '/atendimento'
+    | '/busca-leads'
     | '/configuracoes'
-    | '/dashboard'
-    | '/empresa-servicos'
-    | '/estrategia'
-    | '/handoffs'
+    | '/diagnostico'
+    | '/empresa'
     | '/leads'
-    | '/listas'
-    | '/mission-control'
-    | '/observabilidade'
-    | '/oportunidades'
     | '/orcamentos'
     | '/pedidos'
-    | '/perfis-busca'
-    | '/playbooks'
-    | '/portal'
-    | '/prospeccao'
+    | '/portal-vendedor'
     | '/relatorios'
-    | '/relatorios-sdr'
-    | '/scoring'
-    | '/simulador'
-    | '/leads/$leadId'
+    | '/'
+    | '/leads/$id'
+    | '/api/public/evolution-webhook'
+    | '/api/public/lead-flow-tick'
+    | '/api/public/outreach-tick'
+    | '/api/public/prospecting-tick'
+    | '/api/public/resend-webhook'
+    | '/api/public/zapi-webhook'
+    | '/oauth/google-calendar/return'
   id:
     | '__root__'
-    | '/'
     | '/_authenticated'
-    | '/login'
-    | '/recuperar-senha'
-    | '/_authenticated/atendimentos'
-    | '/_authenticated/cadencias'
-    | '/_authenticated/campanhas'
-    | '/_authenticated/central'
+    | '/auth'
+    | '/reset-password'
+    | '/_authenticated/atendimento'
+    | '/_authenticated/busca-leads'
     | '/_authenticated/configuracoes'
-    | '/_authenticated/dashboard'
-    | '/_authenticated/empresa-servicos'
-    | '/_authenticated/estrategia'
-    | '/_authenticated/handoffs'
+    | '/_authenticated/diagnostico'
+    | '/_authenticated/empresa'
     | '/_authenticated/leads'
-    | '/_authenticated/listas'
-    | '/_authenticated/mission-control'
-    | '/_authenticated/observabilidade'
-    | '/_authenticated/oportunidades'
     | '/_authenticated/orcamentos'
     | '/_authenticated/pedidos'
-    | '/_authenticated/perfis-busca'
-    | '/_authenticated/playbooks'
-    | '/_authenticated/portal'
-    | '/_authenticated/prospeccao'
+    | '/_authenticated/portal-vendedor'
     | '/_authenticated/relatorios'
-    | '/_authenticated/relatorios-sdr'
-    | '/_authenticated/scoring'
-    | '/_authenticated/simulador'
-    | '/_authenticated/leads/$leadId'
+    | '/_authenticated/'
+    | '/_authenticated/leads/$id'
+    | '/api/public/evolution-webhook'
+    | '/api/public/lead-flow-tick'
+    | '/api/public/outreach-tick'
+    | '/api/public/prospecting-tick'
+    | '/api/public/resend-webhook'
+    | '/api/public/zapi-webhook'
+    | '/oauth/google-calendar/return'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  LoginRoute: typeof LoginRoute
-  RecuperarSenhaRoute: typeof RecuperarSenhaRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  ApiPublicEvolutionWebhookRoute: typeof ApiPublicEvolutionWebhookRoute
+  ApiPublicLeadFlowTickRoute: typeof ApiPublicLeadFlowTickRoute
+  ApiPublicOutreachTickRoute: typeof ApiPublicOutreachTickRoute
+  ApiPublicProspectingTickRoute: typeof ApiPublicProspectingTickRoute
+  ApiPublicResendWebhookRoute: typeof ApiPublicResendWebhookRoute
+  ApiPublicZapiWebhookRoute: typeof ApiPublicZapiWebhookRoute
+  OauthGoogleCalendarReturnRoute: typeof OauthGoogleCalendarReturnRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/recuperar-senha': {
-      id: '/recuperar-senha'
-      path: '/recuperar-senha'
-      fullPath: '/recuperar-senha'
-      preLoaderRoute: typeof RecuperarSenhaRouteImport
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
       fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteImport
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/simulador': {
-      id: '/_authenticated/simulador'
-      path: '/simulador'
-      fullPath: '/simulador'
-      preLoaderRoute: typeof AuthenticatedSimuladorRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/scoring': {
-      id: '/_authenticated/scoring'
-      path: '/scoring'
-      fullPath: '/scoring'
-      preLoaderRoute: typeof AuthenticatedScoringRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/relatorios-sdr': {
-      id: '/_authenticated/relatorios-sdr'
-      path: '/relatorios-sdr'
-      fullPath: '/relatorios-sdr'
-      preLoaderRoute: typeof AuthenticatedRelatoriosSdrRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/relatorios': {
       id: '/_authenticated/relatorios'
       path: '/relatorios'
       fullPath: '/relatorios'
       preLoaderRoute: typeof AuthenticatedRelatoriosRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/prospeccao': {
-      id: '/_authenticated/prospeccao'
-      path: '/prospeccao'
-      fullPath: '/prospeccao'
-      preLoaderRoute: typeof AuthenticatedProspeccaoRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/portal': {
-      id: '/_authenticated/portal'
-      path: '/portal'
-      fullPath: '/portal'
-      preLoaderRoute: typeof AuthenticatedPortalRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/playbooks': {
-      id: '/_authenticated/playbooks'
-      path: '/playbooks'
-      fullPath: '/playbooks'
-      preLoaderRoute: typeof AuthenticatedPlaybooksRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/perfis-busca': {
-      id: '/_authenticated/perfis-busca'
-      path: '/perfis-busca'
-      fullPath: '/perfis-busca'
-      preLoaderRoute: typeof AuthenticatedPerfisBuscaRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/_authenticated/portal-vendedor': {
+      id: '/_authenticated/portal-vendedor'
+      path: '/portal-vendedor'
+      fullPath: '/portal-vendedor'
+      preLoaderRoute: typeof AuthenticatedPortalVendedorRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/pedidos': {
       id: '/_authenticated/pedidos'
       path: '/pedidos'
       fullPath: '/pedidos'
       preLoaderRoute: typeof AuthenticatedPedidosRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/orcamentos': {
       id: '/_authenticated/orcamentos'
       path: '/orcamentos'
       fullPath: '/orcamentos'
       preLoaderRoute: typeof AuthenticatedOrcamentosRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/oportunidades': {
-      id: '/_authenticated/oportunidades'
-      path: '/oportunidades'
-      fullPath: '/oportunidades'
-      preLoaderRoute: typeof AuthenticatedOportunidadesRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/observabilidade': {
-      id: '/_authenticated/observabilidade'
-      path: '/observabilidade'
-      fullPath: '/observabilidade'
-      preLoaderRoute: typeof AuthenticatedObservabilidadeRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/mission-control': {
-      id: '/_authenticated/mission-control'
-      path: '/mission-control'
-      fullPath: '/mission-control'
-      preLoaderRoute: typeof AuthenticatedMissionControlRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/listas': {
-      id: '/_authenticated/listas'
-      path: '/listas'
-      fullPath: '/listas'
-      preLoaderRoute: typeof AuthenticatedListasRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/leads': {
       id: '/_authenticated/leads'
       path: '/leads'
       fullPath: '/leads'
       preLoaderRoute: typeof AuthenticatedLeadsRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/handoffs': {
-      id: '/_authenticated/handoffs'
-      path: '/handoffs'
-      fullPath: '/handoffs'
-      preLoaderRoute: typeof AuthenticatedHandoffsRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/_authenticated/empresa': {
+      id: '/_authenticated/empresa'
+      path: '/empresa'
+      fullPath: '/empresa'
+      preLoaderRoute: typeof AuthenticatedEmpresaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/estrategia': {
-      id: '/_authenticated/estrategia'
-      path: '/estrategia'
-      fullPath: '/estrategia'
-      preLoaderRoute: typeof AuthenticatedEstrategiaRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/empresa-servicos': {
-      id: '/_authenticated/empresa-servicos'
-      path: '/empresa-servicos'
-      fullPath: '/empresa-servicos'
-      preLoaderRoute: typeof AuthenticatedEmpresaServicosRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/_authenticated/diagnostico': {
+      id: '/_authenticated/diagnostico'
+      path: '/diagnostico'
+      fullPath: '/diagnostico'
+      preLoaderRoute: typeof AuthenticatedDiagnosticoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/configuracoes': {
       id: '/_authenticated/configuracoes'
       path: '/configuracoes'
       fullPath: '/configuracoes'
       preLoaderRoute: typeof AuthenticatedConfiguracoesRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/central': {
-      id: '/_authenticated/central'
-      path: '/central'
-      fullPath: '/central'
-      preLoaderRoute: typeof AuthenticatedCentralRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/_authenticated/busca-leads': {
+      id: '/_authenticated/busca-leads'
+      path: '/busca-leads'
+      fullPath: '/busca-leads'
+      preLoaderRoute: typeof AuthenticatedBuscaLeadsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/campanhas': {
-      id: '/_authenticated/campanhas'
-      path: '/campanhas'
-      fullPath: '/campanhas'
-      preLoaderRoute: typeof AuthenticatedCampanhasRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/_authenticated/atendimento': {
+      id: '/_authenticated/atendimento'
+      path: '/atendimento'
+      fullPath: '/atendimento'
+      preLoaderRoute: typeof AuthenticatedAtendimentoRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/cadencias': {
-      id: '/_authenticated/cadencias'
-      path: '/cadencias'
-      fullPath: '/cadencias'
-      preLoaderRoute: typeof AuthenticatedCadenciasRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/oauth/google-calendar/return': {
+      id: '/oauth/google-calendar/return'
+      path: '/oauth/google-calendar/return'
+      fullPath: '/oauth/google-calendar/return'
+      preLoaderRoute: typeof OauthGoogleCalendarReturnRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/atendimentos': {
-      id: '/_authenticated/atendimentos'
-      path: '/atendimentos'
-      fullPath: '/atendimentos'
-      preLoaderRoute: typeof AuthenticatedAtendimentosRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/api/public/zapi-webhook': {
+      id: '/api/public/zapi-webhook'
+      path: '/api/public/zapi-webhook'
+      fullPath: '/api/public/zapi-webhook'
+      preLoaderRoute: typeof ApiPublicZapiWebhookRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/leads/$leadId': {
-      id: '/_authenticated/leads/$leadId'
-      path: '/$leadId'
-      fullPath: '/leads/$leadId'
-      preLoaderRoute: typeof AuthenticatedLeadsLeadIdRouteImport
+    '/api/public/resend-webhook': {
+      id: '/api/public/resend-webhook'
+      path: '/api/public/resend-webhook'
+      fullPath: '/api/public/resend-webhook'
+      preLoaderRoute: typeof ApiPublicResendWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/prospecting-tick': {
+      id: '/api/public/prospecting-tick'
+      path: '/api/public/prospecting-tick'
+      fullPath: '/api/public/prospecting-tick'
+      preLoaderRoute: typeof ApiPublicProspectingTickRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/outreach-tick': {
+      id: '/api/public/outreach-tick'
+      path: '/api/public/outreach-tick'
+      fullPath: '/api/public/outreach-tick'
+      preLoaderRoute: typeof ApiPublicOutreachTickRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/lead-flow-tick': {
+      id: '/api/public/lead-flow-tick'
+      path: '/api/public/lead-flow-tick'
+      fullPath: '/api/public/lead-flow-tick'
+      preLoaderRoute: typeof ApiPublicLeadFlowTickRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/evolution-webhook': {
+      id: '/api/public/evolution-webhook'
+      path: '/api/public/evolution-webhook'
+      fullPath: '/api/public/evolution-webhook'
+      preLoaderRoute: typeof ApiPublicEvolutionWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/leads/$id': {
+      id: '/_authenticated/leads/$id'
+      path: '/$id'
+      fullPath: '/leads/$id'
+      preLoaderRoute: typeof AuthenticatedLeadsIdRouteImport
       parentRoute: typeof AuthenticatedLeadsRoute
     }
   }
 }
 
 interface AuthenticatedLeadsRouteChildren {
-  AuthenticatedLeadsLeadIdRoute: typeof AuthenticatedLeadsLeadIdRoute
+  AuthenticatedLeadsIdRoute: typeof AuthenticatedLeadsIdRoute
 }
 
 const AuthenticatedLeadsRouteChildren: AuthenticatedLeadsRouteChildren = {
-  AuthenticatedLeadsLeadIdRoute: AuthenticatedLeadsLeadIdRoute,
+  AuthenticatedLeadsIdRoute: AuthenticatedLeadsIdRoute,
 }
 
 const AuthenticatedLeadsRouteWithChildren =
   AuthenticatedLeadsRoute._addFileChildren(AuthenticatedLeadsRouteChildren)
 
-interface AuthenticatedRouteChildren {
-  AuthenticatedAtendimentosRoute: typeof AuthenticatedAtendimentosRoute
-  AuthenticatedCadenciasRoute: typeof AuthenticatedCadenciasRoute
-  AuthenticatedCampanhasRoute: typeof AuthenticatedCampanhasRoute
-  AuthenticatedCentralRoute: typeof AuthenticatedCentralRoute
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAtendimentoRoute: typeof AuthenticatedAtendimentoRoute
+  AuthenticatedBuscaLeadsRoute: typeof AuthenticatedBuscaLeadsRoute
   AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedEmpresaServicosRoute: typeof AuthenticatedEmpresaServicosRoute
-  AuthenticatedEstrategiaRoute: typeof AuthenticatedEstrategiaRoute
-  AuthenticatedHandoffsRoute: typeof AuthenticatedHandoffsRoute
+  AuthenticatedDiagnosticoRoute: typeof AuthenticatedDiagnosticoRoute
+  AuthenticatedEmpresaRoute: typeof AuthenticatedEmpresaRoute
   AuthenticatedLeadsRoute: typeof AuthenticatedLeadsRouteWithChildren
-  AuthenticatedListasRoute: typeof AuthenticatedListasRoute
-  AuthenticatedMissionControlRoute: typeof AuthenticatedMissionControlRoute
-  AuthenticatedObservabilidadeRoute: typeof AuthenticatedObservabilidadeRoute
-  AuthenticatedOportunidadesRoute: typeof AuthenticatedOportunidadesRoute
   AuthenticatedOrcamentosRoute: typeof AuthenticatedOrcamentosRoute
   AuthenticatedPedidosRoute: typeof AuthenticatedPedidosRoute
-  AuthenticatedPerfisBuscaRoute: typeof AuthenticatedPerfisBuscaRoute
-  AuthenticatedPlaybooksRoute: typeof AuthenticatedPlaybooksRoute
-  AuthenticatedPortalRoute: typeof AuthenticatedPortalRoute
-  AuthenticatedProspeccaoRoute: typeof AuthenticatedProspeccaoRoute
+  AuthenticatedPortalVendedorRoute: typeof AuthenticatedPortalVendedorRoute
   AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
-  AuthenticatedRelatoriosSdrRoute: typeof AuthenticatedRelatoriosSdrRoute
-  AuthenticatedScoringRoute: typeof AuthenticatedScoringRoute
-  AuthenticatedSimuladorRoute: typeof AuthenticatedSimuladorRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
-const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedAtendimentosRoute: AuthenticatedAtendimentosRoute,
-  AuthenticatedCadenciasRoute: AuthenticatedCadenciasRoute,
-  AuthenticatedCampanhasRoute: AuthenticatedCampanhasRoute,
-  AuthenticatedCentralRoute: AuthenticatedCentralRoute,
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAtendimentoRoute: AuthenticatedAtendimentoRoute,
+  AuthenticatedBuscaLeadsRoute: AuthenticatedBuscaLeadsRoute,
   AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
-  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedEmpresaServicosRoute: AuthenticatedEmpresaServicosRoute,
-  AuthenticatedEstrategiaRoute: AuthenticatedEstrategiaRoute,
-  AuthenticatedHandoffsRoute: AuthenticatedHandoffsRoute,
+  AuthenticatedDiagnosticoRoute: AuthenticatedDiagnosticoRoute,
+  AuthenticatedEmpresaRoute: AuthenticatedEmpresaRoute,
   AuthenticatedLeadsRoute: AuthenticatedLeadsRouteWithChildren,
-  AuthenticatedListasRoute: AuthenticatedListasRoute,
-  AuthenticatedMissionControlRoute: AuthenticatedMissionControlRoute,
-  AuthenticatedObservabilidadeRoute: AuthenticatedObservabilidadeRoute,
-  AuthenticatedOportunidadesRoute: AuthenticatedOportunidadesRoute,
   AuthenticatedOrcamentosRoute: AuthenticatedOrcamentosRoute,
   AuthenticatedPedidosRoute: AuthenticatedPedidosRoute,
-  AuthenticatedPerfisBuscaRoute: AuthenticatedPerfisBuscaRoute,
-  AuthenticatedPlaybooksRoute: AuthenticatedPlaybooksRoute,
-  AuthenticatedPortalRoute: AuthenticatedPortalRoute,
-  AuthenticatedProspeccaoRoute: AuthenticatedProspeccaoRoute,
+  AuthenticatedPortalVendedorRoute: AuthenticatedPortalVendedorRoute,
   AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
-  AuthenticatedRelatoriosSdrRoute: AuthenticatedRelatoriosSdrRoute,
-  AuthenticatedScoringRoute: AuthenticatedScoringRoute,
-  AuthenticatedSimuladorRoute: AuthenticatedSimuladorRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren,
-)
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  LoginRoute: LoginRoute,
-  RecuperarSenhaRoute: RecuperarSenhaRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  ApiPublicEvolutionWebhookRoute: ApiPublicEvolutionWebhookRoute,
+  ApiPublicLeadFlowTickRoute: ApiPublicLeadFlowTickRoute,
+  ApiPublicOutreachTickRoute: ApiPublicOutreachTickRoute,
+  ApiPublicProspectingTickRoute: ApiPublicProspectingTickRoute,
+  ApiPublicResendWebhookRoute: ApiPublicResendWebhookRoute,
+  ApiPublicZapiWebhookRoute: ApiPublicZapiWebhookRoute,
+  OauthGoogleCalendarReturnRoute: OauthGoogleCalendarReturnRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

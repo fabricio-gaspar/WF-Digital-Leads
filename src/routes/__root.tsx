@@ -11,8 +11,6 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { AuthProvider } from "@/auth/AuthProvider";
-import { Toaster } from "sonner";
 
 
 function NotFoundComponent() {
@@ -80,19 +78,24 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "WF Digital CRM — Prospecção B2B e pipeline comercial" },
-      { name: "description", content: "Plataforma B2B de prospecção, gestão de leads, central de atendimentos WhatsApp e portal do funcionário." },
+      { title: "WF Digital CRM — Prospecção e vendas com IA" },
+      {
+        name: "description",
+        content:
+          "CRM B2B com IA vendedora que prospecta, qualifica e negocia pelo WhatsApp, com escalonamento para vendedores humanos.",
+      },
       { property: "og:title", content: "WF Digital CRM" },
-      { property: "og:description", content: "Prospecção B2B, pipeline comercial e atendimentos em uma central única." },
+      {
+        property: "og:description",
+        content:
+          "CRM B2B com IA vendedora Ana — prospecção, qualificação e negociação pelo WhatsApp.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
-      { rel: "preconnect", href: "https://fonts.googleapis.com" },
-      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" },
     ],
   }),
   shellComponent: RootShell,
@@ -103,11 +106,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: ReactNode }) {
   return (
-    <html lang="pt-BR">
+    <html lang="en">
       <head>
         <HeadContent />
       </head>
-      <body style={{ fontFamily: "'Inter', system-ui, sans-serif" }}>
+      <body>
         {children}
         <Scripts />
       </body>
@@ -117,13 +120,24 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const router = useRouter();
+
+  useEffect(() => {
+    let subscription: { unsubscribe: () => void } | undefined;
+    import("@/integrations/supabase/client").then(({ supabase }) => {
+      const { data } = supabase.auth.onAuthStateChange((event) => {
+        if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+        router.invalidate();
+        if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
+      });
+      subscription = data.subscription;
+    });
+    return () => subscription?.unsubscribe();
+  }, [queryClient, router]);
+
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Outlet />
-        <Toaster richColors position="bottom-right" />
-      </AuthProvider>
+      <Outlet />
     </QueryClientProvider>
   );
 }
-
