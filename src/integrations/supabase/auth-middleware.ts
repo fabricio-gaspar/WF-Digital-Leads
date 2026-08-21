@@ -2,7 +2,7 @@
 import { createMiddleware } from '@tanstack/react-start'
 import { getRequest } from '@tanstack/react-start/server'
 import { createClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/database'
+import type { Database } from '@/integrations/supabase/types'
 
 
 
@@ -113,31 +113,11 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
       throw new Error('Unauthorized: user is inactive');
     }
 
-    // Multi-tenant enforcement: find current organization for the user
-    const { data: roleRow, error: roleErr } = await (supabase as any)
-      .from('user_roles')
-      .select('organization_id')
-      .eq('user_id', data.claims.sub)
-      .limit(1)
-      .maybeSingle();
-
-    if (roleErr) {
-      console.error('[auth-middleware] role lookup failed:', roleErr.message);
-      throw new Error('Unauthorized: role lookup failed');
-    }
-
-    const orgId = roleRow?.organization_id;
-
-    // Inject organization isolation at the database session level (optional but safe)
-    if (orgId) {
-      const rpc = (supabase as any).rpc('set_config', {
-        name: 'app.current_organization_id',
-        value: orgId,
-        is_local: true
-      });
-      if (rpc && typeof rpc.catch === 'function') {
-        await rpc.catch(() => {});
-      }
+    // A organização ativa é a fonte de verdade do banco. A função SQL
+    // current_org_id() aplica esta mesma verificação dentro das políticas RLS.
+    const orgId = (profile as any).active_organization_id ?? null;
+    if (!orgId) {
+      throw new Error('Unauthorized: No active organization selected');
     }
 
     return next({

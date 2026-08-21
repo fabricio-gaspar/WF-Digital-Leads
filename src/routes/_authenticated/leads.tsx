@@ -18,7 +18,7 @@ import { formatBRL } from "@/lib/leads-data";
 import { createLead, listLeads, moveLeadStage, deleteLead } from "@/lib/crm.functions";
 import { approachLeads } from "@/lib/lead-flow.functions";
 import { ApproachModal, type ApproachChoice } from "@/components/ApproachModal";
-import type { Database } from "@/types/database";
+import type { Database } from "@/integrations/supabase/types";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";

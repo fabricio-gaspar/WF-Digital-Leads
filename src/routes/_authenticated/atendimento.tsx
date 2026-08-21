@@ -29,7 +29,7 @@ import { getLeadFlowSettings, openLeadConversation } from "@/lib/lead-flow.funct
 import { shouldShowConversation } from "@/lib/lead-flow";
 import { DEFAULT_LEAD_FLOW } from "@/lib/lead-flow";
 import { toast } from "sonner";
-import type { Database } from "@/types/database";
+import type { Database } from "@/integrations/supabase/types";
 
 type LeadRow = Database["public"]["Tables"]["leads"]["Row"];
 type MsgRow = Database["public"]["Tables"]["lead_messages"]["Row"];
