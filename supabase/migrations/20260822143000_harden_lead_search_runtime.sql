@@ -5,15 +5,15 @@
 
 -- Backfill any legacy cache rows that can be resolved from the creating user's membership.
 UPDATE public.prospecting_cache pc
-SET organization_id = ur.organization_id
-FROM LATERAL (
-  SELECT user_roles.organization_id
-  FROM public.user_roles
-  WHERE user_roles.user_id = pc.user_id
-  ORDER BY user_roles.created_at NULLS LAST
+SET organization_id = (
+  SELECT ur.organization_id
+  FROM public.user_roles ur
+  WHERE ur.user_id = pc.user_id
+  ORDER BY ur.created_at NULLS LAST
   LIMIT 1
-) ur
-WHERE pc.organization_id IS NULL;
+)
+WHERE pc.organization_id IS NULL
+  AND pc.user_id IS NOT NULL;
 
 -- Remove unresolved cache rows instead of leaving cross-tenant/tenantless data behind.
 DELETE FROM public.prospecting_cache
