@@ -1,0 +1,38 @@
+name: Validate LeadAI API control center
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/validate-api-control-center.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install
+        run: npm install --ignore-scripts
+      - name: TypeScript
+        run: npx tsc --noEmit
+      - name: Build
+        run: npm run build
+      - name: Record successful validation
+        run: |
+          mkdir -p .validation
+          printf 'LeadAI API control center: TypeScript + build OK\n' > .validation/api-control-center.ok
+          git config user.name "LeadAI Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add .validation/api-control-center.ok
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "test(integrations): validate API control center build"
+          git push origin main
