@@ -9,7 +9,7 @@ SET organization_id = (
   SELECT ur.organization_id
   FROM public.user_roles ur
   WHERE ur.user_id = pc.user_id
-  ORDER BY ur.created_at NULLS LAST
+  ORDER BY ur.id
   LIMIT 1
 )
 WHERE pc.organization_id IS NULL
