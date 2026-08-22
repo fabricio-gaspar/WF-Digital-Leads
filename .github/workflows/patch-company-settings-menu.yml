@@ -1,0 +1,76 @@
+name: Consolidate Company settings menu
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/patch-company-settings-menu.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Patch Configuracoes to reuse Empresa panel
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const p = 'src/routes/_authenticated/configuracoes.tsx';
+          let s = fs.readFileSync(p, 'utf8');
+
+          s = s.replace(
+            'import { Workflow, Sparkles, User, Bell, Shield, Zap, Loader2, Check, ClipboardList, AlertCircle, Package, MessageSquareWarning, Gauge, HelpCircle, Plus, Trash2, Plug, Search, SlidersHorizontal } from "lucide-react";',
+            'import { Workflow, Sparkles, User, Bell, Shield, Zap, Loader2, Check, ClipboardList, AlertCircle, Package, MessageSquareWarning, Gauge, HelpCircle, Plus, Trash2, Plug, Search, SlidersHorizontal, Building2 } from "lucide-react";'
+          );
+
+          const anchor = 'import { DEFAULT_LEAD_FLOW, type LeadFlowSettings } from "@/lib/lead-flow";';
+          if (!s.includes('CompanySettingsPanel')) {
+            s = s.replace(anchor, anchor + '\nimport { CompanySettingsPanel } from "@/components/CompanySettingsPanel";');
+          }
+
+          s = s.replace(
+            'type TabId = "ana" | "fluxo" | "autonomia" | "prospeccao" | "equipe" | "servicos" | "objecoes" | "score" | "governanca" | "auditoria" | "notificacoes" | "integracoes" | "seguranca";',
+            'type TabId = "ana" | "fluxo" | "autonomia" | "empresa" | "equipe" | "servicos" | "objecoes" | "score" | "governanca" | "auditoria" | "notificacoes" | "integracoes" | "seguranca";'
+          );
+
+          s = s.replace(
+            'const valid: TabId[] = ["ana","fluxo","autonomia","prospeccao","equipe","servicos","objecoes","score","governanca","auditoria","notificacoes","integracoes","seguranca"];\n    return typeof t === "string" && (valid as string[]).includes(t) ? { tab: t as TabId } : {};',
+            'const normalized = t === "prospeccao" ? "empresa" : t;\n    const valid: TabId[] = ["ana","fluxo","autonomia","empresa","equipe","servicos","objecoes","score","governanca","auditoria","notificacoes","integracoes","seguranca"];\n    return typeof normalized === "string" && (valid as string[]).includes(normalized) ? { tab: normalized as TabId } : {};'
+          );
+
+          s = s.replace(
+            '{ id: "prospeccao", label: "Prospecção", icon: Search },',
+            '{ id: "empresa", label: "Empresa", icon: Building2 },'
+          );
+
+          s = s.replace(
+            '{tab === "prospeccao" && <AbaProspeccao />}',
+            '{tab === "empresa" && <CompanySettingsPanel embedded />}'
+          );
+
+          if (!s.includes('{ id: "empresa", label: "Empresa", icon: Building2 }')) throw new Error('Empresa tab replacement failed');
+          if (!s.includes('{tab === "empresa" && <CompanySettingsPanel embedded />}')) throw new Error('Empresa renderer replacement failed');
+          if (!s.includes('t === "prospeccao" ? "empresa" : t')) throw new Error('legacy tab redirect replacement failed');
+
+          fs.writeFileSync(p, s);
+          NODE
+      - name: Commit consolidated navigation
+        run: |
+          if git diff --quiet; then
+            echo "No changes required"
+            exit 0
+          fi
+          git config user.name "LeadAI Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/routes/_authenticated/configuracoes.tsx
+          git commit -m "fix(navigation): unify Empresa inside Configuracoes"
+          git push origin main
