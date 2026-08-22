@@ -14,6 +14,7 @@ import {
   type SequenceStep,
 } from '@/lib/outreach-sequences.functions'
 import { createHandoffInternal } from '@/lib/sales-actions.functions'
+import { assertIntegrationOperational } from '@/lib/integration-control.functions'
 
 // Types
 // ============================================================================
@@ -498,6 +499,19 @@ async function tryStep(ctx: Ctx, lead: any, step: SequenceStep): Promise<void> {
     return
   }
 
+  const { data: runtimeSettings } = await (ctx.supabase as any).from('company_settings')
+    .select('sandbox_mode')
+    .eq('organization_id', lead.organization_id)
+    .limit(1)
+    .maybeSingle()
+  const sandboxMode = Boolean(runtimeSettings?.sandbox_mode)
+  if (channel === 'whatsapp' || channel === 'email') {
+    await assertIntegrationOperational({ ...ctx, organizationId: lead.organization_id } as any, channel === 'whatsapp' ? 'whatsapp' : 'email', { requireReal: !sandboxMode })
+  }
+  if (!step.template && !sandboxMode) {
+    await assertIntegrationOperational({ ...ctx, organizationId: lead.organization_id } as any, 'ai', { requireReal: true })
+  }
+
   const content = step.template
     ? renderTemplate(step.template, lead)
     : await generateOutreachMessage(ctx, lead, channel)
@@ -750,6 +764,12 @@ async function deliverAiMessage(
   messageType: 'ia' | 'ia-escalated' = 'ia',
 ) {
   const channel = delivery.channel ?? 'whatsapp'
+  const { data: runtimeSettings } = await (ctx.supabase as any).from('company_settings')
+    .select('sandbox_mode')
+    .eq('organization_id', lead.organization_id)
+    .limit(1)
+    .maybeSingle()
+  await assertIntegrationOperational({ ...ctx, organizationId: lead.organization_id } as any, channel === 'email' ? 'email' : 'whatsapp', { requireReal: !Boolean(runtimeSettings?.sandbox_mode) })
   const result = channel === 'email'
     ? await sendEmail(
         lead.email || '',
@@ -939,6 +959,11 @@ export async function handleInboundWithAiInternal(
   if (lead.opt_out || lead.ai_paused) return { ok: false, action: 'ignored' as const }
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) return handoffInbound(ctx, lead, userText, 'IA indisponível', true, delivery)
+  try {
+    await assertIntegrationOperational({ ...ctx, organizationId: lead.organization_id } as any, 'ai', { requireReal: true })
+  } catch (error) {
+    return handoffInbound(ctx, lead, userText, error instanceof Error ? error.message : 'IA pausada ou desativada', true, delivery)
+  }
 
   const { loadKnowledgeSnippetInternal } = await import('@/lib/knowledge.functions')
   const [{ data: settings }, { data: services }, { data: objections }, knowledgeChunks, { data: learnedAnswers }, { data: history }] = await Promise.all([
@@ -1229,6 +1254,16 @@ export const sendManualWhatsapp = createServerFn({ method: 'POST' })
 
     const to = lead.whatsapp || lead.phone || ''
     if (!to) return { ok: false, error: 'O lead não possui WhatsApp ou telefone cadastrado.' }
+    const { data: runtimeSettings } = await (ctx.supabase as any).from('company_settings')
+      .select('sandbox_mode')
+      .eq('organization_id', lead.organization_id)
+      .limit(1)
+      .maybeSingle()
+    try {
+      await assertIntegrationOperational({ ...ctx, organizationId: lead.organization_id } as any, 'whatsapp', { requireReal: !Boolean(runtimeSettings?.sandbox_mode) })
+    } catch (error) {
+      return { ok: false, error: error instanceof Error ? error.message : 'WhatsApp indisponível.' }
+    }
 
     const { count } = await (ctx.supabase as any).from('lead_outreach')
       .select('id', { count: 'exact', head: true })
