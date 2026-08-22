@@ -9,12 +9,12 @@ export type SearchExecutionMode = 'test' | 'live'
 type SearchFilters = {
   mode: SearchExecutionMode
   source: SourceId
-  cnae: string | null
-  uf: string | null
-  municipio: string | null
-  keyword: string | null
-  porte: string | null
-  radius_km: number | null
+  cnae?: string | null
+  uf?: string | null
+  municipio?: string | null
+  keyword?: string | null
+  porte?: string | null
+  radius_km?: number | null
   limit: number
 }
 
