@@ -1,0 +1,56 @@
+name: Enforce scheduler integration controls
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/patch-scheduler-controls.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Patch scheduler guards
+        run: |
+          node <<'NODE'
+          const fs = require('fs')
+
+          const helper = `\nasync function schedulerEnabled(supabaseAdmin: any, organizationId: string | null | undefined): Promise<boolean> {\n  if (!organizationId) return false\n  const { data } = await supabaseAdmin\n    .from('integrations')\n    .select('enabled, paused, mode')\n    .eq('organization_id', organizationId)\n    .eq('key', 'scheduler')\n    .maybeSingle()\n  return Boolean(data?.enabled) && !Boolean(data?.paused) && data?.mode !== 'disabled'\n}\n`
+
+          // outreach tick
+          {
+            const p = 'src/routes/api/public/outreach-tick.ts'
+            let s = fs.readFileSync(p, 'utf8')
+            s = s.replace(`        for (const cand of candidates ?? []) {\n          // Atomic claim`, `        for (const cand of candidates ?? []) {\n          if (!(await schedulerEnabled(supabaseAdmin, (cand as any).organization_id))) continue\n          // Atomic claim`)
+            s = s.replace(`.select('id, lead_id, channel, attempt')`, `.select('id, lead_id, channel, attempt, organization_id')`)
+            s = s.replace(`.select('id, owner_id, assigned_to, company, contact_channels, active_channel')`, `.select('id, owner_id, assigned_to, company, contact_channels, active_channel, organization_id')`)
+            s = s.replace(`        for (const lead of due ?? []) {\n          try {`, `        for (const lead of due ?? []) {\n          if (!(await schedulerEnabled(supabaseAdmin, (lead as any).organization_id))) continue\n          try {`)
+            s = s.replace(`.select('id, owner_id, assigned_to, company, contact_channels, active_channel, ai_paused, opt_out')`, `.select('id, owner_id, assigned_to, company, contact_channels, active_channel, ai_paused, opt_out, organization_id')`)
+            if (!s.includes('async function schedulerEnabled(')) s += helper
+            fs.writeFileSync(p, s)
+          }
+
+          // prospecting tick
+          {
+            const p = 'src/routes/api/public/prospecting-tick.ts'
+            let s = fs.readFileSync(p, 'utf8')
+            s = s.replace(`        for (const schedule of due ?? []) {\n          const s = schedule as any`, `        for (const schedule of due ?? []) {\n          const s = schedule as any\n          if (!(await schedulerEnabled(supabaseAdmin, s.organization_id))) {\n            processed.push({ id: s.id, result: { skipped: 'scheduler_paused' } })\n            continue\n          }`)
+            if (!s.includes('async function schedulerEnabled(')) s += helper
+            fs.writeFileSync(p, s)
+          }
+          NODE
+      - name: Commit scheduler guards
+        run: |
+          git config user.name "LeadAI Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/routes/api/public/outreach-tick.ts src/routes/api/public/prospecting-tick.ts
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "fix(automation): honor scheduler pause per organization"
+          git push origin main
