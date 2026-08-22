@@ -1,0 +1,90 @@
+name: Apply LeadAI API runtime guards
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/patch-api-runtime-guards.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Patch runtime guards and legacy adapters
+        run: |
+          node <<'NODE'
+          const fs = require('fs')
+
+          // 1) Lead Search: operational control center is authoritative for live calls.
+          {
+            const p = 'src/lib/lead-search.functions.ts'
+            let s = fs.readFileSync(p, 'utf8')
+            const importAnchor = "import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware'"
+            if (!s.includes("integration-control.functions")) {
+              s = s.replace(importAnchor, importAnchor + "\nimport { assertIntegrationOperational, getIntegrationRuntimeState } from '@/lib/integration-control.functions'")
+            }
+            const oldCaps = `    const configured = (settings?.prospecting_sources as Record<string, boolean> | null) ?? {}\n    return {\n      test: true,\n      sources: {\n        cnpj_ws: { enabled: configured.cnpj_ws !== false && !!process.env.CNPJWS_API_KEY, configured: !!process.env.CNPJWS_API_KEY, label: 'CNPJ.ws Comercial' },\n        google_places: { enabled: configured.google_places !== false && !!process.env.GOOGLE_PLACES_API_KEY, configured: !!process.env.GOOGLE_PLACES_API_KEY, label: 'Google Places' },\n        apify: { enabled: configured.apify !== false && !!process.env.APIFY_TOKEN, configured: !!process.env.APIFY_TOKEN, label: 'Apify / Google Maps' },\n        ai_only: { enabled: false, configured: !!process.env.ANTHROPIC_API_KEY, label: 'IA somente (não validada)' },\n      },\n    }`
+            const newCaps = `    const configured = (settings?.prospecting_sources as Record<string, boolean> | null) ?? {}\n    const [cnpj, google, apify] = await Promise.all([\n      getIntegrationRuntimeState(context as any, 'cnpj_ws'),\n      getIntegrationRuntimeState(context as any, 'google_places'),\n      getIntegrationRuntimeState(context as any, 'apify'),\n    ])\n    return {\n      test: true,\n      sources: {\n        cnpj_ws: { enabled: configured.cnpj_ws !== false && cnpj.operational && cnpj.mode === 'real', configured: cnpj.credentialConfigured, paused: cnpj.paused, mode: cnpj.mode, label: 'CNPJ.ws Comercial' },\n        google_places: { enabled: configured.google_places !== false && google.operational && google.mode === 'real', configured: google.credentialConfigured, paused: google.paused, mode: google.mode, label: 'Google Places' },\n        apify: { enabled: configured.apify !== false && apify.operational && apify.mode === 'real', configured: apify.credentialConfigured, paused: apify.paused, mode: apify.mode, label: 'Apify / Google Maps' },\n        ai_only: { enabled: false, configured: !!process.env.ANTHROPIC_API_KEY, label: 'IA somente (não validada)' },\n      },\n    }`
+            if (s.includes(oldCaps)) s = s.replace(oldCaps, newCaps)
+
+            const searchAnchor = `    let results: ExternalCompany[]\n    if (filters.mode === 'test') results = demoCompanies(filters)`
+            const guarded = `    let results: ExternalCompany[]\n    if (filters.mode === 'live') {\n      if (filters.source === 'ai_only') throw new Error('A fonte IA somente não é aceita para prospecção oficial sem validação externa.')\n      await assertIntegrationOperational(context as any, filters.source as 'cnpj_ws' | 'google_places' | 'apify', { requireReal: true })\n    }\n    if (filters.mode === 'test') results = demoCompanies(filters)`
+            if (s.includes(searchAnchor)) s = s.replace(searchAnchor, guarded)
+            s = s.replace('score: company.score ?? null,', 'score: company.score ?? 0,')
+            fs.writeFileSync(p, s)
+          }
+
+          // 2) Legacy prospecting: fix invalid CNPJ.ws public filtered endpoint and honor central controls.
+          {
+            const p = 'src/lib/prospecting.functions.ts'
+            let s = fs.readFileSync(p, 'utf8')
+            const importAnchor = "import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware'"
+            if (!s.includes("integration-control.functions")) {
+              s = s.replace(importAnchor, importAnchor + "\nimport { assertIntegrationOperational } from '@/lib/integration-control.functions'")
+            }
+            const cnpjReplacement = `async function fetchFromCnpjWs(filters: Filters): Promise<ExternalCompany[]> {\n  const key = process.env.CNPJWS_API_KEY\n  if (!key) throw new Error('CNPJWS_API_KEY não configurada. A pesquisa por filtros exige o plano comercial/Premium do CNPJ.ws.')\n  if (!filters.cnae && !filters.keyword) throw new Error('Informe CNAE ou palavra-chave/razão social para pesquisar no CNPJ.ws Comercial.')\n\n  const UF_IBGE: Record<string, string> = { AC:'12',AL:'27',AP:'16',AM:'13',BA:'29',CE:'23',DF:'53',ES:'32',GO:'52',MA:'21',MT:'51',MS:'50',MG:'31',PA:'15',PB:'25',PR:'41',PE:'26',PI:'22',RJ:'33',RN:'24',RS:'43',RO:'11',RR:'14',SC:'42',SP:'35',SE:'28',TO:'17' }\n  const params = new URLSearchParams({ limite: String(filters.limit), situacao_cadastral: 'Ativa' })\n  if (filters.cnae) params.set('atividade_id', filters.cnae.replace(/\\D/g, ''))\n  if (filters.keyword && !filters.cnae) params.set('razao_social', filters.keyword)\n  if (filters.uf && UF_IBGE[filters.uf.toUpperCase()]) params.set('estado_id', UF_IBGE[filters.uf.toUpperCase()])\n\n  const res = await fetch(\`https://comercial.cnpj.ws/v2/pesquisa?\${params.toString()}\`, { headers: { accept: 'application/json', x_api_token: key } })\n  if (!res.ok) throw new Error(\`CNPJ.ws pesquisa \${res.status}: \${(await res.text().catch(() => '')).slice(0, 200)}\`)\n  const payload = await res.json() as { data?: string[] }\n  const results: ExternalCompany[] = []\n  for (const cnpj of (payload.data ?? []).slice(0, filters.limit)) {\n    const detail = await fetch(\`https://comercial.cnpj.ws/cnpj/\${cnpj}\`, { headers: { accept: 'application/json', x_api_token: key } })\n    if (!detail.ok) continue\n    results.push(normalizeCnpjWs(await detail.json() as CnpjWsEstab))\n  }\n  const porteFilter = filters.porte?.toLowerCase()\n  const minCap = filters.min_capital ?? 0\n  return results\n    .filter((c) => (filters.municipio ? (c.municipio ?? '').toLowerCase().includes(filters.municipio.toLowerCase()) : true))\n    .filter((c) => (porteFilter ? (c.porte ?? '').toLowerCase().includes(porteFilter) : true))\n    .filter((c) => (minCap > 0 ? (c.capital_social ?? 0) >= minCap : true))\n    .slice(0, filters.limit)\n}\n\n// ============= Google Places (New) adapter =============`
+            const re = /async function fetchFromCnpjWs\(filters: Filters\): Promise<ExternalCompany\[]> \{[\s\S]*?\n\}\n\n\/\/ ============= Google Places \(New\) adapter =============/
+            if (!re.test(s)) throw new Error('Legacy CNPJ adapter block not found')
+            s = s.replace(re, cnpjReplacement)
+
+            const guardAnchor = `    if (!enabled[data.source]) {\n      throw new Error(\`A fonte "\${data.source}" está desativada. Ative-a em Configurações → Prospecção.\`)\n    }`
+            const guardReplacement = `    if (!enabled[data.source]) {\n      throw new Error(\`A fonte "\${data.source}" está desativada. Ative-a em Empresa → Perfil de Buscas.\`)\n    }\n    const integrationKey = data.source === 'ai_only' ? 'ai' : data.source\n    await assertIntegrationOperational(context as any, integrationKey as 'ai' | 'cnpj_ws' | 'google_places' | 'apify', { requireReal: true })`
+            if (s.includes(guardAnchor)) s = s.replace(guardAnchor, guardReplacement)
+            fs.writeFileSync(p, s)
+          }
+
+          // 3) Do not clear a successful connection merely because an admin edits/pauses the row.
+          {
+            const p = 'src/lib/integration-control.functions.ts'
+            let s = fs.readFileSync(p, 'utf8')
+            const old = `    const { data: row, error } = await ctx.supabase\n      .from('integrations')\n      .upsert({ organization_id: orgId, key: data.key, label: meta.label, provider: meta.provider, connected: false, ...patch }, { onConflict: 'organization_id,key' })`
+            const next = `    const current = await loadRow(ctx, data.key)\n    const connected = data.enabled === false || data.mode === 'disabled' ? false : Boolean(current?.connected)\n    const { data: row, error } = await ctx.supabase\n      .from('integrations')\n      .upsert({ organization_id: orgId, key: data.key, label: meta.label, provider: meta.provider, connected, ...patch }, { onConflict: 'organization_id,key' })`
+            if (s.includes(old)) s = s.replace(old, next)
+            fs.writeFileSync(p, s)
+          }
+          NODE
+      - name: Commit runtime fixes
+        run: |
+          git config user.name "LeadAI Automation"
+          git config user.email "actions@users.noreply.github.com"
+          git add src/lib/lead-search.functions.ts src/lib/prospecting.functions.ts src/lib/integration-control.functions.ts
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "fix(integrations): enforce pause and real-mode runtime guards"
+          git push origin main
+      - name: Validate source
+        continue-on-error: true
+        run: |
+          corepack enable
+          npm install --ignore-scripts
+          npx tsc --noEmit
+          npm run build
