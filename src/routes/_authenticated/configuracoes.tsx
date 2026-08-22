@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Workflow, Sparkles, User, Bell, Shield, Zap, Loader2, Check, ClipboardList, AlertCircle, Package, MessageSquareWarning, Gauge, HelpCircle, Plus, Trash2, Plug, Search, SlidersHorizontal } from "lucide-react";
+import { Workflow, Sparkles, User, Bell, Shield, Zap, Loader2, Check, ClipboardList, AlertCircle, Package, MessageSquareWarning, Gauge, HelpCircle, Plus, Trash2, Plug, Search, SlidersHorizontal, Building2 } from "lucide-react";
 import { Card, SectionTitle } from "@/components/ui-kit";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -49,15 +49,17 @@ import { AUTONOMY_STAGES, AUTONOMY_LABEL, DEFAULT_AUTONOMY, readAutonomy, type A
 import { GoogleCalendarCard } from "@/components/GoogleCalendarCard";
 import { getLeadFlowSettings, updateLeadFlowSettings, runNoReplySweep } from "@/lib/lead-flow.functions";
 import { DEFAULT_LEAD_FLOW, type LeadFlowSettings } from "@/lib/lead-flow";
+import { CompanySettingsPanel } from "@/components/CompanySettingsPanel";
 
 
-type TabId = "ana" | "fluxo" | "autonomia" | "prospeccao" | "equipe" | "servicos" | "objecoes" | "score" | "governanca" | "auditoria" | "notificacoes" | "integracoes" | "seguranca";
+type TabId = "ana" | "fluxo" | "autonomia" | "empresa" | "equipe" | "servicos" | "objecoes" | "score" | "governanca" | "auditoria" | "notificacoes" | "integracoes" | "seguranca";
 export const Route = createFileRoute("/_authenticated/configuracoes")({
   component: Configuracoes,
   validateSearch: (s: Record<string, unknown>): { tab?: TabId } => {
     const t = s.tab;
-    const valid: TabId[] = ["ana","fluxo","autonomia","prospeccao","equipe","servicos","objecoes","score","governanca","auditoria","notificacoes","integracoes","seguranca"];
-    return typeof t === "string" && (valid as string[]).includes(t) ? { tab: t as TabId } : {};
+    const normalized = t === "prospeccao" ? "empresa" : t;
+    const valid: TabId[] = ["ana","fluxo","autonomia","empresa","equipe","servicos","objecoes","score","governanca","auditoria","notificacoes","integracoes","seguranca"];
+    return typeof normalized === "string" && (valid as string[]).includes(normalized) ? { tab: normalized as TabId } : {};
   },
 });
 
@@ -65,7 +67,7 @@ const TABS = [
   { id: "ana", label: "Ana (IA)", icon: Sparkles },
   { id: "fluxo", label: "Fluxo de Leads", icon: Workflow },
   { id: "autonomia", label: "Autonomia", icon: SlidersHorizontal },
-  { id: "prospeccao", label: "Prospecção", icon: Search },
+  { id: "empresa", label: "Empresa", icon: Building2 },
   { id: "equipe", label: "Equipe", icon: User },
   { id: "servicos", label: "Serviços", icon: Package },
   { id: "objecoes", label: "Objeções", icon: MessageSquareWarning },
@@ -108,7 +110,7 @@ function Configuracoes() {
         {tab === "ana" && <AbaAna />}
         {tab === "fluxo" && <AbaFluxoLeads />}
         {tab === "autonomia" && <AbaAutonomia />}
-        {tab === "prospeccao" && <AbaProspeccao />}
+        {tab === "empresa" && <CompanySettingsPanel embedded />}
         {tab === "equipe" && <AbaEquipe />}
         {tab === "servicos" && <AbaServicos />}
         {tab === "objecoes" && <AbaObjecoes />}
