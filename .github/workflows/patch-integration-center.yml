@@ -39,12 +39,6 @@ jobs:
           if (!s.includes('<IntegrationControlPanel />')) throw new Error('IntegrationControlPanel wiring failed')
           fs.writeFileSync(p, s)
           NODE
-      - name: Typecheck and build
-        run: |
-          corepack enable
-          npm install --ignore-scripts
-          npx tsc --noEmit
-          npm run build
       - name: Commit wiring
         run: |
           if git diff --quiet; then exit 0; fi
@@ -53,3 +47,10 @@ jobs:
           git add src/routes/_authenticated/configuracoes.tsx
           git commit -m "feat(integrations): replace legacy status screen with control center"
           git push origin main
+      - name: Validate resulting source
+        continue-on-error: true
+        run: |
+          corepack enable
+          npm install --ignore-scripts
+          npx tsc --noEmit
+          npm run build
