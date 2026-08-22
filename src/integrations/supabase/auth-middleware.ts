@@ -4,8 +4,6 @@ import { getRequest } from '@tanstack/react-start/server'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 
-
-
 function isNewSupabaseApiKey(value: string): boolean {
   return value.startsWith('sb_publishable_') || value.startsWith('sb_secret_');
 }
@@ -32,7 +30,6 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
 
 export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server(
   async ({ next }) => {
-    
     const SUPABASE_URL = process.env.SUPABASE_URL;
     const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
 
@@ -45,7 +42,7 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
       console.error(`[Supabase] ${message}`);
       throw new Error(message);
     }
-    
+
     const request = getRequest();
 
     if (!request?.headers) {
@@ -99,7 +96,6 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
     }
 
     // Bloqueia usuários com profile.active=false em qualquer server function.
-    // Patch intencional além do gerador para atender à matriz de RBAC aprovada.
     const { data: profile, error: profileErr } = await (supabase as any)
       .from('profiles')
       .select('*')
@@ -113,31 +109,38 @@ export const requireSupabaseAuth = createMiddleware({ type: 'function' }).server
       throw new Error('Unauthorized: user is inactive');
     }
 
-    // Multi-tenant enforcement: find current organization for the user
-    const { data: roleRow, error: roleErr } = await (supabase as any)
+    // Multi-tenant enforcement: prefer the active organization from the profile
+    // when it is a valid membership; otherwise fall back to the first membership.
+    const { data: roleRows, error: roleErr } = await (supabase as any)
       .from('user_roles')
       .select('organization_id')
-      .eq('user_id', data.claims.sub)
-      .limit(1)
-      .maybeSingle();
+      .eq('user_id', data.claims.sub);
 
     if (roleErr) {
       console.error('[auth-middleware] role lookup failed:', roleErr.message);
       throw new Error('Unauthorized: role lookup failed');
     }
 
-    const orgId = roleRow?.organization_id;
+    const memberships = (roleRows ?? []).map((row: any) => row.organization_id).filter(Boolean);
+    const activeOrganizationId = (profile as any)?.active_organization_id as string | null | undefined;
+    const orgId = activeOrganizationId && memberships.includes(activeOrganizationId)
+      ? activeOrganizationId
+      : memberships[0];
 
-    // Inject organization isolation at the database session level (optional but safe)
-    if (orgId) {
-      const rpc = (supabase as any).rpc('set_config', {
-        name: 'app.current_organization_id',
-        value: orgId,
-        is_local: true
-      });
-      if (rpc && typeof rpc.catch === 'function') {
-        await rpc.catch(() => {});
-      }
+    if (!orgId) {
+      throw new Error('Unauthorized: user is not linked to an organization');
+    }
+
+    // Compatibilidade com funções SQL legadas. O isolamento principal continua
+    // sendo feito por organization_id + RLS; current_org_id() também possui
+    // fallback por auth.uid() na migration de segurança da Busca de Leads.
+    const rpc = (supabase as any).rpc('set_config', {
+      name: 'app.current_org_id',
+      value: orgId,
+      is_local: true,
+    });
+    if (rpc && typeof rpc.catch === 'function') {
+      await rpc.catch(() => {});
     }
 
     return next({
