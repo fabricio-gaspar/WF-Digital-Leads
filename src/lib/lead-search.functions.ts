@@ -1,6 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { z } from 'zod'
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware'
+import { assertIntegrationOperational, getIntegrationRuntimeState } from '@/lib/integration-control.functions'
 import type { ExternalCompany, SourceId } from './prospecting.functions'
 import { loadLeadFlowSettings, markFirstOutreach } from './lead-flow-db'
 
@@ -376,12 +377,17 @@ export const getLeadSearchCapabilities = createServerFn({ method: 'GET' })
       .limit(1)
       .maybeSingle()
     const configured = (settings?.prospecting_sources as Record<string, boolean> | null) ?? {}
+    const [cnpj, google, apify] = await Promise.all([
+      getIntegrationRuntimeState(context as any, 'cnpj_ws'),
+      getIntegrationRuntimeState(context as any, 'google_places'),
+      getIntegrationRuntimeState(context as any, 'apify'),
+    ])
     return {
       test: true,
       sources: {
-        cnpj_ws: { enabled: configured.cnpj_ws !== false && !!process.env.CNPJWS_API_KEY, configured: !!process.env.CNPJWS_API_KEY, label: 'CNPJ.ws Comercial' },
-        google_places: { enabled: configured.google_places !== false && !!process.env.GOOGLE_PLACES_API_KEY, configured: !!process.env.GOOGLE_PLACES_API_KEY, label: 'Google Places' },
-        apify: { enabled: configured.apify !== false && !!process.env.APIFY_TOKEN, configured: !!process.env.APIFY_TOKEN, label: 'Apify / Google Maps' },
+        cnpj_ws: { enabled: configured.cnpj_ws !== false && cnpj.operational && cnpj.mode === 'real', configured: cnpj.credentialConfigured, paused: cnpj.paused, mode: cnpj.mode, label: 'CNPJ.ws Comercial' },
+        google_places: { enabled: configured.google_places !== false && google.operational && google.mode === 'real', configured: google.credentialConfigured, paused: google.paused, mode: google.mode, label: 'Google Places' },
+        apify: { enabled: configured.apify !== false && apify.operational && apify.mode === 'real', configured: apify.credentialConfigured, paused: apify.paused, mode: apify.mode, label: 'Apify / Google Maps' },
         ai_only: { enabled: false, configured: !!process.env.ANTHROPIC_API_KEY, label: 'IA somente (não validada)' },
       },
     }
@@ -407,6 +413,10 @@ export const searchLeadProspects = createServerFn({ method: 'POST' })
     if (cached) return { cache_id: cached.id as string, cached: true, mode: filters.mode, results: (cached.results ?? []) as ExternalCompany[] }
 
     let results: ExternalCompany[]
+    if (filters.mode === 'live') {
+      if (filters.source === 'ai_only') throw new Error('A fonte IA somente não é aceita para prospecção oficial sem validação externa.')
+      await assertIntegrationOperational(context as any, filters.source as 'cnpj_ws' | 'google_places' | 'apify', { requireReal: true })
+    }
     if (filters.mode === 'test') results = demoCompanies(filters)
     else if (filters.source === 'google_places') results = await searchGoogle(filters)
     else if (filters.source === 'apify') results = await searchApify(filters)
@@ -537,7 +547,7 @@ export const importLeadProspects = createServerFn({ method: 'POST' })
           city: company.municipio,
           distance: company.distance_km == null ? null : Math.round(company.distance_km),
           size: normalizeText(company.porte).includes('grande') ? 'grande' : normalizeText(company.porte).includes('médio') || normalizeText(company.porte).includes('medio') ? 'media' : 'pequena',
-          score: company.score ?? null,
+          score: company.score ?? 0,
           score_snapshot: { total: company.score ?? 0, reason: company.score_reason ?? null, mode: isTest ? 'test' : 'live', source: company.source, captured_at: now },
           score_explanation: company.score_reason ?? null,
           score_source: company.source,

@@ -248,9 +248,11 @@ export const updateIntegrationControl = createServerFn({ method: 'POST' })
     if (data.mode !== undefined) patch.mode = data.mode
     if (data.configuration !== undefined) patch.configuration = sanitizeConfiguration(data.configuration)
 
+    const current = await loadRow(ctx, data.key)
+    const connected = data.enabled === false || data.mode === 'disabled' ? false : Boolean(current?.connected)
     const { data: row, error } = await ctx.supabase
       .from('integrations')
-      .upsert({ organization_id: orgId, key: data.key, label: meta.label, provider: meta.provider, connected: false, ...patch }, { onConflict: 'organization_id,key' })
+      .upsert({ organization_id: orgId, key: data.key, label: meta.label, provider: meta.provider, connected, ...patch }, { onConflict: 'organization_id,key' })
       .select()
       .single()
     if (error) throw new Error(error.message)

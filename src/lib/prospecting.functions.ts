@@ -1,5 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
 import { requireSupabaseAuth } from '@/integrations/supabase/auth-middleware'
+import { assertIntegrationOperational } from '@/lib/integration-control.functions'
 import { z } from 'zod'
 
 
@@ -133,33 +134,29 @@ function normalizeCnpjWs(item: CnpjWsEstab): ExternalCompany {
 }
 
 async function fetchFromCnpjWs(filters: Filters): Promise<ExternalCompany[]> {
-  const params = new URLSearchParams()
-  if (filters.cnae) params.set('estabelecimento.atividade_principal', filters.cnae.replace(/\D/g, ''))
-  if (filters.uf) params.set('estabelecimento.estado', filters.uf.toUpperCase())
-  if (filters.municipio) params.set('estabelecimento.cidade', filters.municipio)
-  params.set('estabelecimento.situacao_cadastral', 'Ativa')
-  params.set('estabelecimento.tipo', 'matriz')
-
-  const url = `https://publica.cnpj.ws/cnpj?${params.toString()}`
   const key = process.env.CNPJWS_API_KEY
-  const headers: Record<string, string> = { accept: 'application/json' }
-  if (key) headers['Authorization'] = `Bearer ${key}`
+  if (!key) throw new Error('CNPJWS_API_KEY não configurada. A pesquisa por filtros exige o plano comercial/Premium do CNPJ.ws.')
+  if (!filters.cnae && !filters.keyword) throw new Error('Informe CNAE ou palavra-chave/razão social para pesquisar no CNPJ.ws Comercial.')
 
-  const res = await fetch(url, { headers })
-  if (res.status === 429) {
-    throw new Error('Limite da API pública CNPJ.ws atingido (3 req/min). Aguarde 1 minuto ou configure uma chave gratuita em cnpj.ws.')
-  }
-  if (!res.ok) {
-    const text = await res.text().catch(() => '')
-    throw new Error(`CNPJ.ws ${res.status}: ${text.slice(0, 200)}`)
-  }
-  const payload = (await res.json()) as { data?: CnpjWsEstab[] } | CnpjWsEstab[]
-  const items = Array.isArray(payload) ? payload : (payload.data ?? [])
-  const mapped = items.map(normalizeCnpjWs)
+  const UF_IBGE: Record<string, string> = { AC:'12',AL:'27',AP:'16',AM:'13',BA:'29',CE:'23',DF:'53',ES:'32',GO:'52',MA:'21',MT:'51',MS:'50',MG:'31',PA:'15',PB:'25',PR:'41',PE:'26',PI:'22',RJ:'33',RN:'24',RS:'43',RO:'11',RR:'14',SC:'42',SP:'35',SE:'28',TO:'17' }
+  const params = new URLSearchParams({ limite: String(filters.limit), situacao_cadastral: 'Ativa' })
+  if (filters.cnae) params.set('atividade_id', filters.cnae.replace(/\D/g, ''))
+  if (filters.keyword && !filters.cnae) params.set('razao_social', filters.keyword)
+  if (filters.uf && UF_IBGE[filters.uf.toUpperCase()]) params.set('estado_id', UF_IBGE[filters.uf.toUpperCase()])
 
+  const res = await fetch(`https://comercial.cnpj.ws/v2/pesquisa?${params.toString()}`, { headers: { accept: 'application/json', x_api_token: key } })
+  if (!res.ok) throw new Error(`CNPJ.ws pesquisa ${res.status}: ${(await res.text().catch(() => '')).slice(0, 200)}`)
+  const payload = await res.json() as { data?: string[] }
+  const results: ExternalCompany[] = []
+  for (const cnpj of (payload.data ?? []).slice(0, filters.limit)) {
+    const detail = await fetch(`https://comercial.cnpj.ws/cnpj/${cnpj}`, { headers: { accept: 'application/json', x_api_token: key } })
+    if (!detail.ok) continue
+    results.push(normalizeCnpjWs(await detail.json() as CnpjWsEstab))
+  }
   const porteFilter = filters.porte?.toLowerCase()
   const minCap = filters.min_capital ?? 0
-  return mapped
+  return results
+    .filter((c) => (filters.municipio ? (c.municipio ?? '').toLowerCase().includes(filters.municipio.toLowerCase()) : true))
     .filter((c) => (porteFilter ? (c.porte ?? '').toLowerCase().includes(porteFilter) : true))
     .filter((c) => (minCap > 0 ? (c.capital_social ?? 0) >= minCap : true))
     .slice(0, filters.limit)
@@ -619,8 +616,10 @@ export const searchExternalCompanies = createServerFn({ method: 'POST' })
       cnpj_ws: true, google_places: false, ai_only: false, apify: false,
     }
     if (!enabled[data.source]) {
-      throw new Error(`A fonte "${data.source}" está desativada. Ative-a em Configurações → Prospecção.`)
+      throw new Error(`A fonte "${data.source}" está desativada. Ative-a em Empresa → Perfil de Buscas.`)
     }
+    const integrationKey = data.source === 'ai_only' ? 'ai' : data.source
+    await assertIntegrationOperational(context as any, integrationKey as 'ai' | 'cnpj_ws' | 'google_places' | 'apify', { requireReal: true })
 
     const hash = hashFilters(data)
 
