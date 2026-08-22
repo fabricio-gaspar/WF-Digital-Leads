@@ -43,13 +43,14 @@ export const Route = createFileRoute('/api/public/outreach-tick')({
         }
 
         for (const cand of candidates ?? []) {
+          if (!(await schedulerEnabled(supabaseAdmin, (cand as any).organization_id))) continue
           // Atomic claim: só ganha quem consegue transicionar queued → locked
           const { data: claimed } = await supabaseAdmin
             .from('outreach_jobs')
             .update({ status: 'locked', locked_at: nowIso, locked_by: workerId } as never)
             .eq('id', (cand as any).id)
             .eq('status', 'queued')
-            .select('id, lead_id, channel, attempt')
+            .select('id, lead_id, channel, attempt, organization_id')
             .maybeSingle()
           if (!claimed) continue // outro worker levou
 
@@ -80,7 +81,7 @@ export const Route = createFileRoute('/api/public/outreach-tick')({
         // ------------------------------------------------------------
         const { data: due, error: dueError } = await supabaseAdmin
           .from('leads')
-          .select('id, owner_id, assigned_to, company, contact_channels, active_channel')
+          .select('id, owner_id, assigned_to, company, contact_channels, active_channel, organization_id')
           .lte('next_action_at', nowIso)
           .eq('ai_paused', false)
           .eq('opt_out', false)
@@ -90,6 +91,7 @@ export const Route = createFileRoute('/api/public/outreach-tick')({
         }
 
         for (const lead of due ?? []) {
+          if (!(await schedulerEnabled(supabaseAdmin, (lead as any).organization_id))) continue
           try {
             await runTimeoutForLead(supabaseAdmin, triggerOutreachInternal, lead, nowIso)
             sweepProcessed.push((lead as any).id)
@@ -144,7 +146,7 @@ async function processTimeout(
 ) {
   const { data: lead } = await supabaseAdmin
     .from('leads')
-    .select('id, owner_id, assigned_to, company, contact_channels, active_channel, ai_paused, opt_out')
+    .select('id, owner_id, assigned_to, company, contact_channels, active_channel, ai_paused, opt_out, organization_id')
     .eq('id', job.lead_id)
     .maybeSingle()
   if (!lead) return
@@ -197,4 +199,15 @@ async function runTimeoutForLead(
   } else {
     await supabaseAdmin.from('leads').update({ next_action_at: null } as never).eq('id', lead.id)
   }
+}
+
+async function schedulerEnabled(supabaseAdmin: any, organizationId: string | null | undefined): Promise<boolean> {
+  if (!organizationId) return false
+  const { data } = await supabaseAdmin
+    .from('integrations')
+    .select('enabled, paused, mode')
+    .eq('organization_id', organizationId)
+    .eq('key', 'scheduler')
+    .maybeSingle()
+  return Boolean(data?.enabled) && !Boolean(data?.paused) && data?.mode !== 'disabled'
 }

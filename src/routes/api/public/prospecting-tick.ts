@@ -34,6 +34,10 @@ export const Route = createFileRoute('/api/public/prospecting-tick')({
 
         for (const schedule of due ?? []) {
           const s = schedule as any
+          if (!(await schedulerEnabled(supabaseAdmin, s.organization_id))) {
+            processed.push({ id: s.id, result: { skipped: 'scheduler_paused' } })
+            continue
+          }
 
           // Quiet hours: se estiver na janela silenciosa (fuso do schedule),
           // apenas reagenda para o próximo horário permitido.
@@ -133,4 +137,15 @@ function isWithinQuietHours(now: Date, startHm: string, endHm: string, timezone:
   const start = sh * 60 + sm
   const end = eh * 60 + em
   return start <= end ? cur >= start && cur < end : cur >= start || cur < end
+}
+
+async function schedulerEnabled(supabaseAdmin: any, organizationId: string | null | undefined): Promise<boolean> {
+  if (!organizationId) return false
+  const { data } = await supabaseAdmin
+    .from('integrations')
+    .select('enabled, paused, mode')
+    .eq('organization_id', organizationId)
+    .eq('key', 'scheduler')
+    .maybeSingle()
+  return Boolean(data?.enabled) && !Boolean(data?.paused) && data?.mode !== 'disabled'
 }
