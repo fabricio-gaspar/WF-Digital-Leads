@@ -50,6 +50,7 @@ import { GoogleCalendarCard } from "@/components/GoogleCalendarCard";
 import { getLeadFlowSettings, updateLeadFlowSettings, runNoReplySweep } from "@/lib/lead-flow.functions";
 import { DEFAULT_LEAD_FLOW, type LeadFlowSettings } from "@/lib/lead-flow";
 import { CompanySettingsPanel } from "@/components/CompanySettingsPanel";
+import { IntegrationControlPanel } from "@/components/IntegrationControlPanel";
 
 
 type TabId = "ana" | "fluxo" | "autonomia" | "empresa" | "equipe" | "servicos" | "objecoes" | "score" | "governanca" | "auditoria" | "notificacoes" | "integracoes" | "seguranca";
@@ -118,7 +119,7 @@ function Configuracoes() {
         {tab === "governanca" && <AbaGovernanca />}
         {tab === "auditoria" && <AbaAuditoria />}
         {tab === "notificacoes" && <AbaNotif />}
-        {tab === "integracoes" && <AbaInt />}
+        {tab === "integracoes" && <AbaIntegracoesCentral />}
         {tab === "seguranca" && <AbaSeg />}
       </div>
     </div>
@@ -780,6 +781,24 @@ function AbaNotif() {
         </ul>
       )}
     </Card>
+  );
+}
+
+function AbaIntegracoesCentral() {
+  const settingsFn = useServerFn(getCompanySettings);
+  const { data: settings } = useQuery({ queryKey: ["company-settings"], queryFn: () => settingsFn() });
+  const sandbox = (settings as any)?.sandbox_mode !== false;
+  return (
+    <div className="space-y-4">
+      <IntegrationControlPanel />
+      <Card>
+        <SectionTitle title="Operação dos canais" hint="Cadência, handoff e conexão de agenda permanecem disponíveis abaixo da Central de APIs." />
+        <ZapiCadenceCard />
+        <SequenceEditorCard />
+        <HandoffAutomationCard />
+        <GoogleCalendarCard sandbox={sandbox} />
+      </Card>
+    </div>
   );
 }
 
